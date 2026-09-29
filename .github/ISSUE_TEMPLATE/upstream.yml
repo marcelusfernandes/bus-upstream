@@ -1,0 +1,64 @@
+name: Product upstream
+description: Iniciativa upstream para reduzir incerteza de Problem/Solution antes de delivery.
+title: "upstream: "
+body:
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Starting hypothesis / signal
+      description: Preserve a formulação inicial; não reescreva já como solução.
+    validations:
+      required: true
+  - type: textarea
+    id: outcomes
+    attributes:
+      label: Desired outcomes
+    validations:
+      required: true
+  - type: dropdown
+    id: problem
+    attributes:
+      label: Problem state
+      options: [Explore, Frame, Investigate, Ready]
+    validations:
+      required: true
+  - type: dropdown
+    id: solution
+    attributes:
+      label: Solution state
+      options: [Explore, Shape, Validate, Deliver]
+    validations:
+      required: true
+  - type: textarea
+    id: unknowns
+    attributes:
+      label: Critical unknowns
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence available
+      description: Evidence IDs + links/origens.
+    validations:
+      required: true
+  - type: textarea
+    id: questions
+    attributes:
+      label: Questions to answer
+    validations:
+      required: true
+  - type: textarea
+    id: exit
+    attributes:
+      label: Exit criteria
+    validations:
+      required: true
+  - type: textarea
+    id: out
+    attributes:
+      label: Out of scope
+  - type: textarea
+    id: refs
+    attributes:
+      label: References
