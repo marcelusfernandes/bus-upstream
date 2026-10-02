@@ -25,6 +25,9 @@ be answered when they were asked, so people filled in fields instead of thinking
   - 🗣 **PM homework**: only people have it (stakeholder intent, internal context).
     The agent drafts candidates; the PM confirms, often in a meeting.
   - ⚖️ **gate**: a human decision (see [01-process.md](01-process.md#human-decisions)).
+- **Propose, don't ask.** The agent never sends the PM an open question. It proposes
+  candidate answers with a recommendation, and the PM picks one or proposes something
+  else. This applies to PM homework as well as to gates.
 - **Agent-only probing.** Techniques such as asking "why" repeatedly or separating a
   surface complaint from the root problem are instructions for the agent. They are
   never shown to the PM as extra questions.
@@ -35,7 +38,7 @@ be answered when they were asked, so people filled in fields instead of thinking
 |---|---|---|---|
 | B1 | **What is the business problem?** | One sentence naming the outcome at stake and what is going wrong, in business terms: revenue, cost, risk, obligation or strategy | 🗣 → ⚖️ gate 1 |
 | B2 | How do we know it exists? | A current value or observation, with its source, population and time window | 🔎 |
-| B3 | How will we know we succeeded? | A metric or success description, with direction, target and timeframe. The agent proposes it; the PM validates it | 🔎 → 🗣 |
+| B3 | How will we know we succeeded? | **One primary** metric or success description, with direction, target and timeframe, plus the **guardrails** that must not get worse. The agent proposes options; the PM picks one or proposes another | 🔎 → 🗣 |
 | B4 | Why is it relevant now? | A trigger or context that makes it matter now, and what happens if we wait | 🗣 |
 | B5 | Which hypotheses came from the business? | Every user-problem, solution and causal hypothesis that arrived with the demand or came up with stakeholders is registered with its origin and routed to the layer that will test it | 🔎 🗣 |
 
@@ -87,6 +90,7 @@ never silently dropped.**
 | Statement | The hypothesis, in the words of whoever raised it |
 | Kind | `user-problem`, `solution`, `causal` |
 | Origin | Who raised it and where (stakeholder role, meeting, research, agent, designer) |
+| Basis | The evidence IDs it came from, or `guess`. Required when the origin is `agent`. A guess is allowed, but it must be labeled as one |
 | Raised at | B, U or S |
 | Routed to | The layer that must test it |
 | Status | `open`, `validated`, `invalidated`, `reframed → H-xx`, `merged → H-xx`, `parked` |

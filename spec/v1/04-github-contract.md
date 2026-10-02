@@ -86,6 +86,7 @@ waiting for an answer.
    ```
 
    From another issue (for example the epic): `/decide D-004 A`.
+   To propose something not on the list: `/decide other: <the PM's own option>`.
 3. A **GitHub Action** handles the comment:
    - `/decide` from the assigned PM → swaps `human:pending` → `human:decided` (permanent)
      and triggers the orchestrator, which posts the decision record and closes the issue.
