@@ -21,7 +21,7 @@ The validator is a single script, `scripts/upstream_validate`:
 7. **Score header format is valid**, and every header change has a matching
    score-change comment.
 8. **Commit format.** Answer commits have the ID title pattern and the required trailers.
-9. **Decision authorship.** A `human:decided` issue has a comment from the assigned PM
+9. **Decision authorship.** A `human:decided` issue has a `/decide` comment from the assigned PM
    before the label change.
 
 ## Where it runs

@@ -86,6 +86,14 @@ answer gets an ID (`B-01`, `U-02`, …).
 - Why now? What does inaction cost?
 
 **User**
+
+The user layer starts in one of two ways. A **hypothesis** may arrive with the
+intake, scored as low Grounding: the work then tests it. If there is **no
+hypothesis**, discovery is needed to find candidate problems, often led by the Product
+Designer. Either way, U usually has no answer at the start. B can progress and S can
+explore probes while U is in discovery, but under the confidence ceiling S cannot
+commit until U is grounded or the gap is accepted as risk (gate 4).
+
 - Who is affected, and in what situation?
 - What do they struggle with? Is it the root problem or a surface complaint?
 - How do we know (interviews, behavior data, support, research)?
@@ -106,7 +114,8 @@ recommendation**.
 Gates (kept few on purpose):
 
 1. Which **business problem/outcome** we serve, including pushback on the demand's framing.
-2. Which **user problem** we bet on (the U pivot).
+2. Which **user problem** we bet on (the U pivot). This gate fires when discovery or
+   hypothesis testing has produced candidates, not at intake.
 3. Which **solution direction / bet(s)** go to design.
 4. **Accepting a gap as risk** (the missing ~30%).
 5. **Material scope expansion**, for example when a feature turns out to be a journey redesign.
@@ -116,9 +125,12 @@ Silence is never approval. A decision exists only as the PM's own comment.
 ## Modes
 
 - **Piloted** (default, junior PM): all five gates stop and wait for the PM.
-- **Autonomous** (senior PM, opt-in per milestone): gates 2 and 3 become recorded
-  recommendations, reviewed with the final conclusions. **Gates 1, 4 and 5 always
-  stay human**, because they accept business risk or change what was asked.
+- **Autonomous** (senior PM, opt-in per milestone): the whole process runs without
+  stopping. At each gate the agent still opens the decision sub-issue with the full
+  recommendation, decides, and marks it `agent:decided`. The senior PM reviews all
+  agent decisions together with the conclusions at the handoff PR, and can roll back
+  to any answer commit. The exception is `state:blocked` (anti-loop): it still needs a
+  human, because the process cannot continue on its own.
 
 ## End of upstream
 

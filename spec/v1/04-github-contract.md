@@ -29,7 +29,8 @@ At most **one value per exclusive family**. Different families can combine freel
 | `layer:` | `business`, `user`, `solution`, `prd` | yes | epics and their sub-issues |
 | `state:` | `ready`, `in-progress`, `in-review`, `qa-failed`, `blocked`, `done` | yes | epics and sub-issues |
 | `type:` | `question`, `evidence`, `decision`, `review` | yes | sub-issues |
-| `human:` | `pending`, `decided` | yes | decision sub-issues |
+| `human:` | `pending`, `decided` | yes | decision sub-issues (piloted mode) |
+| `agent:` | `decided` | — | decision sub-issues decided by the agent (autonomous mode) |
 | `mode:` | `piloted`, `autonomous` | yes | epics (same on all epics of a milestone) |
 | `epic` | — | — | the four epics |
 
@@ -58,10 +59,25 @@ No state may advance while the issue has an open `human:pending` decision.
 1. The agent opens a **decision sub-issue** with `type:decision` and `human:pending`,
    assigned to the PM. Its body: Question / Recommendation / Why / Trade-offs /
    Reversibility / What would change the recommendation / Evidence IDs / Blocks.
-2. The **PM answers in their own comment**. An agent transcribing a decision made
-   elsewhere does not count.
-3. The agent posts the decision record, swaps the label to `human:decided` (it stays
-   permanently), and closes the issue.
+2. The **PM decides with a `/decide` command in their own comment**. An agent
+   transcribing a decision made elsewhere does not count.
+
+   ```
+   /decide A
+   Why: <PM's reasoning, optional but encouraged>
+   ```
+
+   From another issue (for example the epic): `/decide D-004 A`.
+3. A **GitHub Action** handles the comment:
+   - `/decide` from the assigned PM → swaps `human:pending` → `human:decided` (permanent)
+     and triggers the orchestrator, which posts the decision record and closes the issue.
+     A `/decide D-nnn` posted elsewhere is applied to D-nnn, with a link back.
+   - Any other comment from the PM on a pending decision (a clarification, a new
+     option) → the label stays pending and the orchestrator is triggered to reply.
+   - `/decide` from anyone other than the assignee → ignored, with a reply explaining why.
+
+In **autonomous mode** the agent decides, posts the same record, and labels the issue
+`agent:decided`. Filtering `human:decided` vs `agent:decided` shows who made each decision.
 
 Decision comment title, which must be matchable by regex:
 

@@ -2,7 +2,6 @@
 
 | ID | Question | Notes |
 |---|---|---|
-| Q-01 | Language: is the spec in English, and are templates and comments in the PMs' language? | The previous repo docs are in PT-BR; Apollo writes prose in PT and code/issues in EN. The readers of templates and comments (the junior PMs) matter most. |
 | Q-02 | Codex hook support: can the validator run after agent actions? | Not verified. Git hooks and Actions cover the essentials anyway. |
 | Q-03 | Should the PR at handoff be the PRD review and the PM gate (R-20)? | Proposed, not confirmed. |
 | Q-04 | Should a hub initiative issue be added in v2? | Deferred. Revisit if the README reading order turns out not to be enough as the cross-layer story. |

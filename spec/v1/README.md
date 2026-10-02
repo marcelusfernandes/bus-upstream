@@ -41,7 +41,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-04 | Two axes: Y = Definition, X = Grounding. Anchors only at 0/5/10. Scores are routing instructions, not gates. | agreed |
 | R-05 | The links B→U and U→S are first-class; their causality and probability are made explicit. | agreed |
 | R-06 | Agents run the process. The PM decides high-impact questions after receiving a recommendation, the reasoning and the trade-offs. | agreed |
-| R-07 | Two modes: piloted (junior) and autonomous (senior). | agreed |
+| R-07 | Two modes: piloted (junior, all gates human) and autonomous (senior, the whole process runs; decisions are labeled `agent:decided` and reviewed at handoff). | agreed |
 | R-08 | Phase leads use collector/explorer subagents. A thin cross-phase orchestrator owns routing. | agreed |
 | R-09 | Isolated adversarial reviews are triggered by commits of answers and fits, not by phases. | agreed |
 | R-10 | GitHub issues, comments and labels are the main source of truth. Files hold the details. No YAML state file. | agreed |
@@ -55,7 +55,9 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-18 | Reuse the lohra/Apollo `state:*` names with upstream semantics and a reopen rule. | proposed |
 | R-19 | One validator script, run from a `commit-msg` hook and a GitHub Action. | proposed |
 | R-20 | The PR at handoff serves as the final review and the PM gate; merging puts it into the main knowledge base. | proposed |
-| R-21 | Language: the spec is in English; templates and comments are in the PMs' language. | open |
+| R-21 | Language: the spec is in English; templates and comments are in the PMs' language. | agreed |
+| R-22 | The PM decides with `/decide`; a GitHub Action swaps the labels and ignores other comments and non-assignees. | agreed |
+| R-23 | U often starts with no answer: either a hypothesis to test or discovery. Gate 2 fires when candidates exist. | agreed |
 
 ## Out of scope for v1
 
