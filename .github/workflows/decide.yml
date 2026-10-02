@@ -1,0 +1,30 @@
+name: decide
+
+# Applies a PM's /decide (spec/v1/04-github-contract.md). The comment body is untrusted:
+# it is only read by scripts/decide_action.py from the event file, never interpolated here.
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: decide-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  decide:
+    if: ${{ !github.event.issue.pull_request && contains(github.event.comment.body, '/decide') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Apply /decide
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 scripts/decide_action.py "$GITHUB_EVENT_PATH"

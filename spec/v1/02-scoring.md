@@ -34,7 +34,8 @@ is the canonical case of **high Definition and low Grounding**.
 
 - Scorers are **isolated and agnostic**: they don't know which layer lead produced the
   material, and they don't see other scorers' outputs.
-- Run **2–3 scorers** and report the median and the **spread**. A large spread is
+- Intake scores are a **single-agent baseline** (`Spread: 0`). From the first re-score on,
+  run **2–3 scorers** and report the median and the **spread**. A large spread is
   itself a signal that the input is ambiguous.
 - Each score cites the **answer IDs and evidence IDs** it is based on. A score with no
   citation is invalid.

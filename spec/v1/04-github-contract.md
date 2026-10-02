@@ -92,7 +92,9 @@ waiting for an answer.
      and triggers the orchestrator, which posts the decision record and closes the issue.
      A `/decide D-nnn` posted elsewhere is applied to D-nnn, with a link back.
    - Any other comment from the PM on a pending decision (a clarification, a new
-     option) → the label stays pending and the orchestrator is triggered to reply.
+     option) → the Action does nothing; the label stays pending. The orchestrator runs
+     locally, so the Action cannot trigger it: the orchestrator's reconcile finds PM
+     comments newer than its last reply on a pending decision and answers them.
    - `/decide` from anyone other than the assignee → ignored, with a reply explaining why.
 
 In **autonomous mode** the agent decides, posts the same record, and labels the issue

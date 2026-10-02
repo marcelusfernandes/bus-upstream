@@ -55,10 +55,13 @@ The intake agent is a separate, initial agent. It does not run the Business laye
    makes (for example with CRM channels). Context is gathered, not required as a field:
    in most cases the work is about the App, and the agent records that as context
    unless the demand signals otherwise. It asks the PM only when the context is ambiguous.
-3. Split it into **fragments per layer**. A single sentence often contains all three:
+3. **Record the evidence it cites** (`E-nnn`, with a source). Every cited ID must be
+   recorded, and every recorded ID must be cited; `scripts/create_initiative.py` refuses
+   the intake otherwise.
+4. Split it into **fragments per layer**. A single sentence often contains all three:
    a solution, a business outcome and an open question.
-4. Score each layer's Definition and Grounding (see [02-scoring.md](02-scoring.md)).
-5. Create the milestone and the B/U/S/PRD epics (see [04-github-contract.md](04-github-contract.md)).
+5. Score each layer's Definition and Grounding (see [02-scoring.md](02-scoring.md)).
+6. Create the milestone and the B/U/S/PRD epics (see [04-github-contract.md](04-github-contract.md)).
 
 A solution-shaped demand typically scores **high Definition and low Grounding** on S,
 and low on B and U. That profile means "trace back to B and U". It does not mean

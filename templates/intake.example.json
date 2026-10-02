@@ -1,0 +1,100 @@
+{
+  "slug": "usual-basket",
+  "title": "Faster repurchase flow",
+  "demand": "Se o fluxo for mais rápido ele pode converter mais que o App, e o custo de interação é menor. Objetivo: agilizar a compra e reduzir custo. Também queremos entender se ajuda na recorrência ou mexe no AOV.",
+  "context": "App, compared with another channel (comparison unclear)",
+  "mode": "piloted",
+  "fragments": [
+    {
+      "layer": "S",
+      "text": "fluxo mais rápido",
+      "kind": "solution suggested by the stakeholder"
+    },
+    {
+      "layer": "B",
+      "text": "converter mais que o App, reduzir custo",
+      "kind": "desired outcomes (E-002)"
+    },
+    {
+      "layer": "B",
+      "text": "recorrência ou AOV",
+      "kind": "open outcome question"
+    }
+  ],
+  "layers": {
+    "B": {
+      "statement": null,
+      "definition": 5,
+      "grounding": 3,
+      "why": "Outcomes are named but there is no baseline or target; not lower because E-002 names them."
+    },
+    "U": {
+      "statement": null,
+      "definition": 1,
+      "grounding": 2,
+      "why": "No user or situation stated; not 0 because E-001 shows recurrent repurchase exists."
+    },
+    "S": {
+      "statement": "A faster flow.",
+      "definition": 5,
+      "grounding": 0,
+      "why": "Articulated as a concept but undefined (E-003); no evidence links speed to conversion."
+    }
+  },
+  "hypotheses": [
+    {
+      "id": "H-01",
+      "statement": "a faster flow",
+      "kind": "solution",
+      "origin": "business demand",
+      "basis": "intake",
+      "raised_at": "B",
+      "routed_to": "S"
+    },
+    {
+      "id": "H-02",
+      "statement": "if it is faster, it converts more than the App",
+      "kind": "causal",
+      "origin": "business demand",
+      "basis": "intake",
+      "raised_at": "B",
+      "routed_to": "U"
+    },
+    {
+      "id": "H-03",
+      "statement": "it helps recurrence or changes AOV",
+      "kind": "causal",
+      "origin": "business demand",
+      "basis": "intake",
+      "raised_at": "B",
+      "routed_to": "B"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E-001",
+      "layer": "U",
+      "kind": "fact",
+      "claim": "Recurrent repurchase exists enough to investigate a repurchase journey.",
+      "source": "prior analytical discovery",
+      "population": "recurrent customers of the analyzed flow",
+      "freshness": "current for the exercise",
+      "limitations": "does not show the current flow is slow, nor that speed increases conversion"
+    },
+    {
+      "id": "E-002",
+      "layer": "B",
+      "kind": "decision",
+      "claim": "Reducing time to order and interaction cost are desired outcomes.",
+      "source": "PM intake",
+      "limitations": "a desired outcome is not causality"
+    },
+    {
+      "id": "E-003",
+      "layer": "S",
+      "kind": "fact",
+      "claim": "No product or flow rule was specified at the start.",
+      "source": "intake"
+    }
+  ]
+}
