@@ -15,10 +15,7 @@ Scaffold reconstruído em 2026-09-28.
 
 ## Process inspiration
 
-- Exios / Product Upstream Proposal:
-  https://app.notion.com/p/3e9645ba6e3881c28af1cf4521678bd2
-- Exios / Práticas:
-  https://app.notion.com/p/2abbce051ca64a4eb1b7347dfe437fa9
+- Private process references: kept locally in `SOURCES.local.md` (gitignored).
 - lohra-ts development workflow:
   https://github.com/marcelusfernandes/lohra-ts
 
