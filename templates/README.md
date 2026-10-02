@@ -1,0 +1,33 @@
+# Templates
+
+These templates define what agents write on GitHub and in `initiatives/<slug>/`. The
+validator parses the same lines: `scripts/upstream_contract.py` holds the regexes, and
+`tests/test_contract.py` fails if a template stops matching them.
+
+| File | Used by | For |
+|---|---|---|
+| [epic-body.md](epic-body.md) | intake, orchestrator | Body of each B/U/S layer epic |
+| [decision-body.md](decision-body.md) | orchestrator | Body of a decision sub-issue, plus how the PM answers |
+| [hypothesis-body.md](hypothesis-body.md) | intake, leads | Body of a hypothesis sub-issue |
+| [comments.md](comments.md) | all agents | Comment title patterns |
+| [hypotheses-register.md](hypotheses-register.md) | leads, orchestrator | `initiatives/<slug>/hypotheses.md` |
+| [review-file.md](review-file.md) | reviewers | `initiatives/<slug>/<layer>/review.md` |
+
+## Who writes what
+
+- **Score header:** the orchestrator. When a scorer panel returns, the orchestrator
+  updates the header line in the epic body **and** posts the score-change comment in the
+  same action. The header always equals the latest score comment (validator check 7).
+- **Labels:** the orchestrator, except `human:decided`, which the `/decide` GitHub
+  Action applies when the assigned PM decides.
+- **Review comments and `review.md`:** the reviewer only. The comment and the file
+  carry the same title line (check 2).
+- **Hypothesis closing comment and the `hypotheses.md` row:** the lead that resolved
+  the hypothesis. The status must match in both places (check 2), and it must match the
+  `hyp:` label (check 10).
+
+## Rules carried from the spec
+
+- B1, U1 and S2 answers are **one sentence**.
+- IDs are used verbatim everywhere: `B-01`, `U-02`, `S-01`, `D-001`, `E-001`, `H-01`.
+- Agents propose options. They never ask the PM an open question.

@@ -122,6 +122,10 @@ Detail: <link to file>
 
 ### Score change comment
 
+The orchestrator updates the epic's score header **and** posts this comment in the same
+action. Intake posts the first one (`Definition – → n`). The header always equals the
+latest score comment.
+
 ```
 ## Score · U · Definition 4 → 7 · Grounding 3 → 6
 Why: <one line per axis, including why not closer to the other extreme>
@@ -153,6 +157,7 @@ and a link. The file holds the detail. The IDs and verdicts must match between t
 |---|---|
 | `B-nn`, `U-nn`, `S-nn` | Answered question in a layer |
 | `BU-fit`, `US-fit` | Link fit reviews |
+| `PRD` | Target of the final PRD review (`## Review · PRD · …`) |
 | `S-A`, `S-B`… | Solution bets |
 | `D-nnn` | Human decision |
 | `E-nnn` | Evidence record |

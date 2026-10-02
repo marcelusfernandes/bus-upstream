@@ -1,0 +1,5 @@
+#!/bin/sh
+# Validator check 8: answer commits need the ID title and trailers (spec/v1/06-commit-contract.md).
+# Enable once per clone:  git config core.hooksPath scripts/hooks
+ROOT="$(git rev-parse --show-toplevel)"
+exec python3 "$ROOT/scripts/upstream_validate.py" commit-msg "$1"
