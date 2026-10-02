@@ -23,15 +23,20 @@
 
 | Section | From |
 |---|---|
-| Business problem, baseline, success signal, why now | B |
-| User problem: who, situation, evidence (root, not surface) | U |
+| Business problem (one sentence), baseline, success signal, why it is relevant now | B |
+| User problem (one sentence), who, situation, evidence (root, not surface) | U |
 | B→U link and its confidence | link |
-| Solution direction (What) + alternatives considered + high-level How | S / bet |
+| Solution (one sentence), alternatives considered, high-level How | S / bet |
+| Derived hypotheses to validate in design, each with how it could be tested | S4 |
+| Stakeholder hypotheses and what happened to them | hypothesis register |
 | U→S link: confidence and what would prove us wrong | link |
 | Named bets / accepted risks, and who accepted them | decisions |
 | Open questions handed to design | everything not closed |
 
 There are **no acceptance criteria, no files and no edge-case catalog**. Those belong downstream.
+
+A non-product solution (a process, operations or communication change) still produces
+a PRD, describing what will be done and why.
 
 ## Several bets, roadmaps and journeys
 

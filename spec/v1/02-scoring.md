@@ -39,6 +39,8 @@ is the canonical case of **high Definition and low Grounding**.
 - Each score cites the **answer IDs and evidence IDs** it is based on. A score with no
   citation is invalid.
 - Each score includes **one sentence on why it is not closer to the other extreme**.
+- **Grounding cap:** if most of a layer's answers are `bet` rather than `evidenced`, its
+  Grounding score is capped at 5 (see [12-key-questions.md](12-key-questions.md)).
 
 ## Where scores live
 

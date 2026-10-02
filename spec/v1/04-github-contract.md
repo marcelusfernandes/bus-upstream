@@ -28,7 +28,8 @@ At most **one value per exclusive family**. Different families can combine freel
 |---|---|---|---|
 | `layer:` | `business`, `user`, `solution`, `prd` | yes | epics and their sub-issues |
 | `state:` | `ready`, `in-progress`, `in-review`, `qa-failed`, `blocked`, `done` | yes | epics and sub-issues |
-| `type:` | `question`, `evidence`, `decision`, `review` | yes | sub-issues |
+| `type:` | `question`, `evidence`, `decision`, `review`, `hypothesis` | yes | sub-issues |
+| `hyp:` | `open`, `validated`, `invalidated`, `reframed`, `merged`, `parked` | yes | hypothesis sub-issues |
 | `human:` | `pending`, `decided` | yes | decision sub-issues (piloted mode) |
 | `agent:` | `decided` | — | decision sub-issues decided by the agent (autonomous mode) |
 | `mode:` | `piloted`, `autonomous` | yes | epics (same on all epics of a milestone) |
@@ -53,6 +54,23 @@ reopening comment cites the invalidated ID and the evidence or decision that
 invalidated it. These comments are the trail of wrong assumptions.
 
 No state may advance while the issue has an open `human:pending` decision.
+
+A layer epic cannot reach `state:done` while a hypothesis routed to it has `hyp:open`.
+
+## Hypotheses
+
+Each hypothesis is a sub-issue labeled `type:hypothesis` + `hyp:open`, placed under the
+epic of the layer it is **routed to**. Its body holds the register fields (see
+[12-key-questions.md](12-key-questions.md#hypothesis-register)). It is closed with a comment:
+
+```
+## Hypothesis H-03 · invalidated | validated | reframed → H-07 | merged → H-02 | parked
+Why: <one line>
+Evidence: E-… · Decision: D-… (if any)
+```
+
+Filtering `type:hypothesis` with `hyp:open` shows which stakeholder ideas are still
+waiting for an answer.
 
 ## Human decisions
 
@@ -137,5 +155,6 @@ and a link. The file holds the detail. The IDs and verdicts must match between t
 | `S-A`, `S-B`… | Solution bets |
 | `D-nnn` | Human decision |
 | `E-nnn` | Evidence record |
+| `H-nn` | Hypothesis (sub-issue under the epic of the layer it is routed to) |
 
 IDs are unique within a milestone and are used verbatim in comments, files and commits.

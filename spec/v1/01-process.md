@@ -74,36 +74,22 @@ and low on B and U. That profile means "trace back to B and U". It does not mean
 - **Anti-loop.** If the same question fails twice without new evidence, mark it
   `state:blocked` + `human:pending`, record why, and stop repeating the approach.
 
-## Key questions per layer (seed set)
+## Key questions and hypotheses
 
-These questions are the core product, for both the agent and the junior PM. Each
-answer gets an ID (`B-01`, `U-02`, …).
+The key questions per layer, the one-sentence rule for B1, U1 and S2, and the
+hypothesis register are defined in [12-key-questions.md](12-key-questions.md).
 
-**Business**
-- What outcome does the business want? Is the request a solution standing in for it?
-- How do we know the problem exists (numbers, feedback, incidents)? What is the baseline?
-- How will we know we succeeded? Propose a metric or a success description; the PM validates it.
-- Why now? What does inaction cost?
+**How the user layer starts.** A hypothesis may arrive with the intake, scored as low
+Grounding; the work then tests it. If there is no hypothesis, discovery is needed to
+find candidate problems, often led by the Product Designer. Either way, U usually has
+no answer at the start. B can progress and S can explore probes while U is in
+discovery, but under the confidence ceiling S cannot commit until U is grounded or
+the gap is accepted as risk (gate 4).
 
-**User**
-
-The user layer starts in one of two ways. A **hypothesis** may arrive with the
-intake, scored as low Grounding: the work then tests it. If there is **no
-hypothesis**, discovery is needed to find candidate problems, often led by the Product
-Designer. Either way, U usually has no answer at the start. B can progress and S can
-explore probes while U is in discovery, but under the confidence ceiling S cannot
-commit until U is grounded or the gap is accepted as risk (gate 4).
-
-- Who is affected, and in what situation?
-- What do they struggle with? Is it the root problem or a surface complaint?
-- How do we know (interviews, behavior data, support, research)?
-- **B→U:** does solving this move the business outcome? How confident are we, and what would prove us wrong?
-
-**Solution**
-- What are the genuinely different options (different mechanisms, not variations)?
-- **U→S:** which option solves the user problem, and therefore the business problem?
-- How confident are we that it will work? What would make us stop?
-- What is the high-level How, and what are its main risks?
+**Hypotheses from the business are never ignored.** Every user-problem or solution
+hypothesis that comes with the demand is registered with its origin and routed to the
+layer that can test it. That layer must close it explicitly: validated, invalidated,
+reframed, merged or parked, always with a reason.
 
 ## Human decisions
 

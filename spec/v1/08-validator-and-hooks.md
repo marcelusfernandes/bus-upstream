@@ -23,13 +23,15 @@ The validator is a single script, `scripts/upstream_validate`:
 8. **Commit format.** Answer commits have the ID title pattern and the required trailers.
 9. **Decision authorship.** A `human:decided` issue has a `/decide` comment from the assigned PM
    before the label change.
+10. **No silent hypotheses.** A layer epic cannot be `state:done` while any hypothesis routed
+    to it is `hyp:open`. Every closed hypothesis has a closing comment with a status and a reason.
 
 ## Where it runs
 
 | Trigger | Checks | Catches |
 |---|---|---|
 | `commit-msg` git hook | 8 | Malformed answer commits, locally |
-| GitHub Action on `issues`, `issue_comment` and `labeled` events | 3, 4, 5, 6, 7, 9 | Changes from humans and agents on GitHub |
+| GitHub Action on `issues`, `issue_comment` and `labeled` events | 3, 4, 5, 6, 7, 9, 10 | Changes from humans and agents on GitHub |
 | Orchestrator reconcile (each run) | all | Drift between files and GitHub |
 | PR check at handoff | all | Drift before the merge into main |
 

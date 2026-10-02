@@ -20,6 +20,7 @@ initiatives/<slug>/
     evidence/
     review.md
   decisions/D-001.md          mirror of the decision issue + the PM's words + link
+  hypotheses.md               register of all H-nn: origin, routing, status, resolution (orchestrator)
   learnings.md                invalidated assumptions, errors, dead ends (append-only)
   prd/README.md               the PRD (PRD writer)
 ```

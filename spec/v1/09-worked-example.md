@@ -20,6 +20,17 @@ that is not in the eval and is not invented here.
 | B→U / U→S | "se for mais rápido ele pode converter mais" | Causal hypothesis: speed → conversion. The eval warns not to assume it. |
 | U | (none stated) | User problem missing |
 
+## Hypothesis register at intake
+
+| ID | Hypothesis | Kind | Origin | Routed to |
+|---|---|---|---|---|
+| H-01 | "a faster flow" | solution | business demand | S |
+| H-02 | "if it is faster, it converts more than the App" | causal | business demand | U (B→U) |
+| H-03 | "it helps recurrence or changes AOV" | causal, open | business demand | B (in scope?) |
+
+None of these can be dropped. If speed turns out not to be the user's problem, H-01 is
+closed as `invalidated` with the evidence, so it is never silently ignored.
+
 ## Initial scores (illustrative reasoning, scored against the anchors)
 
 | Layer | Definition | Grounding | Why not closer to the other extreme |

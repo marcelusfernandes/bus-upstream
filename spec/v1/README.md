@@ -30,6 +30,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 9. [09-worked-example.md](09-worked-example.md) — `usual-basket` through the new model.
 10. [10-open-questions.md](10-open-questions.md) — not decided yet.
 11. [11-legacy-mapping.md](11-legacy-mapping.md) — what is kept, dropped or reversed.
+12. [12-key-questions.md](12-key-questions.md) — key questions per layer and the hypothesis register.
 
 ## Decision register
 
@@ -58,6 +59,11 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-21 | Language: the spec is in English; templates and comments are in the PMs' language. | agreed |
 | R-22 | The PM decides with `/decide`; a GitHub Action swaps the labels and ignores other comments and non-assignees. | agreed |
 | R-23 | U often starts with no answer: either a hypothesis to test or discovery. Gate 2 fires when candidates exist. | agreed |
+| R-24 | B1, U1 and S2 are each one sentence; the detail goes in the answer file. | agreed |
+| R-25 | Hypothesis register: hypotheses are registered with their origin, routed to a layer, and closed explicitly. A layer cannot be done with open hypotheses. | agreed |
+| R-26 | B4 asks "Why is it relevant now?" | agreed |
+| R-27 | A non-product solution still produces a PRD. | agreed |
+| R-28 | Grounding is capped at 5 when a layer rests mostly on bets. | agreed |
 
 ## Out of scope for v1
 
