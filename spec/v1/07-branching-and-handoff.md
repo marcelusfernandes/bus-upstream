@@ -17,7 +17,6 @@
    as part of the knowledge base, so learnings can be aggregated across initiatives.
 4. The PRD epic links the Designer to the PRD.
 
-(R-20 is still **proposed**. See [10-open-questions.md](10-open-questions.md).)
 
 ## PRD content
 
@@ -45,7 +44,7 @@ a PRD, describing what will be done and why.
 - In v1, a single bet means a single PRD epic. With parallel bets, each bet that
   proceeds gets its own PRD. A journey-level change becomes a sequenced set of bets:
   the first gets the PRD, and the rest stay as linked hypotheses.
-- When a team picks up a bet downstream, it may become its own milestone that links
-  back to this one. This is deferred (see [10-open-questions.md](10-open-questions.md)).
+- When a team picks up a bet downstream, it **gets its own milestone**, which links back to
+  the demand's milestone (R-29).
 - When the solution grows from a feature into a journey, that triggers human gate 5
   (material scope expansion).

@@ -55,7 +55,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-17 | Adopt from Apollo: a README reading order; evidence → review → distilled with "review wins"; short single-target returns. | agreed |
 | R-18 | Reuse the lohra/Apollo `state:*` names with upstream semantics and a reopen rule. | proposed |
 | R-19 | One validator script, run from a `commit-msg` hook and a GitHub Action. | proposed |
-| R-20 | The PR at handoff serves as the final review and the PM gate; merging puts it into the main knowledge base. | proposed |
+| R-20 | The PR at handoff serves as the final review and the PM gate; merging puts it into the main knowledge base. | agreed |
 | R-21 | Language: the spec is in English; templates and comments are in the PMs' language. | agreed |
 | R-22 | The PM decides with `/decide`; a GitHub Action swaps the labels and ignores other comments and non-assignees. | agreed |
 | R-23 | U often starts with no answer: either a hypothesis to test or discovery. Gate 2 fires when candidates exist. | agreed |
@@ -63,6 +63,9 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-25 | Hypothesis register: hypotheses are registered with their origin, routed to a layer, and closed explicitly. A layer cannot be done with open hypotheses. | agreed |
 | R-26 | B4 asks "Why is it relevant now?" | agreed |
 | R-27 | A non-product solution still produces a PRD. | agreed |
+| R-29 | A bet picked up downstream gets its own milestone, linked back to the demand's milestone. | agreed |
+| R-30 | Codex hooks (repo-level) run the validator: PreToolUse blocks rule-breaking label changes, Stop runs reconcile checks. | proposed |
+| R-31 | Model routing: authors and reviewers on different models; mixed scorer panel. | proposed |
 | R-28 | Grounding is capped at 5 when a layer rests mostly on bets. | agreed |
 
 ## Out of scope for v1

@@ -47,5 +47,20 @@ back**. A fit review cannot be skipped because the solution looked clear.
 
 ## Model routing
 
-To be decided at implementation. Default: the strongest model for the orchestrator,
-the leads' synthesis and the reviewers; a fast model for the collectors.
+Proposed (R-31). The principle: **an author and its reviewer never run on the same
+model**, because isolation alone does not remove biases a model shares with itself.
+The scorer panel is mixed, so its spread also shows when models disagree.
+
+| Role | Model | Effort |
+|---|---|---|
+| Intake | `gpt-6-astra` | high |
+| Cross-phase orchestrator | `gpt-6.1-sol` | high |
+| Phase leads (B/U/S) | `gpt-6-astra` | high |
+| Collectors / explorers | `gpt-6-luna` (bounded) · `gpt-6.1-sol` (long, multi-source) | high |
+| Scorers (panel of 3) | `gpt-6-luna` + `gpt-6.1-sol` + `gpt-5.6-sol` | high |
+| Reviewers / fit gates | `gpt-6.1-sol` | high |
+| PRD writer | `gpt-6.1-sol` | high |
+
+All roles run at `high` effort. The models are taken from the Codex 0.160 bundled catalog. Availability depends on the
+account (check `/model`). Confirm the routing by running the golden case, not by
+opinion.
