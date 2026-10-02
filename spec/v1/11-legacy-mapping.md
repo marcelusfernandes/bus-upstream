@@ -1,7 +1,7 @@
 # 11 — Legacy mapping
 
-What carries over from the previous Problem/Solution scaffold (still present on this
-branch as legacy) and what does not. This mapping exists so that a build agent does
+What carries over from the previous Problem/Solution scaffold (removed from this
+branch; it is still in git history at `5bca341`) and what does not. This mapping exists so that a build agent does
 not re-import dropped pieces.
 
 ## Kept

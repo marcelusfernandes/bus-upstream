@@ -6,10 +6,9 @@ This folder specifies the redesigned product upstream: an AI-agent-run process t
 takes a demand from stakeholders to a clear **Business problem**, **User problem** and
 **Solution** direction, packaged as a PRD the Product Designer uses to design.
 
-> **Legacy notice.** On this branch, `AGENTS.md`, `.agents/skills/`, `.codex/agents/`,
-> `docs/upstream/`, `templates/` and `.github/ISSUE_TEMPLATE/` still describe the
-> **previous** Problem/Solution process. They are pending replacement and must not be
-> used to build or run the new process. See [11-legacy-mapping.md](11-legacy-mapping.md).
+> **Legacy notice.** The previous Problem/Solution scaffold (skills, agents, docs,
+> templates, scripts and issue templates) was removed from this branch. Git history keeps
+> it. See [11-legacy-mapping.md](11-legacy-mapping.md) for what carried over.
 
 ## Who it is for
 
