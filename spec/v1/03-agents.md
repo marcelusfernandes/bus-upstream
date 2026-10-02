@@ -4,7 +4,7 @@
 
 | Agent | Owns | Writes to | Never |
 |---|---|---|---|
-| **Intake** | Literal demand, per-layer fragments, initial scores | Milestone description, epic bodies, `intake.md` | Interprets the demand as a solution to build |
+| **Intake** | Literal demand, context, per-layer fragments, initial scores, hypotheses and the evidence it cites | Milestone, epics and their first score comments, hypothesis sub-issues, `initiatives/<slug>/` skeleton (via `scripts/create_initiative.py`) | Interprets the demand as a solution to build |
 | **Cross-phase orchestrator** | Routing: which gap comes next and which lead gets it; the layer state labels; gates | Layer epic labels and comments, `README.md` reading order | Does research. Keeps state outside GitHub. |
 | **Business lead** | The B layer and the B→U link (from the B side) | `business/`, B epic | Decides B on behalf of the PM |
 | **User lead** | The U layer and the B→U link; works with the Designer | `user/`, U epic | Same as above |

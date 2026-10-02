@@ -64,8 +64,9 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-26 | B4 asks "Why is it relevant now?" | agreed |
 | R-27 | A non-product solution still produces a PRD. | agreed |
 | R-29 | A bet picked up downstream gets its own milestone, linked back to the demand's milestone. | agreed |
-| R-30 | Codex hooks (repo-level) run the validator: PreToolUse blocks rule-breaking label changes, Stop runs reconcile checks. | proposed |
+| R-30 | Codex hooks (repo-level) run the validator: PreToolUse blocks rule-breaking label changes, Stop runs drift checks. Format verified against the Codex docs. | agreed |
 | R-31 | Model routing: authors and reviewers on different models; mixed scorer panel. | proposed |
+| R-32 | Intake evidence: every cited E-id is recorded and every recorded one is cited. Intake scores are a single-agent baseline (Spread 0). | agreed |
 | R-28 | Grounding is capped at 5 when a layer rests mostly on bets. | agreed |
 
 ## Out of scope for v1

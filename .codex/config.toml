@@ -1,0 +1,18 @@
+# Repo-level Codex hooks (spec/v1/08-validator-and-hooks.md). Format checked against
+# https://learn.chatgpt.com/docs/hooks on 2026-10-02. They load only after the project
+# .codex/ layer is trusted and the hooks are reviewed with /hooks.
+
+[[hooks.PreToolUse]]
+matcher = "Bash"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'python3 "$(git rev-parse --show-toplevel)/scripts/codex_hooks.py" pre-tool-use'
+timeout = 30
+
+[[hooks.Stop]]
+
+[[hooks.Stop.hooks]]
+type = "command"
+command = 'python3 "$(git rev-parse --show-toplevel)/scripts/codex_hooks.py" stop'
+timeout = 60
