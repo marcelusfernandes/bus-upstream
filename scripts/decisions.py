@@ -43,8 +43,10 @@ def requests(issue):
     for cm in _ordered(issue):
         m = re.search(c.DECISION_REQUEST_TITLE, _text(cm), re.MULTILINE)
         if m and m["id"] not in found:
+            blocks = re.search(r"\*\*Blocks:\*\* (.+)$", _text(cm), re.MULTILINE)
             found[m["id"]] = {"ref": m["ref"], "question": m["question"], "requested_at": cm["created_at"],
-                              "options": dict(re.findall(OPTION_LINE, _text(cm), re.MULTILINE))}
+                              "options": dict(re.findall(OPTION_LINE, _text(cm), re.MULTILINE)),
+                              "blocks": blocks.group(1).strip() if blocks else None}
     return found
 
 
@@ -64,9 +66,10 @@ def records(issue):
 
 
 def recorded_by(issue, decision_id):
-    """'agent', a PM login, or None, from the record's `Decided by:` line."""
+    """'agent', a PM login, or None, from the record's `Decision (@pm, date, …)` line (or the older
+    `Decided by: @pm` line)."""
     cm = record_comments(issue).get(decision_id)
-    m = re.search(r"Decided by: (?:@(\S+)|(agent))", _text(cm)) if cm else None
+    m = re.search(r"(?:Decision \(|Decided by: )(?:@([A-Za-z0-9-]+)|(agent))", _text(cm)) if cm else None
     return (m.group(1) or m.group(2)) if m else None
 
 
@@ -81,17 +84,36 @@ def _pm_decisions(issue):
     for cm in _ordered(issue):
         if cm["author"] not in assignees or is_agent_comment(cm):
             continue
-        m = re.search(c.DECIDE_COMMAND, _text(cm), re.MULTILINE)
+        commands = decide_commands(_text(cm))
+        for target, choice, why in commands:
+            waiting = [rid for rid, r in reqs.items() if r["requested_at"] < cm["created_at"]
+                       and rid not in decided and not (rid in recs and recs[rid] < cm["created_at"])]
+            if target is None:  # a bare /decide is valid only alone, with exactly one decision waiting
+                target = waiting[0] if len(waiting) == 1 and len(commands) == 1 else None
+            if target in waiting and _valid_choice(reqs[target], choice):
+                decided.add(target)
+                out.append((target, {"author": cm["author"], "choice": choice, "why": why,
+                                     "created_at": cm["created_at"]}))
+    return out
+
+
+def decide_commands(text):
+    """[(target D-id or None, choice, why)] for every /decide line in a comment. Several decisions can
+    be answered in one comment, one `/decide D-nnn <option>` line each, each with its own `Why:`."""
+    lines, out = (text or "").replace("\r\n", "\n").split("\n"), []
+    for n, line in enumerate(lines):
+        m = re.match(c.DECIDE_COMMAND, line)
         if not m:
             continue
-        waiting = [rid for rid, r in reqs.items() if r["requested_at"] < cm["created_at"]
-                   and rid not in decided and not (rid in recs and recs[rid] < cm["created_at"])]
-        target = m["target"] or (waiting[0] if len(waiting) == 1 else None)
-        if target in waiting and _valid_choice(reqs[target], m["choice"]):
-            why = re.search(r"^Why: (.+)$", _text(cm), re.MULTILINE)
-            decided.add(target)
-            out.append((target, {"author": cm["author"], "choice": m["choice"],
-                                 "why": why.group(1).strip() if why else None, "created_at": cm["created_at"]}))
+        why = None
+        for following in lines[n + 1:]:
+            if re.match(c.DECIDE_COMMAND, following):
+                break
+            w = re.match(r"^Why: (.+)$", following)
+            if w:
+                why = w.group(1).strip()
+                break
+        out.append((m["target"], m["choice"], why))
     return out
 
 
