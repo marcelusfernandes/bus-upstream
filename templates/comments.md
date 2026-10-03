@@ -1,6 +1,8 @@
 # Comment patterns
 
-Every agent comment starts with one of these title lines. The rest of the comment is
+Every agent comment starts with a `## ` title line, one of these. Agents comment with the
+PM's own GitHub account today, so that title is how a comment is known to be the agent's:
+a comment starting with `## ` never counts as a PM decision. The rest of the comment is
 free, but short: one line of why, the IDs, and a link to the file holding the detail.
 
 ## Answer U-02 · Recurring buyers rebuild the same basket manually each week
@@ -27,9 +29,17 @@ Blocking: <list> · Return to: U-01
 
 What changed: <one line>
 
+## Decision request D-004 · U-02 · Which user problem do we bet on?
+
+Options, recommendation and how to decide: see [decision-request.md](decision-request.md).
+
 ## Decision D-004 · U-02 · Bet on basket rebuilding as the user problem
 
-Decided by: @<pm> (/decide A) · Why: <PM's reason, if given>
+Decided by: @<pm> (/decide A) on 2026-10-03 · Why: <PM's reason, if given>
+
+## Reply · D-004
+
+<the orchestrator's answer to a PM comment that was not a /decide: options and a recommendation, never an open question>
 
 ## Hypothesis H-01 · invalidated
 

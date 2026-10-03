@@ -19,7 +19,7 @@ initiatives/<slug>/
     bets/S-A/README.md        one folder per bet from day one
     evidence/
     review.md
-  decisions/D-001.md          mirror of the decision issue + the PM's words + link
+  decisions/D-001.md          record of a decision taken in an issue: the PM's choice, words, issue link
   hypotheses.md               register of all H-nn: origin, routing, status, resolution (orchestrator)
   learnings.md                invalidated assumptions, errors, dead ends (append-only)
   prd/README.md               the PRD (PRD writer)

@@ -10,21 +10,22 @@ Writing a drift rule down does not detect drift; something has to run the check.
 The validator is a single script, `scripts/upstream_validate`:
 
 1. **IDs resolve both ways.** Every ID cited on GitHub exists in a file (always checked;
-   an **open** decision needs no file until it is recorded). Every ID defined in a file is
+   a decision with a request but no record yet needs no file until it is recorded). Every ID defined in a file is
    cited on GitHub, but that direction is checked only at handoff (`--final`): mid-process,
    drafts and fresh evidence legitimately exist before anything cites them.
 2. **Verdicts match.** A decided answer or review has the same verdict in the comment
    and in the file.
 3. **Exclusive label families** have at most one value.
 4. **`state:blocked` implies `human:pending`.**
-5. **No state advances while `human:pending` is open** on the issue or its decision sub-issues.
+5. **No state advances while `human:pending` is open** on the issue (a decision there waits for the PM).
 6. **Anti-loop is enforced, not just documented.** A third attempt at the same question
    without a new `E-` ID is rejected.
 7. **Score header format is valid**, and every header change has a matching
    score-change comment.
 8. **Commit format.** Answer commits have the ID title pattern and the required trailers.
-9. **Decision authorship.** A `human:decided` issue has a `/decide` comment from the assigned PM
-   before the label change.
+9. **Decision authorship.** An issue labeled `human:decided` has a valid `/decide` from its
+   assigned PM on that same issue, before the label change. Comments starting with a `## `
+   title are agents' and never count.
 10. **No silent hypotheses.** A layer epic cannot be `state:done` while any hypothesis routed
     to it is `hyp:open`. Every closed hypothesis has a closing comment with a status and a reason.
 

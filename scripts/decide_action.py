@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 """/decide handler for the GitHub Action (spec/v1/04-github-contract.md).
 
-Only the assigned PM can decide. A valid /decide swaps human:pending -> human:decided
-and acknowledges; it never closes the issue (the orchestrator posts the decision record
-and closes). Comments without /decide are ignored here; the orchestrator's reconcile
-finds PM replies on pending decisions. The comment body is untrusted: it is never
-echoed for refused requests and never reaches a shell.
+Decisions live in the issue that requested them. A PM's `/decide` applies to a request
+on the same issue: bare when exactly one is waiting, `/decide D-nnn X` otherwise. Only
+the assigned PM can decide. A valid /decide adds human:decided (and removes
+human:pending when nothing else waits for the PM) and acknowledges; the orchestrator
+posts the record in the same issue afterwards. The comment body is untrusted: it is
+never echoed in refusals and never reaches a shell.
 """
 import json
+import os
 import re
 import sys
 
+import decisions as d
 import upstream_contract as c
+
+TRUSTED_ASSOCIATIONS = ("OWNER", "MEMBER", "COLLABORATOR")
 
 
 def parse_decide(body):
@@ -20,55 +25,56 @@ def parse_decide(body):
     return (m["target"], m["choice"]) if m else None
 
 
-def _has(issue, label):
-    return label in issue.get("labels", [])
-
-
 def _reply(issue, text):
     return [{"kind": "comment", "issue": issue["number"], "body": text}]
 
 
-def _refusal(target, author):
-    if not _has(target, "type:decision"):
-        return "This issue is not a decision. Use `/decide D-nnn <option>` to name one."
-    if _has(target, "human:decided") or _has(target, "agent:decided"):
-        return f"D-issue #{target['number']} is already decided."
-    if not _has(target, "human:pending"):
-        return f"D-issue #{target['number']} is not waiting for a decision."
-    if author not in target.get("assignees", []):
-        owners = ", ".join(f"@{a}" for a in target.get("assignees", [])) or "the assigned PM"
-        return f"Only {owners} can decide #{target['number']}. Nothing changed."
+def _refusal(issue, target_id, choice, author):
+    """Reason the /decide cannot apply, or None. `issue` holds only comments before it."""
+    waiting = d.awaiting_pm(issue)
+    if target_id is None:
+        if not waiting:
+            return "No decision is waiting for the PM on this issue. Nothing changed."
+        if len(waiting) > 1:
+            return f"Several decisions are waiting here ({', '.join(waiting)}). Name one: `/decide {waiting[0]} <option>`."
+        target_id = waiting[0]
+    if target_id not in waiting:
+        if target_id in d.decided_unrecorded(issue):
+            return f"{target_id} is already decided; its record will be posted here."
+        if target_id in d.records(issue):
+            return f"{target_id} is already recorded. Nothing changed."
+        return f"No request for {target_id} on this issue. Nothing changed."
+    if author not in issue.get("assignees", []):
+        owners = ", ".join(f"@{a}" for a in issue.get("assignees", [])) or "the assigned PM"
+        return f"Only {owners} can decide {target_id}. Nothing changed."
+    options = d.requests(issue)[target_id]["options"]
+    if not (choice.startswith("other: ") or choice in options):
+        return f"{target_id} has options {', '.join(sorted(options))} (or `other: <your option>`). Nothing changed."
     return None
 
 
-TRUSTED_ASSOCIATIONS = ("OWNER", "MEMBER", "COLLABORATOR")
-
-
-def plan(comment, here, lookup):
-    """comment: {author, body, url, association}; here: the issue commented on;
-    lookup(D-id) -> issue or None. Outsiders on a public repo are ignored silently."""
-    if comment["author"].endswith("[bot]"):
+def plan(comment, issue):
+    """comment: {author, body, url, association}; issue: the issue with the comments BEFORE this one."""
+    if comment["author"].endswith("[bot]") or comment.get("association", "OWNER") not in TRUSTED_ASSOCIATIONS:
         return []
-    if comment.get("association", "OWNER") not in TRUSTED_ASSOCIATIONS:
+    if d.is_agent_comment(comment):  # agents share the PM's account; their comments start with "## "
         return []
     parsed = parse_decide(comment["body"])
     if parsed is None:
         return []
     target_id, choice = parsed
-    target = lookup(target_id) if target_id else here
-    if target is None:
-        return _reply(here, f"No decision issue found for {target_id}. Nothing changed.")
-    refusal = _refusal(target, comment["author"])
+    refusal = _refusal(issue, target_id, choice, comment["author"])
     if refusal:
-        return _reply(here, refusal)
-    n = target["number"]
-    actions = [{"kind": "remove_label", "issue": n, "label": "human:pending"},
-               {"kind": "add_label", "issue": n, "label": "human:decided"},
-               {"kind": "comment", "issue": n,
-                "body": f"Decision received from @{comment['author']}: **{choice}** ({comment['url']}). "
-                        "The orchestrator will post the decision record and close this issue."}]
-    if target["number"] != here["number"]:
-        actions.append({"kind": "comment", "issue": here["number"], "body": f"Applied to #{n}."})
+        return _reply(issue, refusal)
+    waiting = d.awaiting_pm(issue)
+    target_id = target_id or waiting[0]
+    n = issue["number"]
+    actions = [{"kind": "add_label", "issue": n, "label": "human:decided"}]
+    if not [w for w in waiting if w != target_id]:
+        actions.append({"kind": "remove_label", "issue": n, "label": "human:pending"})
+    actions.append({"kind": "comment", "issue": n,
+                    "body": f"{target_id} decided by @{comment['author']}: **{choice}** ({comment['url']}). "
+                            "The orchestrator will post the decision record here."})
     return actions
 
 
@@ -85,30 +91,26 @@ def to_gh_commands(actions):
     return cmds
 
 
-def _issue_from_event(issue):
+def _issue_before(event, comments):
+    """The issue as it was before this comment, with its earlier comments."""
+    issue, current = event["issue"], event["comment"]["id"]
     return {"number": issue["number"], "title": issue["title"],
             "labels": [l["name"] for l in issue.get("labels", [])],
-            "assignees": [a["login"] for a in issue.get("assignees", [])]}
-
-
-def _lookup(decision_id):
-    import gh_client as gh
-    out = gh.run(["gh", "issue", "list", "--state", "all", "--label", "type:decision", "--search",
-                  f"{decision_id} in:title", "--json", "number,title,labels,assignees"])
-    for issue in json.loads(out):
-        if re.search(rf"\b{decision_id}\b", issue["title"]):
-            return _issue_from_event(issue)
-    return None
+            "assignees": [a["login"] for a in issue.get("assignees", [])],
+            "comments": [{"author": (cm.get("user") or {}).get("login"), "body": cm.get("body") or "",
+                          "created_at": cm["created_at"]} for cm in comments if cm.get("id") != current]}
 
 
 def main(argv):
     import gh_client as gh
     with open(argv[1], encoding="utf-8") as f:
         event = json.load(f)
+    repo = os.environ.get("GH_REPO") or event["repository"]["full_name"]
+    out = gh.run(["gh", "api", "--paginate", f"repos/{repo}/issues/{event['issue']['number']}/comments", "--jq", ".[]"])
+    comments = [json.loads(line) for line in out.splitlines() if line.strip()]  # one per line, across pages
     comment = {"author": event["comment"]["user"]["login"], "body": event["comment"]["body"],
-               "url": event["comment"]["html_url"],
-               "association": event["comment"].get("author_association", "NONE")}
-    for cmd in to_gh_commands(plan(comment, _issue_from_event(event["issue"]), _lookup)):
+               "url": event["comment"]["html_url"], "association": event["comment"].get("author_association", "NONE")}
+    for cmd in to_gh_commands(plan(comment, _issue_before(event, comments))):
         gh.run(cmd)
     return 0
 

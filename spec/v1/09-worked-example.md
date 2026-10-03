@@ -58,13 +58,14 @@ These numbers show the scoring method. They are not eval ground truth.
 
 ## First question to the PM (gate 1, illustrative)
 
+Posted as a comment on the **B epic**, not as a separate issue:
+
 ```
-## Decision D-001 · B-01 · Which outcome does this demand serve?
-Question: The demand names conversion vs. the App, interaction cost, recurrence
-and AOV. Which outcome do we optimize first?
-Recommendation: <agent fills after the B lead's first pass>
-Why / Trade-offs / Reversibility / What would change it / Evidence: E-001, E-002
-Blocks: B epic cannot reach done; S cannot commit.
+## Decision request D-001 · B-01 · Which outcome does this demand serve first?
+- **A** — Conversion of the repurchase flow against the App · trade-offs: … · reversibility: easy
+- **B** — Interaction cost per order · trade-offs: … · reversibility: easy
+**Recommendation:** A — <agent fills after the B lead's first pass>
+To decide, reply on this issue with `/decide A` …
 ```
 
 ## Key-question pass (Q-10)

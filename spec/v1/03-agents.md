@@ -20,7 +20,10 @@
   write as one operation (score header + comment, review comment + `review.md`,
   hypothesis comment + register + label, answer commit + comment).
 - **The orchestrator** runs `route`, `review`, `answer`, `score`, `decision-record`, and
-  `decision-open` for blocked layers (accept as risk / change approach / park).
+  `decision-open` for blocked layers (accept as risk / change approach / park). Decisions
+  are comments in the issue that needs them, never separate issues.
+- **Every agent comment starts with a `## ` title line**, because agents comment with the
+  PM's account; that is how a comment is known not to be the PM's.
 - **Leads** write answer drafts and READMEs in their layer folder, and run
   `decision-open` and `hypothesis-close`.
 - **Collectors** write exactly one evidence file each.

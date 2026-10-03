@@ -14,6 +14,7 @@ import json
 import re
 import sys
 
+import decisions as dec
 import upstream_contract as c
 import upstream_validate as v
 
@@ -44,15 +45,9 @@ def _blocked_since(epic):
     return max(times) if times else ""
 
 
-def _recorded_after(kids, since):
-    """A decision under this layer was recorded (closed with its record) after `since`."""
-    for k in kids:
-        if _has(k, "type:decision") and k.get("state") == "closed":
-            for cm in k.get("comments", []):
-                text = cm["body"].replace("\r\n", "\n")
-                if cm["created_at"] > since and re.search(c.DECISION_TITLE, text, re.MULTILINE):
-                    return True
-    return False
+def _recorded_after(issue, since):
+    """A decision was recorded on this issue after `since`."""
+    return any(at > since for at in dec.records(issue).values())
 
 
 def _layer(snap, code):
@@ -63,29 +58,27 @@ def _layer(snap, code):
     d, g = _scores(epic)
     blocked = _state(epic) == "blocked"
     return {"issue": epic["number"], "state": _state(epic), "definition": d, "grounding": g,
-            "unblock_decided": blocked and _recorded_after(kids, _blocked_since(epic)),
+            "unblock_decided": blocked and _recorded_after(epic, _blocked_since(epic)),
             "open_hypotheses": sorted(_id(k, c.HYPOTHESIS_ID) for k in kids
                                       if _has(k, "type:hypothesis") and _has(k, "hyp:open")),
-            "pending_decisions": sorted(_id(k, c.DECISION_ID) for k in kids
-                                        if _has(k, "type:decision") and _has(k, "human:pending")
-                                        and k.get("state") == "open")}
+            "pending_decisions": sorted(rid for i in [epic] + kids for rid in dec.awaiting_pm(i)),
+            "open_requests": sorted(rid for i in [epic] + kids for rid in dec.open_requests(i))}
 
 
 def _needs_reply(issue):
-    """Assigned PM commented after the last non-PM comment, without a /decide."""
-    assignees = set(issue.get("assignees", []))
+    """The assigned PM's latest comment, on an issue with a decision waiting, is not a /decide."""
+    if not dec.awaiting_pm(issue):
+        return False
     comments = sorted(issue.get("comments", []), key=lambda cm: cm["created_at"])
-    if not comments or comments[-1]["author"] not in assignees:
+    last = comments[-1] if comments else None
+    if not last or dec.is_agent_comment(last) or last["author"] not in issue.get("assignees", []):
         return False
-    return not re.search(c.DECIDE_COMMAND, comments[-1]["body"].replace("\r\n", "\n"), re.MULTILINE)
+    return not re.search(c.DECIDE_COMMAND, last["body"].replace("\r\n", "\n"), re.MULTILINE)
 
 
-def _awaits_agent(snap, decision):
-    """Autonomous mode: an open decision with no human:* or agent:* label waits for the agent."""
-    if decision.get("state") != "open" or any(l.startswith(("human:", "agent:")) for l in decision["labels"]):
-        return False
-    parent = next((i for i in snap["issues"] if i["number"] == decision.get("parent")), None)
-    return bool(parent and _has(parent, "mode:autonomous"))
+def _autonomous(snap, issue):
+    parent = next((i for i in snap["issues"] if i["number"] == issue.get("parent")), None)
+    return _has(issue, "mode:autonomous") or bool(parent and _has(parent, "mode:autonomous"))
 
 
 def _obligations(report):
@@ -95,22 +88,21 @@ def _obligations(report):
     out += [f"reply to the PM on {r['decision']} (comment without /decide)" for r in report["needs_reply"]]
     out += [f"decide {d} (autonomous mode)" for d in report["agent_decide"]]
     for code, layer in report["layers"].items():
-        if layer["state"] == "blocked" and not layer["pending_decisions"]:
+        if layer["state"] == "blocked" and not layer["open_requests"]:
             out.append(f"{code} is blocked: " + ("the PM decided how to unblock; act on it" if layer["unblock_decided"]
                                                 else "open a decision for the PM"))
     return out
 
 
 def reconcile(snap):
-    decisions = [i for i in snap["issues"] if _has(i, "type:decision")]
+    issues = snap["issues"]
     report = {
         "drift": [str(e) for e in v.validate_snapshot(snap) + v.validate_files_and_comments(snap)],
         "layers": {code: layer for code in LAYER_LABEL if (layer := _layer(snap, code))},
-        "needs_reply": [{"decision": _id(d, c.DECISION_ID), "issue": d["number"]} for d in decisions
-                        if d.get("state") == "open" and _has(d, "human:pending") and _needs_reply(d)],
-        "decided_unrecorded": [_id(d, c.DECISION_ID) for d in decisions
-                               if d.get("state") == "open" and _has(d, "human:decided")],
-        "agent_decide": [_id(d, c.DECISION_ID) for d in decisions if _awaits_agent(snap, d)],
+        "needs_reply": [{"decision": dec.awaiting_pm(i)[0], "issue": i["number"]} for i in issues if _needs_reply(i)],
+        "decided_unrecorded": sorted(rid for i in issues for rid in dec.decided_unrecorded(i)),
+        "agent_decide": sorted(rid for i in issues if _autonomous(snap, i) for rid in dec.open_requests(i)
+                               if rid not in dec.decided_unrecorded(i)),
     }
     report["obligations"] = _obligations(report)
     return report

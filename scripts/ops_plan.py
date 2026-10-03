@@ -9,6 +9,7 @@ that breaks a rule.
 import re
 import statistics
 
+import decisions
 import upstream_contract as c
 import upstream_validate as v
 
@@ -116,8 +117,9 @@ def plan_route(snap, layer, state):
         raise OpsError(f"state must be one of {STATES}")
     epic = _epic(snap, layer)
     children = _children(snap, epic["number"])
-    if state in ("in-review", "done") and any("human:pending" in ch["labels"] for ch in children):
-        raise OpsError(f"{layer} has a pending human decision; it cannot move to {state}")
+    waiting = decisions.awaiting_pm(epic) or any("human:pending" in ch["labels"] for ch in children)
+    if state in ("in-review", "done") and waiting:
+        raise OpsError(f"{layer} has a decision waiting for the PM; it cannot move to {state}")
     if state == "done":
         open_h = [ch["title"] for ch in children if "type:hypothesis" in ch["labels"] and "hyp:open" in ch["labels"]]
         if open_h:
@@ -189,9 +191,8 @@ def _latest_review(snap, slug, answer_id):
 
 
 def _require_decided(snap, decision_id):
-    d = _by_id(snap, decision_id, "type:decision")
-    if not d or not ({"human:decided", "agent:decided"} & set(d["labels"])):
-        raise OpsError(f"{decision_id} is not decided yet")
+    if not any(decision_id in decisions.records(i) for i in snap["issues"]):
+        raise OpsError(f"{decision_id} is not recorded yet; record the decision before the answer")
 
 
 def plan_answer(snap, slug, answer_id, text, why, evidence, reasoning, learning, decision=None):
@@ -222,29 +223,46 @@ def plan_answer(snap, slug, answer_id, text, why, evidence, reasoning, learning,
             {"kind": "comment", "issue": _epic(snap, layer)["number"], "body": body}]
 
 
-# ---------- decisions ----------
+# ---------- decisions (they live in the issue that requests them) ----------
 
-def _decision_body(decision_id, ref, question, options, recommendation, why, would_change, evidence, blocks, piloted):
-    lines = [f"## {decision_id} · {question}", "", f"**Ref:** {ref}", "", f"**Question:** {question}", "",
-             "**Options**"]
+def _request_comment(decision_id, ref, question, options, recommendation, why, would_change, evidence, blocks,
+                     piloted):
+    lines = [f"## Decision request {decision_id} · {ref} · {question}", "", "**Options**"]
     lines += [f"- **{o['key']}** — {_one_line(o['text'], 'option')} · trade-offs: {o.get('tradeoffs', '—')}"
               f" · reversibility: {o.get('reversibility', '—')}" for o in options]
-    lines += ["", f"**Recommendation:** {recommendation} — {why}", "",
-              f"**What would change the recommendation:** {would_change}", "",
+    lines += ["", f"**Recommendation:** {recommendation} — {why}",
+              f"**What would change the recommendation:** {would_change}",
               f"**Evidence:** {', '.join(evidence) or '—'} · **Blocks:** {blocks}"]
-    if piloted:
-        lines += ["", "---", "", "### How to decide", "", "Reply with your own comment:", "",
-                  f"/decide {recommendation}", "/decide other: <your own option>", "",
-                  "From another issue, name the decision:", "", f"/decide {decision_id} {recommendation}", "",
-                  "Add `Why: <your reasoning>` on the next line. Other comments keep the decision pending."]
+    if piloted:  # instructions stay inline: a line starting with /decide must only ever come from the PM
+        lines += ["", f"To decide, reply on this issue with `/decide {recommendation}` (add `Why: <your reasoning>` on "
+                      f"the next line) or `/decide other: <your option>`. If several decisions are waiting here, "
+                      f"name this one: `/decide {decision_id} {recommendation}`. Other comments keep it pending."]
     return "\n".join(lines) + "\n"
+
+
+def _with_checklist_line(body, line, replace_prefix=None):
+    """Add (or replace) a line in the issue body's `### Decisions` checklist."""
+    lines = (body or "").rstrip("\n").split("\n")
+    if replace_prefix:
+        for n, existing in enumerate(lines):
+            if existing.startswith(replace_prefix):
+                lines[n] = line
+                return "\n".join(lines) + "\n"
+    if "### Decisions" not in lines:
+        lines += ["", "### Decisions", ""]
+    lines.append(line)
+    return "\n".join(lines) + "\n"
+
+
+def _all_decision_ids(snap):
+    return {rid for i in snap["issues"] for rid in list(decisions.requests(i)) + list(decisions.records(i))}
 
 
 def plan_decision_open(snap, slug, decision_id, ref, question, options, recommendation, why, would_change,
                        evidence, blocks):
     if not re.fullmatch(c.DECISION_ID, decision_id):
         raise OpsError(f"{decision_id} is not a decision ID")
-    if _by_id(snap, decision_id, "type:decision"):
+    if decision_id in _all_decision_ids(snap):
         raise OpsError(f"{decision_id} already exists")
     if not re.fullmatch(rf"{c.ANSWER_ID}|{c.FIT_ID}", ref):
         raise OpsError(f"{ref} is not an answer or fit ID")
@@ -259,71 +277,61 @@ def plan_decision_open(snap, slug, decision_id, ref, question, options, recommen
     pm, mode = _readme_value(snap, slug, "PM"), _readme_value(snap, slug, "Mode") or "piloted"
     if not pm:
         raise OpsError("initiative README has no 'PM: @login' line")
-    layer = _layer_of(ref)
-    labels = ["type:decision", LAYER[layer][0]] + (["human:pending"] if mode == "piloted" else [])
-    body = _decision_body(decision_id, ref, question, options, recommendation, why, would_change, evidence, blocks,
-                          mode == "piloted")
-    return [{"kind": "create_issue", "title": f"{decision_id} · {question}", "body": body, "labels": labels,
-             "assignees": [pm.lstrip("@")], "parent": _epic(snap, layer)["number"]}]
+    pm, piloted = pm.lstrip("@"), mode == "piloted"
+    epic = _epic(snap, _layer_of(ref))
+    n = epic["number"]
+    actions = [{"kind": "comment", "issue": n, "body": _request_comment(
+        decision_id, ref, question, options, recommendation, why, would_change, evidence, blocks, piloted)},
+        {"kind": "edit_body", "issue": n,
+         "body": _with_checklist_line(epic["body"], f"- [ ] {decision_id} · {question}")}]
+    if pm not in epic.get("assignees", []):
+        actions.append({"kind": "assign", "issue": n, "assignees": [pm]})
+    if piloted and "human:pending" not in epic["labels"]:
+        actions.append({"kind": "labels", "issue": n, "add": ["human:pending"], "remove": []})
+    return actions
 
 
-def _options(body):
-    return {m.group(1): m.group(2) for m in re.finditer(r"^- \*\*([A-Z])\*\* — (.+?) · trade-offs:", body, re.M)}
-
-
-def _pm_decide(snap, decision):
-    """(author, choice, why) of the latest valid /decide by an assignee, or None."""
-    did = re.match(c.DECISION_ID, decision["title"]).group(0)
-    found = []
-    for i in snap["issues"]:
-        for cm in i.get("comments", []):
-            if cm["author"] not in decision["assignees"]:
-                continue
-            text = cm["body"].replace("\r\n", "\n")
-            m = re.search(c.DECIDE_COMMAND, text, re.MULTILINE)
-            if m and ((m["target"] is None and i is decision) or m["target"] == did):
-                why = re.search(r"^Why: (.+)$", text, re.MULTILINE)
-                found.append((cm["created_at"], cm["author"], m["choice"], why.group(1) if why else None))
-    return max(found)[1:] if found else None
-
-
-def _parent_mode(snap, decision):
-    parent = next((i for i in snap["issues"] if i["number"] == decision.get("parent")), None)
-    return "autonomous" if parent and "mode:autonomous" in parent["labels"] else "piloted"
+def _autonomous(snap, issue):
+    parent = next((i for i in snap["issues"] if i["number"] == issue.get("parent")), None)
+    return "mode:autonomous" in issue["labels"] or bool(parent and "mode:autonomous" in parent["labels"])
 
 
 def plan_decision_record(snap, slug, decision_id, agent_choice=None, agent_why=None):
-    d = _by_id(snap, decision_id, "type:decision")
-    if not d or d["state"] != "open":
-        raise OpsError(f"{decision_id} is not an open decision")
-    options = _options(d["body"])
-    ref = re.search(r"^\*\*Ref:\*\* (\S+)$", d["body"], re.MULTILINE)
-    if not ref:
-        raise OpsError(f"{decision_id} body has no **Ref:** line")
-    actions = []
-    if "human:decided" in d["labels"]:
-        decided = _pm_decide(snap, d)
-        if not decided:
-            raise OpsError(f"{decision_id} is labeled decided but has no /decide from the assigned PM")
-        author, choice, why = decided
-        by = f"@{author} (/decide {choice})"
+    issue, req = decisions.find_request(snap, decision_id)
+    if not issue:
+        raise OpsError(f"no request for {decision_id}")
+    if decision_id in decisions.records(issue):
+        raise OpsError(f"{decision_id} is already recorded")
+    actions, add_labels = [], []
+    decided = decisions.pm_decision(issue, decision_id)
+    if decided:
+        choice, why = decided["choice"], decided["why"]
+        by = f"@{decided['author']} (/decide {choice}) on {decided['created_at'][:10]}"
     elif agent_choice:
-        if _parent_mode(snap, d) != "autonomous":
+        if not _autonomous(snap, issue):
             raise OpsError("only autonomous mode lets the agent decide")
         choice, why, by = agent_choice, agent_why, "agent (autonomous mode)"
-        actions.append({"kind": "labels", "issue": d["number"], "add": ["agent:decided"], "remove": []})
+        add_labels.append("agent:decided")
     else:
         raise OpsError(f"{decision_id} is not decided yet")
-    answer = choice[len("other: "):] if choice.startswith("other: ") else options.get(choice)
+    answer = decisions.answer_text(issue, decision_id, choice)
     if not answer:
-        raise OpsError(f"choice {choice} is not one of the options {sorted(options)}")
-    title = f"## Decision {decision_id} · {ref.group(1)} · {_one_line(answer, 'answer')}"
-    record = f"{title}\n\nDecided by: {by}\nWhy: {why or '—'}\nIssue: #{d['number']}\n"
+        raise OpsError(f"choice {choice} is not one of the options {sorted(req['options'])}")
+    title = f"## Decision {decision_id} · {req['ref']} · {_one_line(answer, 'answer')}"
+    still_waiting = [w for w in decisions.awaiting_pm(issue) if w != decision_id]
+    remove = ["human:pending"] if "human:pending" in issue["labels"] and not still_waiting else []
+    if add_labels or remove:
+        actions.append({"kind": "labels", "issue": issue["number"], "add": add_labels, "remove": remove})
+    body = _with_checklist_line(issue.get("body"), f"- [x] {decision_id} · {req['question']} → {answer}",
+                                replace_prefix=f"- [ ] {decision_id} ·")
+    path = f"{_base(slug)}/decisions/{decision_id}.md"
     return actions + [
-        {"kind": "write_file", "path": f"{_base(slug)}/decisions/{decision_id}.md", "text": record},
-        {"kind": "comment", "issue": d["number"], "body": f"{title}\nDecided by: {by} · Why: {why or '—'}"},
-        {"kind": "close", "issue": d["number"]},
-        _commit(f"chore({slug}): record decision {decision_id}", [f"{_base(slug)}/decisions/{decision_id}.md"])]
+        {"kind": "write_file", "path": path,
+         "text": f"{title}\n\nQuestion: {req['question']}\nDecided by: {by}\nWhy: {why or '—'}\n"
+                 f"Issue: #{issue['number']}\n"},
+        {"kind": "comment", "issue": issue["number"], "body": f"{title}\nDecided by: {by} · Why: {why or '—'}"},
+        {"kind": "edit_body", "issue": issue["number"], "body": body},
+        _commit(f"chore({slug}): record decision {decision_id}", [path])]
 
 
 # ---------- hypotheses ----------

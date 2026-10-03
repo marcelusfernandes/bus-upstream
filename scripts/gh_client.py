@@ -57,3 +57,10 @@ def edit_labels(repo, number, add, remove):
 
 def close_issue(repo, number):
     run(["gh", "issue", "close", str(number), "--repo", repo])
+
+
+def add_assignees(repo, number, logins):
+    cmd = ["gh", "issue", "edit", str(number), "--repo", repo]
+    for login in logins:
+        cmd += ["--add-assignee", login]
+    run(cmd)

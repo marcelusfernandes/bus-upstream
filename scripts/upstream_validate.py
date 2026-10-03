@@ -15,6 +15,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+import decisions
 import upstream_contract as c
 
 ADVANCED_STATES = ("state:in-review", "state:done")
@@ -91,9 +92,16 @@ def check_blocked_needs_human(snap):
 # ---------- check 5: no state advance while human:pending ----------
 
 def _pending_since(snap, issue):
+    """When the oldest thing still waiting for the PM started waiting: the request time of a
+    decision awaiting /decide, or (for a blocked layer) when human:pending was added."""
     candidates = [issue] + [ch for ch in _children(snap, issue["number"]) if ch.get("state") == "open"]
-    times = [_label_added_at(i, "human:pending") for i in candidates if _has(i, "human:pending")]
-    times = [t for t in times if t]
+    times = []
+    for i in candidates:
+        awaiting, reqs = decisions.awaiting_pm(i), decisions.requests(i)
+        if awaiting:
+            times += [reqs[rid]["requested_at"] for rid in awaiting]
+        elif _has(i, "human:pending") and _label_added_at(i, "human:pending"):
+            times.append(_label_added_at(i, "human:pending"))
     return min(times) if times else None
 
 
@@ -138,36 +146,26 @@ def check_score_header(snap):
 
 # ---------- check 9: decision authorship ----------
 
-def _decision_id(issue):
-    m = re.search(c.DECISION_ID, issue.get("title", ""))
-    return m.group(0) if m else None
-
-
-def _counts_as_decide(cm, decision, here):
-    """A /decide counts on the decision issue itself, or anywhere when it names the D-id."""
-    for m in _titles(cm["body"], c.DECIDE_COMMAND):
-        if m["target"] is None and here:
-            return True
-        if m["target"] and m["target"] == _decision_id(decision):
-            return True
-    return False
-
-
-def _has_pm_decide(snap, decision, before):
-    assignees = set(decision.get("assignees", []))
-    for issue in _issues(snap):
-        here = issue is decision
-        for cm in issue.get("comments", []):
-            in_time = before is None or cm["created_at"] <= before
-            if cm["author"] in assignees and in_time and _counts_as_decide(cm, decision, here):
-                return True
-    return False
-
-
 def check_decision_authorship(snap):
-    return [Error(9, _where(i), "human:decided without a /decide comment from the assigned PM")
-            for i in _issues(snap)
-            if _has(i, "human:decided") and not _has_pm_decide(snap, i, _label_added_at(i, "human:decided"))]
+    """Every record names who decided, and that must hold: a PM record needs that PM's own valid
+    /decide for the same D-id on the same issue; an agent record needs agent:decided. The record
+    is the audit trail, since one issue can hold several decisions."""
+    errors = []
+    for issue in _issues(snap):
+        if _has(issue, "human:decided"):
+            labeled_at = _label_added_at(issue, "human:decided")
+            if not [dec for _, dec in decisions.pm_decisions(issue) if labeled_at is None or dec["created_at"] <= labeled_at]:
+                errors.append(Error(9, _where(issue), "human:decided without a /decide comment from the assigned PM"))
+        for rid in decisions.records(issue):
+            by = decisions.recorded_by(issue, rid)
+            if by == "agent":
+                if not _has(issue, "agent:decided"):
+                    errors.append(Error(9, _where(issue), f"{rid} recorded as decided by agent without agent:decided"))
+                continue
+            decided = decisions.pm_decision(issue, rid)
+            if not decided or decided["author"] != by:
+                errors.append(Error(9, _where(issue), f"{rid} record names @{by} but there is no matching /decide"))
+    return errors
 
 
 # ---------- check 10: no silent hypotheses ----------
@@ -226,17 +224,10 @@ def _ids_on_github(snap):
     return ids
 
 
-def _open_decision_ids(snap):
-    """A decision's file is written when it is recorded, so an open decision needs none yet."""
-    return {m.group(0) for i in _issues(snap)
-            if _has(i, "type:decision") and i.get("state") == "open"
-            and (m := re.match(c.DECISION_ID, i.get("title", "")))}
-
-
 def check_ids_resolve(snap, final=False):
     """GitHub -> files always. Files -> GitHub only at handoff (final): mid-process, drafts
     and fresh evidence legitimately exist before anything on GitHub cites them."""
-    on_github, in_files = _ids_on_github(snap) - _open_decision_ids(snap), _ids_in_files(snap)
+    on_github, in_files = _ids_on_github(snap) - decisions.open_request_ids(snap), _ids_in_files(snap)
     errors = [Error(1, "github", f"{i} cited on GitHub but has no file") for i in sorted(on_github - in_files)]
     if final:
         errors += [Error(1, "files", f"{i} defined in files but never cited on GitHub")

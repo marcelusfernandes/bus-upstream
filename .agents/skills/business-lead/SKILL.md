@@ -16,7 +16,7 @@ orchestrator's brief (gap: `define` or `ground`).
 
 | ID | Question | You produce |
 |---|---|---|
-| B1 | What is the business problem? | One sentence: the outcome at stake and what is going wrong, in business terms. **Gate 1**: open a decision with 2–3 candidate statements and your recommendation. |
+| B1 | What is the business problem? | One sentence: the outcome at stake and what is going wrong, in business terms. **Gate 1**: request a decision (a comment on the B epic, never a separate issue) with 2–3 candidate statements and your recommendation. |
 | B2 | How do we know it exists? | The baseline with its source, population and time window |
 | B3 | How will we know we succeeded? | **One primary** metric plus guardrails, proposed as decision options for the PM to pick |
 | B4 | Why is it relevant now? | The trigger, and what waiting costs |
