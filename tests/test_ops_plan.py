@@ -92,6 +92,14 @@ class Route(unittest.TestCase):
         body = o.plan_fix_labels(snap)[1]["body"]
         self.assertIn("removed `human:decided`: a decision is still waiting for the PM", body)
 
+    def test_leaving_blocked_after_a_decision_sets_decided(self):
+        snap = DecisionRecord()._pm_decides(DecisionRecord()._opened(), "/decide A")
+        epic = by_number(snap, 1)
+        epic["labels"] = ["epic", "state:blocked", "human:pending", "mode:piloted", "layer:business"]
+        action = o.plan_route(snap, "B", "in-progress")[0]
+        self.assertIn("human:decided", action["add"])
+        self.assertIn("human:pending", action["remove"])
+
     def test_unknown_state(self):
         with self.assertRaises(o.OpsError):
             o.plan_route(usual_basket(), "B", "finished")
