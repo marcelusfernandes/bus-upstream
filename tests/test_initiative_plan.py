@@ -20,6 +20,7 @@ def usual_basket_intake():
         "demand": "Se o fluxo for mais rápido ele pode converter mais que o App, e o custo de interação é menor.",
         "context": "App, compared with another channel (unclear)",
         "mode": "piloted",
+        "pm": "junior-pm",
         "layers": {
             "B": {"statement": None, "definition": 5, "grounding": 3, "why": "outcomes named, no baseline"},
             "U": {"statement": None, "definition": 1, "grounding": 2, "why": "no user problem stated"},
@@ -37,6 +38,13 @@ def usual_basket_intake():
 class Validation(unittest.TestCase):
     def test_valid_intake_has_no_errors(self):
         self.assertEqual(p.validate_intake(usual_basket_intake()), [])
+
+    def test_pm_login_required_and_valid(self):
+        data = usual_basket_intake()
+        del data["pm"]
+        self.assertTrue(any("pm" in e for e in p.validate_intake(data)))
+        data["pm"] = "not a login!"
+        self.assertTrue(any("pm" in e for e in p.validate_intake(data)))
 
     def test_bad_slug(self):
         data = usual_basket_intake()
@@ -76,10 +84,10 @@ class Validation(unittest.TestCase):
         data["evidence"].append({"id": "E-009", "layer": "U", "kind": "fact", "claim": "x", "source": "y"})
         self.assertTrue(any("E-009" in e for e in p.validate_intake(data)))
 
-    def test_multi_sentence_statement_rejected(self):
+    def test_statement_must_be_a_single_line(self):
         data = usual_basket_intake()
-        data["layers"]["S"]["statement"] = "A faster flow. Also a new button."
-        self.assertTrue(any("one sentence" in e for e in p.validate_intake(data)))
+        data["layers"]["S"]["statement"] = "A faster flow.\nAlso a new button."
+        self.assertTrue(any("single line" in e for e in p.validate_intake(data)))
 
 
 class ExampleTemplate(unittest.TestCase):
@@ -94,6 +102,10 @@ class ExampleTemplate(unittest.TestCase):
 class Plan(unittest.TestCase):
     def setUp(self):
         self.plan = p.plan_initiative(usual_basket_intake())
+
+    def test_readme_records_pm(self):
+        readme = self.plan["files"]["initiatives/usual-basket/README.md"]
+        self.assertEqual(p.pm_from_readme(readme), "junior-pm")
 
     def test_milestone_holds_literal_demand(self):
         self.assertIn(usual_basket_intake()["demand"], self.plan["milestone"]["description"])

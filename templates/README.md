@@ -15,15 +15,17 @@ validator parses the same lines: `scripts/upstream_contract.py` holds the regexe
 
 ## Who writes what
 
-- **Score header:** the orchestrator. When a scorer panel returns, the orchestrator
-  updates the header line in the epic body **and** posts the score-change comment in the
-  same action. The header always equals the latest score comment (validator check 7).
+- **Everything below is written through `scripts/upstream_ops.py`**, never by hand.
+- **Score header:** the orchestrator (`upstream_ops score`). It updates the header line
+  in the epic body **and** posts the score-change comment in the same action. The header
+  always equals the latest score comment (validator check 7).
 - **Labels:** the orchestrator, except `human:decided`, which the `/decide` GitHub
   Action applies when the assigned PM decides.
-- **Review comments and `review.md`:** the reviewer only. The comment and the file
-  carry the same title line (check 2).
+- **Review comments and `review.md`:** the orchestrator records the read-only
+  reviewer's verdict (`upstream_ops review`). The comment and the file carry the same
+  title line (check 2).
 - **Hypothesis closing comment and the `hypotheses.md` row:** the lead that resolved
-  the hypothesis. The status must match in both places (check 2), and it must match the
+  the hypothesis (`upstream_ops hypothesis-close`). The status must match in both places (check 2), and it must match the
   `hyp:` label (check 10).
 
 ## Rules carried from the spec

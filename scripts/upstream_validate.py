@@ -226,10 +226,21 @@ def _ids_on_github(snap):
     return ids
 
 
-def check_ids_resolve(snap):
-    on_github, in_files = _ids_on_github(snap), _ids_in_files(snap)
+def _open_decision_ids(snap):
+    """A decision's file is written when it is recorded, so an open decision needs none yet."""
+    return {m.group(0) for i in _issues(snap)
+            if _has(i, "type:decision") and i.get("state") == "open"
+            and (m := re.match(c.DECISION_ID, i.get("title", "")))}
+
+
+def check_ids_resolve(snap, final=False):
+    """GitHub -> files always. Files -> GitHub only at handoff (final): mid-process, drafts
+    and fresh evidence legitimately exist before anything on GitHub cites them."""
+    on_github, in_files = _ids_on_github(snap) - _open_decision_ids(snap), _ids_in_files(snap)
     errors = [Error(1, "github", f"{i} cited on GitHub but has no file") for i in sorted(on_github - in_files)]
-    errors += [Error(1, "files", f"{i} defined in files but never cited on GitHub") for i in sorted(in_files - on_github)]
+    if final:
+        errors += [Error(1, "files", f"{i} defined in files but never cited on GitHub")
+                   for i in sorted(in_files - on_github)]
     return errors
 
 
@@ -367,9 +378,10 @@ def validate_snapshot(snap):
     return [e for check in SNAPSHOT_CHECKS for e in check(snap)]
 
 
-def validate_files_and_comments(snap):
-    """Drift checks between files and GitHub (1, 2). Run at reconcile and on the handoff PR."""
-    return [e for check in FILE_CHECKS for e in check(snap)]
+def validate_files_and_comments(snap, final=False):
+    """Drift checks between files and GitHub (1, 2). final=True at handoff also flags
+    files that nothing on GitHub cites."""
+    return check_ids_resolve(snap, final) + check_verdicts_match(snap)
 
 
 def _report(errors):
@@ -381,10 +393,10 @@ def _report(errors):
 def main(argv):
     if len(argv) == 3 and argv[1] == "commit-msg":
         return _report(check_commit_message(Path(argv[2]).read_text(encoding="utf-8")))
-    if len(argv) == 3 and argv[1] == "snapshot":
+    if len(argv) >= 3 and argv[1] == "snapshot":
         snap = json.loads(Path(argv[2]).read_text(encoding="utf-8"))
-        return _report(validate_snapshot(snap) + validate_files_and_comments(snap))
-    print("usage: upstream_validate.py commit-msg <file> | snapshot <snapshot.json>", file=sys.stderr)
+        return _report(validate_snapshot(snap) + validate_files_and_comments(snap, final="--final" in argv))
+    print("usage: upstream_validate.py commit-msg <file> | snapshot <snapshot.json> [--final]", file=sys.stderr)
     return 2
 
 

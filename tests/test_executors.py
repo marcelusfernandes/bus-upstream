@@ -15,10 +15,24 @@ import codex_hooks  # noqa: E402
 import create_initiative  # noqa: E402
 import decide_action  # noqa: E402
 import gh_client  # noqa: E402
+import git_ops  # noqa: E402
 import github_snapshot  # noqa: E402
 import initiative_plan  # noqa: E402
 
 EXAMPLE = ROOT / "templates" / "intake.example.json"
+
+
+class FakeGit:
+    def __init__(self, dirty=""):
+        self.calls, self.dirty = [], dirty
+
+    def __call__(self, args):
+        self.calls.append(args)
+        if args[0] == "status":
+            return self.dirty
+        if args[:2] == ["branch", "--show-current"]:
+            return "main"
+        return ""
 
 
 class FakeGh:
@@ -27,10 +41,14 @@ class FakeGh:
     def __init__(self):
         self.calls, self.next_issue = [], 100
 
-    def __call__(self, cmd):
+    def __call__(self, cmd, stdin=None):
         self.calls.append(cmd)
         if cmd[:2] == ["gh", "api"] and cmd[2].endswith("/milestones"):
             return json.dumps({"number": 7})
+        if cmd[:2] == ["gh", "api"] and cmd[2].endswith("/issues") and "POST" in cmd:
+            self.next_issue += 1
+            assert json.loads(stdin)["milestone"] == 7
+            return json.dumps({"number": self.next_issue})
         if cmd[:3] == ["gh", "issue", "create"]:
             self.next_issue += 1
             return f"https://github.com/o/r/issues/{self.next_issue}\n"
@@ -69,7 +87,7 @@ class CreateInitiative(unittest.TestCase):
         self.assertEqual(milestone, 7)
         self.assertEqual(set(numbers), {"B", "U", "S", "PRD"})
         self.assertIn("Milestone: #7", readme)
-        creates = [c for c in fake.calls if c[:3] == ["gh", "issue", "create"]]
+        creates = [c for c in fake.calls if c[:2] == ["gh", "api"] and c[2].endswith("/issues") and "POST" in c]
         self.assertEqual(len(creates), 4 + 3)
         self.assertEqual(len([c for c in fake.calls if c[2:3] and str(c[2]).endswith("sub_issues")]), 3)
         self.assertEqual(len([c for c in fake.calls if c[:3] == ["gh", "issue", "comment"]]), 3)
@@ -88,9 +106,28 @@ class CreateInitiative(unittest.TestCase):
         def boom(cmd):
             raise gh_client.GhError("nope")
         err = io.StringIO()
-        with mock.patch.object(gh_client, "run", boom), redirect_stderr(err):
+        with mock.patch.object(gh_client, "run", boom), mock.patch.object(git_ops, "run_git", FakeGit()), \
+                redirect_stderr(err):
             self.assertEqual(create_initiative.main([str(EXAMPLE), "--apply", "--repo", "o/r"]), 1)
-        self.assertIn("partially created", err.getvalue())
+        self.assertIn("partially created on upstream/usual-basket", err.getvalue())
+
+    def test_apply_switches_branch_first_then_commits_and_pushes(self):
+        git = FakeGit()
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(gh_client, "run", FakeGh()), \
+                mock.patch.object(git_ops, "run_git", git), mock.patch.object(create_initiative, "ROOT", Path(tmp)), \
+                redirect_stdout(io.StringIO()):
+            self.assertEqual(create_initiative.main([str(EXAMPLE), "--apply", "--repo", "o/r"]), 0)
+        self.assertIn(["switch", "-c", "upstream/usual-basket", "origin/main"], git.calls)
+        self.assertEqual(git.calls[-2:], [["commit", "-m", "chore: intake usual-basket"],
+                                          ["push", "-u", "origin", "upstream/usual-basket"]])
+
+    def test_dirty_tree_stops_before_github(self):
+        fake, err = FakeGh(), io.StringIO()
+        with mock.patch.object(gh_client, "run", fake), mock.patch.object(git_ops, "run_git", FakeGit(dirty=" M x")), \
+                redirect_stderr(err):
+            self.assertEqual(create_initiative.main([str(EXAMPLE), "--apply", "--repo", "o/r"]), 1)
+        self.assertEqual(fake.calls, [])
+        self.assertIn("uncommitted", err.getvalue())
 
 
 class GhClient(unittest.TestCase):
@@ -100,13 +137,17 @@ class GhClient(unittest.TestCase):
             with self.assertRaises(gh_client.GhError):
                 gh_client.run(["gh", "x"])
 
-    def test_create_issue_passes_labels_as_arguments(self):
-        fake = FakeGh()
+    def test_create_issue_sends_json_not_shell(self):
+        seen = {}
+
+        def fake(cmd, stdin=None):
+            seen["cmd"], seen["stdin"] = cmd, stdin
+            return json.dumps({"number": 5})
         with mock.patch.object(gh_client, "run", fake):
-            n = gh_client.create_issue("o/r", "t; rm -rf /", "b", ["epic", "layer:user"], "M")
-        self.assertEqual(n, 101)
-        self.assertIn("t; rm -rf /", fake.calls[0])
-        self.assertEqual(fake.calls[0].count("--label"), 2)
+            n = gh_client.create_issue_api("o/r", "t; rm -rf /", "b", ["epic"], ["pm"], 7)
+        self.assertEqual(n, 5)
+        self.assertEqual(json.loads(seen["stdin"])["title"], "t; rm -rf /")
+        self.assertNotIn("t; rm -rf /", seen["cmd"])
 
 
 class DecideMain(unittest.TestCase):

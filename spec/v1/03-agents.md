@@ -14,6 +14,19 @@
 | **Reviewers** (isolated, read-only) | Adversarial review of committed answers and fits | `review.md` in the layer folder, verdict comment | Edit the artifact they review |
 | **PRD writer** | Compiles the PRD from the committed layers | `prd/`, PRD epic | Invents what upstream did not decide |
 
+## Who writes what (as built)
+
+- **All contract writes go through `scripts/upstream_ops.py`**, which plans each paired
+  write as one operation (score header + comment, review comment + `review.md`,
+  hypothesis comment + register + label, answer commit + comment).
+- **The orchestrator** runs `route`, `review`, `answer`, `score`, `decision-record`, and
+  `decision-open` for blocked layers (accept as risk / change approach / park).
+- **Leads** write answer drafts and READMEs in their layer folder, and run
+  `decision-open` and `hypothesis-close`.
+- **Collectors** write exactly one evidence file each.
+- **Reviewers and scorers are read-only.** They return JSON, and the orchestrator
+  records it, so a reviewer never edits what it reviews.
+
 ## The orchestrator is thin
 
 The cross-phase orchestrator rebuilds its view **from GitHub on every run** (the

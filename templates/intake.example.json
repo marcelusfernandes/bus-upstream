@@ -4,6 +4,7 @@
   "demand": "Se o fluxo for mais rápido ele pode converter mais que o App, e o custo de interação é menor. Objetivo: agilizar a compra e reduzir custo. Também queremos entender se ajuda na recorrência ou mexe no AOV.",
   "context": "App, compared with another channel (comparison unclear)",
   "mode": "piloted",
+  "pm": "marcelusfernandes",
   "fragments": [
     {
       "layer": "S",

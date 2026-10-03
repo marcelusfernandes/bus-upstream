@@ -46,7 +46,7 @@ over. Their meaning is adapted for upstream:
 | `state:in-progress` | The lead and its subagents are working |
 | `state:in-review` | The isolated reviewer is checking an answer or a fit |
 | `state:qa-failed` | The review rejected it; back to work, with the reasons in a comment |
-| `state:blocked` | Anti-loop triggered. **Always** together with `human:pending`. |
+| `state:blocked` | Anti-loop triggered. **Always** together with `human:pending`; `upstream_ops route` adds it, and leaving `blocked` removes it. |
 | `state:done` | Answered well enough for dependent layers to rely on. **Can be reopened.** |
 
 **Reopen rule:** `done` → `in-progress` is allowed when an answer is invalidated. The

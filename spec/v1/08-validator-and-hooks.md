@@ -9,8 +9,10 @@ Writing a drift rule down does not detect drift; something has to run the check.
 
 The validator is a single script, `scripts/upstream_validate`:
 
-1. **IDs resolve both ways.** Every ID cited in a comment exists in a file, and every
-   ID defined in a file is cited in a comment.
+1. **IDs resolve both ways.** Every ID cited on GitHub exists in a file (always checked;
+   an **open** decision needs no file until it is recorded). Every ID defined in a file is
+   cited on GitHub, but that direction is checked only at handoff (`--final`): mid-process,
+   drafts and fresh evidence legitimately exist before anything cites them.
 2. **Verdicts match.** A decided answer or review has the same verdict in the comment
    and in the file.
 3. **Exclusive label families** have at most one value.
@@ -55,6 +57,9 @@ on 2026-10-02. Implemented in `.codex/config.toml` and `scripts/codex_hooks.py`.
 - They load only after the project `.codex/` layer is trusted and the hooks are reviewed
   with `/hooks`.
 - Hooks only see **agent** actions. Human changes on GitHub are covered by the Action.
+- `scripts/upstream_ops.py` calls `gh` from Python, so the `PreToolUse` hook does not
+  see those calls. That is intended: its plans refuse rule-breaking writes before they
+  happen. The hook catches agents that bypass the helper with `gh issue edit`.
 
 The Action **validates** the score header. It does not sync it to labels, because
 scores are never labels.
