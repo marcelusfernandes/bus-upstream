@@ -21,7 +21,9 @@ The JSON needs the PM's GitHub login (`pm`): every decision is assigned to it.
 4. **Register hypotheses.** Every user-problem, solution or causal claim that arrived
    with the demand becomes an `H-nn` entry with its origin (who and where) and is routed to
    the layer that can test it. If you raise one yourself, set `origin: agent` and give a
-   `basis` (evidence IDs or `guess`).
+   `basis` (evidence IDs or `guess`). Write `origin` in words (who, and where it came up),
+   never a file path: a PM on GitHub cannot open it. Give each hypothesis a `test`: what
+   would validate or invalidate it, in one line.
 5. **Record evidence you cite.** Each `E-nnn` gets a claim, kind, source and layer, plus
    population, time window, freshness and limitations when known. Never cite an ID you did
    not record, and never record one you do not cite.

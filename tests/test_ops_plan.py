@@ -428,9 +428,14 @@ class CheckpointAndSummary(unittest.TestCase):
         self.assertIn("| H-03 | it helps recurrence or changes AOV | causal | B → B | open |", body)
         self.assertIn("| H-01 | a faster flow | solution | B → S | open |", body, "raised at B, routed to S")
         self.assertLess(body.index("### Hypotheses"), body.index("### Decisions"))
-        twice = o.plan_summary(apply_to_snapshot(snap, [{"kind": "edit_body", "issue": 1, "body": body}]),
-                               SLUG, "B", "o/r")[0]["body"]
-        self.assertEqual(twice, body, "summary is idempotent")
+        actions = o.plan_summary(snap, SLUG, "B", "o/r")
+        hyp_bodies = {a["issue"]: a["body"] for a in actions[1:]}
+        self.assertIn("**As raised:** “it helps recurrence or changes AOV” — business demand", hyp_bodies[7])
+        self.assertIn("**Status:** open", hyp_bodies[7])
+        after = apply_to_snapshot(snap, actions)
+        again = o.plan_summary(after, SLUG, "B", "o/r")
+        self.assertEqual(again[0]["body"], body, "summary is idempotent")
+        self.assertEqual(len(again), 1, "hypothesis bodies already current: no further edits")
 
 
 class Signing(unittest.TestCase):

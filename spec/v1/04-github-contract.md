@@ -59,6 +59,11 @@ A layer epic cannot reach `state:done` while a hypothesis routed to it has `hyp:
 
 ## Hypotheses
 
+The hypothesis issue is self-contained (see `templates/hypothesis-body.md`): the hypothesis
+as raised and who raised it, how it gets tested, its status and resolution, and its basis
+with each evidence ID followed by its claim. `upstream_ops summary` refreshes these bodies
+from the register and the evidence files.
+
 Each hypothesis is a sub-issue labeled `type:hypothesis` + `hyp:open`, placed under the
 epic of the layer it is **routed to**. Its body holds the register fields (see
 [12-key-questions.md](12-key-questions.md#hypothesis-register)). It is closed with a comment:
