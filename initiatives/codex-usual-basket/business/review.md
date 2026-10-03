@@ -1,3 +1,7 @@
+## Review · B-02 · rejected
+
+Blocking: B-02 afirma que E-001 confirma recompra, mas o arquivo citado não existe no diretório permitido; essa atribuição não é verificável. · Return to: B-02
+
 ## Review · B-01 · rejected
 
 Blocking: A afirmação sobre recompra cita E-001, ausente no diretório de evidências permitido; seu suporte, população e janela temporal não puderam ser verificados. · Return to: B-01
