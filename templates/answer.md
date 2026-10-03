@@ -1,5 +1,7 @@
 <!-- initiatives/<slug>/<layer>/answers/<ID>.md · one key question per file. The first three
-lines are read by `upstream_ops summary` to keep the epic body self-contained; keep their format. -->
+lines are read by `upstream_ops summary` to keep the epic body self-contained; keep their format.
+The **Answer:** line must stand on its own for a PM reading only GitHub: write the content,
+never just a pointer to a file ("see hypotheses.md"). A reference for detail is fine after it. -->
 # B-01 · What is the business problem?
 
 **Answer:** The repurchase flow converts below the App.
