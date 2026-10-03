@@ -416,6 +416,14 @@ class RelayDecide(unittest.TestCase):
 
 
 class CheckpointAndSummary(unittest.TestCase):
+    def test_summary_never_cuts_an_answer(self):
+        snap = snap_with_readme()
+        long_answer = "x " * 200
+        snap["files"][DRAFT_B1] = f"# B-01 · What is the business problem?\n\n**Answer:** {long_answer.strip()}\n\n**State:** open\n"
+        body = o.plan_summary(snap, SLUG, "B", "o/r")[0]["body"]
+        self.assertIn(long_answer.strip(), body)
+        self.assertNotIn("…", body)
+
     def test_checkpoint_commits_the_whole_initiative_only_if_dirty(self):
         actions = o.plan_checkpoint(SLUG, "waiting for D-002")
         self.assertEqual(actions[0]["paths"], [BASE])

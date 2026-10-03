@@ -516,7 +516,7 @@ def plan_summary(snap, slug, layer, repo):
     folder = LAYER[layer][1]
     rows = _answer_rows(snap, slug, folder)
     table = "### Key questions\n\n| ID | Question | State | Answer |\n|---|---|---|---|\n" + "".join(
-        f"| {i} | {_cell(q)} | {s} | {_cell(a if len(a) <= 160 else a[:157] + '…')} |\n" for i, q, s, a in rows) \
+        f"| {i} | {_cell(q)} | {s} | {_cell(a)} |\n" for i, q, s, a in rows) \
         if rows else "### Key questions\n\nNo answer drafted yet.\n"
     statement_id = {"B": "B-01", "U": "U-01", "S": "S-02"}.get(layer)
     statement = next((a for i, _, s, a in rows if i == statement_id and s in ("evidenced", "bet")), "not yet writable")
