@@ -12,6 +12,7 @@ validator parses the same lines: `scripts/upstream_contract.py` holds the regexe
 | [comments.md](comments.md) | all agents | Comment title patterns |
 | [hypotheses-register.md](hypotheses-register.md) | leads, orchestrator | `initiatives/<slug>/hypotheses.md` |
 | [review-file.md](review-file.md) | reviewers | `initiatives/<slug>/<layer>/review.md` |
+| [answer.md](answer.md) | leads | `initiatives/<slug>/<layer>/answers/<ID>.md` |
 
 ## Who writes what
 
@@ -22,7 +23,9 @@ validator parses the same lines: `scripts/upstream_contract.py` holds the regexe
 - **Labels:** the orchestrator, except `human:decided`, which the `/decide` GitHub
   Action applies when the assigned PM decides.
 - **Decisions:** comments in the issue that needs them (`decision-request.md`), never a
-  separate issue. Every agent comment starts with a `## ` title line.
+  separate issue. Every agent comment carries the invisible `<!-- enceladus:<role> -->`
+  marker.
+- **Answers:** `answer.md` (its first three lines feed the epic summary).
 - **Review comments and `review.md`:** the orchestrator records the read-only
   reviewer's verdict (`upstream_ops review`). The comment and the file carry the same
   title line (check 2).

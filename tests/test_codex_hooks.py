@@ -77,6 +77,13 @@ class Stop(unittest.TestCase):
         by_number(snap, 2)["comments"].append({"author": "agent", "body": "## Answer U-02 · x", "created_at": "Z"})
         self.assertIsNone(h.stop({"stop_hook_active": True}, snapshots=[snap]))
 
+    def test_uncommitted_initiative_work_blocks_once(self):
+        reason = h.stop({"stop_hook_active": False}, snapshots=[usual_basket()],
+                        uncommitted="?? initiatives/x/business/answers/B-01.md")
+        self.assertIn("checkpoint", reason)
+        self.assertIsNone(h.stop({"stop_hook_active": True}, snapshots=[usual_basket()],
+                                 uncommitted="?? initiatives/x/business/answers/B-01.md"))
+
     def test_clean_passes(self):
         self.assertIsNone(h.stop({"stop_hook_active": False}, snapshots=[usual_basket()]))
 

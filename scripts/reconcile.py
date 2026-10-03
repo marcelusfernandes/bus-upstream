@@ -83,7 +83,10 @@ def _autonomous(snap, issue):
 
 def _obligations(report):
     """Mechanical must-dos from the contract. Not a work order between layers."""
-    out = [f"fix drift: {e}" for e in report["drift"]]
+    out = [f"fix labels on #{f['issue']} (upstream_ops fix-labels): add {f['add'] or '-'}, remove {f['remove'] or '-'}"
+           for f in report["label_fixes"]]
+    covered = lambda e: e.startswith("[check 11]") or (e.startswith("[check 3]") and "human:" in e)  # noqa: E731
+    out += [f"fix drift: {e}" for e in report["drift"] if not covered(e)]
     out += [f"record decision {d} (decided, still open)" for d in report["decided_unrecorded"]]
     out += [f"reply to the PM on {r['decision']} (comment without /decide)" for r in report["needs_reply"]]
     out += [f"decide {d} (autonomous mode)" for d in report["agent_decide"]]
@@ -103,6 +106,7 @@ def reconcile(snap):
         "decided_unrecorded": sorted(rid for i in issues for rid in dec.decided_unrecorded(i)),
         "agent_decide": sorted(rid for i in issues if _autonomous(snap, i) for rid in dec.open_requests(i)
                                if rid not in dec.decided_unrecorded(i)),
+        "label_fixes": [{"issue": i["number"], "add": add, "remove": remove} for i, add, remove in v.label_fixes(snap)],
     }
     report["obligations"] = _obligations(report)
     return report

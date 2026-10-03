@@ -24,17 +24,22 @@ The validator is a single script, `scripts/upstream_validate`:
    score-change comment.
 8. **Commit format.** Answer commits have the ID title pattern and the required trailers.
 9. **Decision authorship.** An issue labeled `human:decided` has a valid `/decide` from its
-   assigned PM on that same issue, before the label change. Comments starting with a `## `
-   title are agents' and never count.
+   assigned PM on that same issue, before the label change, and every record naming a PM has
+   that PM's own `/decide` for the same D-id. Agent comments (Enceladus marker, or a `## `
+   title on older ones) never count.
 10. **No silent hypotheses.** A layer epic cannot be `state:done` while any hypothesis routed
     to it is `hyp:open`. Every closed hypothesis has a closing comment with a status and a reason.
+11. **Labels match the story in the comments.** One `human:` label at most, derived from
+    the comments: `pending` while a decision waits for the PM (or the layer is blocked),
+    otherwise `decided` once the PM decided there. `agent:decided` once an agent record
+    exists. `upstream_ops fix-labels` applies the correction.
 
 ## Where it runs
 
 | Trigger | Checks | Catches |
 |---|---|---|
 | `commit-msg` git hook | 8 | Malformed answer commits, locally |
-| GitHub Action on `issues`, `issue_comment` and `labeled` events | 3, 4, 5, 6, 7, 9, 10 | Changes from humans and agents on GitHub |
+| GitHub Action on `issues`, `issue_comment` and `labeled` events | 3, 4, 5, 6, 7, 9, 10, 11 | Changes from humans and agents on GitHub |
 | Codex `PreToolUse` hook (repo-level) | 3, 4, 5, 10 | **Blocks** an agent's `gh` label change that would break a rule, before it runs |
 | Codex `Stop` hook (repo-level) | 1, 2 | Drift left at the end of an agent turn; blocking it makes the agent keep going and fix it |
 | Orchestrator reconcile (each run) | all | Drift between files and GitHub |
@@ -48,9 +53,12 @@ on 2026-10-02. Implemented in `.codex/config.toml` and `scripts/codex_hooks.py`.
 - `PreToolUse` with matcher `Bash` reads `tool_input.command`. For every
   `gh issue edit N --add-label/--remove-label`, it loads the initiative's snapshot,
   simulates the change, and blocks (exit 2, reason on stderr) when the change would add a
-  validator error. It always blocks an agent from adding `human:decided`.
+  validator error. It always blocks an agent from adding `human:decided` with `gh`; the
+  only sanctioned paths are the `/decide` Action and `upstream_ops fix-labels`, which
+  adds it only when a valid PM `/decide` already exists in the comments.
 - `Stop` runs the drift checks (1, 2) over every `initiatives/<slug>/` that has a
-  milestone. It blocks once; when `stop_hook_active` is true it lets the turn end, so it
+  milestone, and blocks once if `initiatives/` has uncommitted work (run `checkpoint`).
+  It blocks once; when `stop_hook_active` is true it lets the turn end, so it
   never loops.
 - The hooks **fail open**: if GitHub cannot be reached, they say so on stderr and allow
   the action. A broken hook must not stop all agent work. The Action, the reconcile and

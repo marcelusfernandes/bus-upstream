@@ -45,8 +45,8 @@ class Plan(unittest.TestCase):
 
     def test_single_waiting_decision(self):
         actions = d.plan(comment("/decide A"), epic("D-001"))
-        self.assertEqual(kinds(actions), ["add_label", "remove_label", "comment"])
-        self.assertEqual((actions[0]["label"], actions[1]["label"]), ("human:decided", "human:pending"))
+        self.assertEqual(kinds(actions), ["remove_label", "add_label", "comment"])
+        self.assertEqual((actions[0]["label"], actions[1]["label"]), ("human:pending", "human:decided"))
         self.assertIn("D-001 decided by @junior-pm: **A**", actions[2]["body"])
         self.assertTrue(all(a["issue"] == 1 for a in actions))
 
@@ -58,9 +58,9 @@ class Plan(unittest.TestCase):
         self.assertEqual(kinds(actions), ["comment"])
         self.assertIn("/decide D-001", actions[0]["body"])
 
-    def test_targeted_keeps_pending_while_another_waits(self):
+    def test_targeted_keeps_only_pending_while_another_waits(self):
         actions = d.plan(comment("/decide D-002 B"), epic("D-001", "D-002"))
-        self.assertEqual(kinds(actions), ["add_label", "comment"])
+        self.assertEqual(kinds(actions), ["comment"], "one human: label: pending stays, decided waits")
 
     def test_nothing_waiting(self):
         self.assertIn("No decision is waiting", d.plan(comment("/decide A"), epic())[0]["body"])

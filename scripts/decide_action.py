@@ -3,9 +3,10 @@
 
 Decisions live in the issue that requested them. A PM's `/decide` applies to a request
 on the same issue: bare when exactly one is waiting, `/decide D-nnn X` otherwise. Only
-the assigned PM can decide. A valid /decide adds human:decided (and removes
-human:pending when nothing else waits for the PM) and acknowledges; the orchestrator
-posts the record in the same issue afterwards. The comment body is untrusted: it is
+the assigned PM can decide. An issue carries one human: label at most: when this was
+the last decision waiting, a valid /decide swaps human:pending for human:decided;
+while another still waits, human:pending stays. It always acknowledges; the
+orchestrator posts the record in the same issue afterwards. The comment body is untrusted: it is
 never echoed in refusals and never reaches a shell.
 """
 import json
@@ -69,9 +70,9 @@ def plan(comment, issue):
     waiting = d.awaiting_pm(issue)
     target_id = target_id or waiting[0]
     n = issue["number"]
-    actions = [{"kind": "add_label", "issue": n, "label": "human:decided"}]
-    if not [w for w in waiting if w != target_id]:
-        actions.append({"kind": "remove_label", "issue": n, "label": "human:pending"})
+    still_waiting = [w for w in waiting if w != target_id]
+    actions = [] if still_waiting else [{"kind": "remove_label", "issue": n, "label": "human:pending"},
+                                        {"kind": "add_label", "issue": n, "label": "human:decided"}]
     actions.append({"kind": "comment", "issue": n,
                     "body": f"{target_id} decided by @{comment['author']}: **{choice}** ({comment['url']}). "
                             "The orchestrator will post the decision record here."})

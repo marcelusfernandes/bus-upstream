@@ -48,7 +48,7 @@ LABEL_FAMILIES = (
         ("merged", "Hypothesis merged into another one"),
         ("parked", "Hypothesis set aside, with a reason"),
     )),
-    LabelFamily("human:", True, "B60205", (
+    LabelFamily("human:", True, "B60205", (  # exactly one: pending while anything waits, else decided
         ("pending", "Waiting for the PM's /decide"),
         ("decided", "Decided by the PM (permanent)"),
     )),
@@ -95,6 +95,26 @@ HYPOTHESIS_TITLE = (rf"^## Hypothesis (?P<id>{HYPOTHESIS_ID}) · "
 DECIDE_COMMAND = rf"^/decide(?: (?P<target>{DECISION_ID}))? (?P<choice>[A-Z]|other: .+)$"
 
 SCORE_MIN, SCORE_MAX = 0, 10
+
+# ---------- Agent identity ----------
+# Agents comment with the PM's GitHub account today, so every agent comment carries an
+# invisible marker. A PM decision relayed from Codex carries the relay marker and never
+# the agent marker.
+
+AGENT_NAME = "Enceladus"
+AGENT_MARKER = r"<!-- enceladus(?::(?P<role>[a-z_]+))? -->"
+RELAY_MARKER = "<!-- relayed-from:codex -->"
+
+
+def signature(role):
+    return f"\n<!-- enceladus:{role} -->"
+
+
+# ---------- Decision request limits (format, so a PM can read it in the issue) ----------
+
+REQUEST_QUESTION_MAX = 120
+REQUEST_OPTION_MAX = 140
+REQUEST_CONTEXT_MAX = 700
 
 # ---------- Commits ----------
 

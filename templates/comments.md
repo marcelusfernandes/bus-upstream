@@ -1,9 +1,14 @@
 # Comment patterns
 
-Every agent comment starts with a `## ` title line, one of these. Agents comment with the
-PM's own GitHub account today, so that title is how a comment is known to be the agent's:
-a comment starting with `## ` never counts as a PM decision. The rest of the comment is
-free, but short: one line of why, the IDs, and a link to the file holding the detail.
+Every agent comment starts with one of these title lines and ends with the invisible
+marker `<!-- enceladus:<role> -->` (added by `upstream_ops --agent <role>`). Agents comment
+with the PM's own GitHub account today, so the marker is how a comment is known to be the
+agent's; it never counts as a PM decision. The rest of the comment is short: one line of
+why, the IDs, and a link to the file holding the detail.
+
+## Labels fixed
+
+removed `human:decided`: a decision is waiting for the PM.
 
 ## Answer U-02 · Recurring buyers rebuild the same basket manually each week
 

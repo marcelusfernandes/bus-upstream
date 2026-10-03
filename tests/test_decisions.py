@@ -83,6 +83,47 @@ class AgentComments(unittest.TestCase):
         self.assertEqual(d.awaiting_pm(issue), ["D-001"])
 
 
+class Signature(unittest.TestCase):
+    def test_invisible_enceladus_marker_marks_an_agent_comment(self):
+        body = "Recurrence is option C" + d.c.signature("orchestrator")
+        self.assertEqual(body, "Recurrence is option C\n<!-- enceladus:orchestrator -->")
+        self.assertTrue(d.is_agent_comment(comment(PM, body, T1)))
+
+    def test_quoting_an_agent_comment_keeps_the_pm_a_pm(self):
+        quoted = "> Recurrence is option C\n> <!-- enceladus:orchestrator -->\n\n/decide A"
+        issue = epic([comment("agent", REQ1, T0), comment(PM, quoted, T1)])
+        self.assertFalse(d.is_agent_comment(issue["comments"][1]))
+        self.assertEqual(d.pm_decision(issue, "D-001")["choice"], "A")
+
+    def test_relayed_decision_counts_as_the_pm(self):
+        relayed = "/decide A\nWhy: typed in Codex\n" + d.c.RELAY_MARKER
+        issue = epic([comment("agent", REQ1, T0), comment(PM, relayed, T1)])
+        self.assertEqual(d.pm_decision(issue, "D-001")["choice"], "A")
+
+
+class ExpectedLabels(unittest.TestCase):
+    """One human: label at most: pending while anything waits, otherwise decided."""
+
+    def test_new_request_after_a_decision_means_pending_only(self):
+        issue = epic([comment("agent", REQ1, T0), comment(PM, "/decide A", T1),
+                      comment("agent", "## Decision D-001 · B-01 · Conversion\nDecided by: @junior-pm", T2),
+                      comment("agent", REQ2, T3)])
+        self.assertEqual(d.expected_labels(issue), {"human:pending": True, "human:decided": False,
+                                                    "agent:decided": None})
+
+    def test_all_decided_means_decided_only(self):
+        issue = epic([comment("agent", REQ1, T0), comment(PM, "/decide A", T1)])
+        self.assertEqual(d.expected_labels(issue)["human:pending"], False)
+        self.assertEqual(d.expected_labels(issue)["human:decided"], True)
+
+    def test_nothing_decided_means_no_human_label(self):
+        self.assertEqual(d.expected_labels(epic([])), {"human:pending": False, "human:decided": False,
+                                                       "agent:decided": None})
+
+    def test_blocked_layer_needs_pending(self):
+        self.assertTrue(d.expected_labels(epic([]), blocked=True)["human:pending"])
+
+
 class Ids(unittest.TestCase):
     def test_all_request_ids_across_issues(self):
         snap = {"issues": [epic([comment("agent", REQ1, T0)]), dict(epic([comment("agent", REQ2, T0)]), number=2)]}

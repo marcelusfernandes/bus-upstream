@@ -98,7 +98,8 @@ class Cli(unittest.TestCase):
     def test_decision_open_comments_in_the_epic_and_assigns_the_pm(self):
         spec = {"id": "D-001", "ref": "B-01", "question": "Which outcome first?",
                 "options": [{"key": "A", "text": "Conversion"}, {"key": "B", "text": "Cost"}],
-                "recommendation": "A", "why": "largest gap", "would_change": "cost data", "blocks": "B"}
+                "recommendation": "A", "why": "largest gap", "would_change": "cost data", "blocks": "B",
+                "context": "Two outcomes named, no baseline yet."}
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
             json.dump(spec, f)
         code, gh_calls, git_calls, _, _ = run(["decision-open", "--spec", f.name], usual_basket())
@@ -110,6 +111,18 @@ class Cli(unittest.TestCase):
         self.assertIn(["gh", "issue", "edit", "1", "--repo", "o/r", "--add-label", "human:pending"], cmds)
         self.assertFalse(any("POST" in c for c in cmds), "no separate decision issue")
         self.assertEqual(git_calls, [])
+
+    def test_comments_are_signed_with_the_agent_role(self):
+        code, gh_calls, _, _, _ = run(["--agent", "business_lead", "hypothesis-close", "--id", "H-01", "--status",
+                                       "parked", "--why", "out of scope"], usual_basket())
+        self.assertEqual(code, 0)
+        comment_cmd = next(c[0] for c in gh_calls if c[0][:3] == ["gh", "issue", "comment"])
+        self.assertTrue(comment_cmd[-1].endswith("<!-- enceladus:business_lead -->"))
+
+    def test_checkpoint_skips_when_clean(self):
+        code, _, git_calls, _, _ = run(["checkpoint", "--reason", "waiting for D-002"], usual_basket())
+        self.assertEqual(code, 0)
+        self.assertNotIn("commit", [c[0] for c in git_calls])
 
     def test_rule_violation_is_reported_without_writes(self):
         code, gh_calls, _, _, output = run(["route", "--layer", "B", "--state", "done"], usual_basket())
