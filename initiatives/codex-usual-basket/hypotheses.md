@@ -1,0 +1,6 @@
+| ID | Statement | Kind | Origin | Basis | Raised at | Routed to | Status | Resolution |
+|---|---|---|---|---|---|---|---|---|
+| H-01 | fluxo mais rápido | solution | stakeholder, parágrafo citado em evals/usual-basket/input.md | demanda literal; aspiração ainda sem intervenção definida (E-003) | B | S | open | — |
+| H-02 | Se o fluxo for mais rápido ele pode converter mais que o App | causal | stakeholder, parágrafo citado em evals/usual-basket/input.md | demanda literal; E-001 não demonstra essa causalidade | B | U | open | — |
+| H-03 | o custo de interação é menor | causal | stakeholder, parágrafo citado em evals/usual-basket/input.md | demanda literal; E-002 confirma apenas o outcome desejado, não a redução comparativa | B | B | open | — |
+| H-04 | Também queremos entender se ajuda na recorrência ou mexe no AOV. | causal | stakeholder, parágrafo citado em evals/usual-basket/input.md | questão exploratória da demanda literal; E-001 confirma recorrência existente, não impacto do fluxo | B | B | open | — |
