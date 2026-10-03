@@ -103,8 +103,10 @@ When the PM is piloting in this Codex session, show each decision request exactl
 appears on GitHub (context, options, recommendation). The PM may answer here. When the
 PM types an answer to a specific decision, post it verbatim:
 `upstream_ops <slug> relay-decide --decision D-nnn --choice <option> --why "<the PM's words>"`.
-It carries no Enceladus marker, because it is the PM's decision. Only relay what the PM
-typed as an answer in this session. Never turn a PM's GitHub comment, or your own reading
+It carries no Enceladus marker, because it is the PM's decision, and it writes out the
+chosen option (`Choice: B — <option text>`) so anyone reading the issue understands what
+was decided. Pass the PM's reason as `--why` when they gave one, in their words. Only relay
+what the PM typed as an answer in this session. Never turn a PM's GitHub comment, or your own reading
 of their intent, into a `/decide`.
 
 ## Comments

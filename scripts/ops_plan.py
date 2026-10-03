@@ -430,13 +430,16 @@ def plan_reply(snap, decision_id, text):
 def plan_relay_decide(snap, slug, decision_id, choice, why):
     """Post the PM's own answer, typed in Codex, verbatim. It is the PM's decision: no agent marker."""
     import decide_action
-    issue, _ = _open_request(snap, decision_id)
+    issue, req = _open_request(snap, decision_id)
     pm = (_readme_value(snap, slug, "PM") or "").lstrip("@")
     refusal = decide_action._refusal(issue, decision_id, choice, pm)
     if refusal:
         raise OpsError(refusal)
-    body = f"/decide {decision_id} {choice}" + (f"\nWhy: {_one_line(why, 'why')}" if why else "") + \
-        f"\n{c.RELAY_MARKER}"
+    # A reader of the issue must see what was chosen, not only a letter.
+    chosen = decisions.answer_text(issue, decision_id, choice)
+    body = (f"/decide {decision_id} {choice}" + (f"\nWhy: {_one_line(why, 'why')}" if why else "")
+            + f"\n\n**Choice:** {choice} — {chosen}\n_(Answered by the PM in Codex and relayed verbatim.)_"
+            + f"\n{c.RELAY_MARKER}")
     return [{"kind": "comment", "issue": issue["number"], "body": body, "sign": False}]
 
 
