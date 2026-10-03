@@ -1,3 +1,7 @@
+## Review · B-01 · rejected
+
+Blocking: A afirmação sobre recompra cita E-001, ausente no diretório de evidências permitido; seu suporte, população e janela temporal não puderam ser verificados. · Return to: B-01
+
 ## Review · B-05 · approved
 
 Blocking: none · Return to: none
