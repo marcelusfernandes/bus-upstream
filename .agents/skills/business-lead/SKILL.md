@@ -49,6 +49,8 @@ orchestrator's brief (gap: `define` or `ground`).
    - `context`: up to about three paragraphs: why this question exists, what the evidence
      says (with each E-id's claim), and what each choice changes;
    - each option `text` and `tradeoffs`: a sentence or two each.
+   The helper refuses anything beyond these hard limits (generous on purpose):
+   question 200 characters, context 2000, each option `text` and `tradeoffs` 300.
    When evidence is missing, include a **bet** option: "commit to X as a bet, owned by
    the PM, validated by <how> in parallel". Accepting it is gate 4 (accepted risk); say so
    in its trade-offs. Do not only offer "wait for a diagnosis".

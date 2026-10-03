@@ -127,9 +127,9 @@ def main(argv):
     import gh_client as gh
     import github_snapshot as g
     root = Path(__file__).resolve().parents[1]
-    if len(argv) < 2:
-        print("usage: reconcile.py <slug> [--json]", file=sys.stderr)
-        return 2
+    if len(argv) < 2 or argv[1] in ("-h", "--help"):
+        print("usage: reconcile.py <slug> [--json]\n\n" + (__doc__ or "").strip(), file=sys.stderr)
+        return 0 if len(argv) >= 2 else 2
     snap = g.load_initiative(gh.current_repo(), root / "initiatives" / argv[1], root)
     if snap is None:
         print(f"initiatives/{argv[1]} has no milestone yet", file=sys.stderr)
