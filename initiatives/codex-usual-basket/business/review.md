@@ -1,3 +1,7 @@
+## Review · B-05 · approved
+
+Blocking: none · Return to: none
+
 ## Review · B-05 · rejected
 
 Blocking: A recomendação de D-005 depende da alegação de que o helper não permite atualizar Test, mas nenhuma fonte permitida sustenta essa limitação operacional. · Return to: B-05
