@@ -1,3 +1,7 @@
+## Review · B-01 · rejected
+
+Blocking: D-004 afirma um pedido de fechamento sem evidência citada e fundamenta a disposição de H-03/H-04 em E-013, ausente dos insumos autorizados. · Return to: B-01
+
 ## Review · B-05 · approved
 
 Blocking: none · Return to: none
