@@ -156,6 +156,11 @@ class Review(unittest.TestCase):
         actions = o.plan_review(snap_with_readme(), SLUG, "B-01", "approved")
         self.assertEqual(actions[-1]["paths"], sorted([f"{BASE}/business/review.md", DRAFT_B1]))
 
+    def test_review_can_record_its_limitations(self):
+        actions = o.plan_review(snap_with_readme(), SLUG, "B-01", "approved", limitations="did not check AOV data")
+        self.assertIn("Limitations: did not check AOV data", actions[0]["text"])
+        self.assertIn("Limitations: did not check AOV data", actions[1]["body"])
+
     def test_fit_review_goes_to_dependent_layer(self):
         actions = o.plan_review(usual_basket(), SLUG, "BU-fit", "approved")
         self.assertEqual(actions[0]["path"], f"{BASE}/user/review.md")
@@ -449,6 +454,12 @@ class HypothesisUpdate(unittest.TestCase):
 
 
 class CheckpointAndSummary(unittest.TestCase):
+    def test_open_statement_says_why(self):
+        snap = snap_with_readme()
+        snap["files"][DRAFT_B1] = "# B-01 · What is the business problem?\n\n**Answer:** no baseline yet.\n\n**State:** open\n"
+        body = o.plan_summary(snap, SLUG, "B", "o/r")[0]["body"]
+        self.assertIn("**Statement:** not yet written — B-01 is open: no baseline yet.", body)
+
     def test_summary_never_cuts_an_answer(self):
         snap = snap_with_readme()
         long_answer = "x " * 200

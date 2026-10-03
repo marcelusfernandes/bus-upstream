@@ -88,6 +88,28 @@ class Cli(unittest.TestCase):
         self.assertIn("initiatives/usual-basket/business/review.md", written)
         self.assertEqual(git_calls[-1], ["push", "-u", "origin", "upstream/usual-basket"])
 
+    def test_local_commit_lands_before_any_github_write(self):
+        order = []
+        git = FakeGit()
+        original = git.__call__
+
+        def tracking_git(args):
+            order.append(("git", args[0]))
+            return original(args)
+        fake = FakeGh()
+
+        def tracking_gh(cmd, stdin=None):
+            order.append(("gh", cmd[2]))
+            return fake(cmd, stdin)
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(gh_client, "run", tracking_gh), \
+                mock.patch.object(git_ops, "run_git", tracking_git), mock.patch.object(u, "ROOT", Path(tmp)), \
+                redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            code = u.main(["usual-basket", "--repo", "o/r", "review", "--target", "B-01", "--verdict", "approved"],
+                          load=loader(usual_basket()))
+        self.assertEqual(code, 0)
+        first_gh = next(n for n, (tool, _) in enumerate(order) if tool == "gh")
+        self.assertLess(order.index(("git", "push")), first_gh)
+
     def test_writes_refused_off_the_initiative_branch(self):
         code, gh_calls, _, written, output = run(["review", "--target", "B-01", "--verdict", "approved"],
                                                  usual_basket(), git=FakeGit(branch="main"))
