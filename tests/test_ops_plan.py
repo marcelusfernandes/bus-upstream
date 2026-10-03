@@ -401,6 +401,7 @@ class RelayDecide(unittest.TestCase):
         actions = o.sign(o.plan_relay_decide(snap, SLUG, "D-001", "B", "typed in Codex"), "orchestrator")
         body = actions[0]["body"]
         self.assertTrue(body.startswith("/decide D-001 B\nWhy: typed in Codex"))
+        self.assertIn("**Choice:** B — Cost per order", body)
         self.assertIn(c.RELAY_MARKER, body)
         self.assertNotIn("enceladus", body)
         after = apply_to_snapshot(snap, actions, now=T1)

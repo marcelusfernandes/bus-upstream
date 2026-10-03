@@ -130,8 +130,8 @@ of decisions stays in the comments, the records and GitHub's label timeline.
 
 **Deciding from Codex.** When the PM pilots the process in Codex, the agent shows the same
 request there. If the PM types the answer in Codex, the agent posts it verbatim with
-`upstream_ops relay-decide` as `/decide D-nnn <option>` plus `Why:` and the invisible
-`<!-- relayed-from:codex -->` note, with no Enceladus marker, because it is the PM's
+`upstream_ops relay-decide` as `/decide D-nnn <option>` plus `Why:`, the chosen option
+written out (`Choice: <option> — <text>`), and the invisible `<!-- relayed-from:codex -->` note, with no Enceladus marker, because it is the PM's
 decision. The agent never turns a PM's GitHub comment, or its own reading of the PM's
 intent, into a `/decide`.
 

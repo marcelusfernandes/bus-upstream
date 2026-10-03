@@ -73,8 +73,9 @@ def plan(comment, issue):
     still_waiting = [w for w in waiting if w != target_id]
     actions = [] if still_waiting else [{"kind": "remove_label", "issue": n, "label": "human:pending"},
                                         {"kind": "add_label", "issue": n, "label": "human:decided"}]
+    chosen = d.answer_text(issue, target_id, choice)  # write the option out, so anyone reading understands
     actions.append({"kind": "comment", "issue": n,
-                    "body": f"{target_id} decided by @{comment['author']}: **{choice}** ({comment['url']}). "
+                    "body": f"{target_id} decided by @{comment['author']}: **{choice} — {chosen}** ({comment['url']}). "
                             "The orchestrator will post the decision record here."})
     return actions
 

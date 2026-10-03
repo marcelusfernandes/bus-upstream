@@ -47,7 +47,7 @@ class Plan(unittest.TestCase):
         actions = d.plan(comment("/decide A"), epic("D-001"))
         self.assertEqual(kinds(actions), ["remove_label", "add_label", "comment"])
         self.assertEqual((actions[0]["label"], actions[1]["label"]), ("human:pending", "human:decided"))
-        self.assertIn("D-001 decided by @junior-pm: **A**", actions[2]["body"])
+        self.assertIn("D-001 decided by @junior-pm: **A — Conversion**", actions[2]["body"])
         self.assertTrue(all(a["issue"] == 1 for a in actions))
 
     def test_never_closes(self):
