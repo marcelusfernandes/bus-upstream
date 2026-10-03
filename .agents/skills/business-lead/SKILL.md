@@ -49,14 +49,20 @@ orchestrator's brief (gap: `define` or `ground`).
    - `context`: up to about three paragraphs: why this question exists, what the evidence
      says (with each E-id's claim), and what each choice changes;
    - each option `text` and `tradeoffs`: a sentence or two each.
+   The helper refuses anything beyond these hard limits (generous on purpose):
+   question 200 characters, context 2000, each option `text` and `tradeoffs` 300.
    When evidence is missing, include a **bet** option: "commit to X as a bet, owned by
    the PM, validated by <how> in parallel". Accepting it is gate 4 (accepted risk); say so
    in its trade-offs. Do not only offer "wait for a diagnosis".
 5. **Resolve hypotheses routed to B** (for example "is recurrence or AOV in scope?") when
    evidence or a decision settles them:
    `upstream_ops <slug> --agent business_lead hypothesis-close --id H-nn --status <...> --why "<...>" [--evidence ...] [--into H-nn]`.
-6. **Update `business/README.md`** with the current statement and state of each question.
-7. **Return at most 15 lines:** the answer IDs drafted and ready for review, the
+6. **Complete hypotheses that miss a test or a readable origin:**
+   `upstream_ops <slug> --agent business_lead hypothesis-update --id H-nn --test "<what would validate or invalidate it>" [--origin "<who and where, in words>"]`.
+   It updates the register and the hypothesis issue together. Never ask the PM to accept
+   a missing field you can fill yourself.
+7. **Update `business/README.md`** with the current statement and state of each question.
+8. **Return at most 15 lines:** the answer IDs drafted and ready for review, the
    decision spec paths in /tmp, the hypotheses closed, and what is still open.
 
 ## Self-check before returning

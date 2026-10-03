@@ -114,6 +114,16 @@ class LabelObligation(unittest.TestCase):
         self.assertEqual(len(report["obligations"]), 2, "fix labels + record D-001, no duplicate drift line")
 
 
+class Cli(unittest.TestCase):
+    def test_help_is_not_read_as_a_slug(self):
+        import io
+        from contextlib import redirect_stderr
+        err = io.StringIO()
+        with redirect_stderr(err):
+            self.assertEqual(r.main(["reconcile.py", "--help"]), 0)
+        self.assertIn("usage: reconcile.py <slug>", err.getvalue())
+
+
 class Summary(unittest.TestCase):
     def test_summary_is_short_and_factual(self):
         text = r.summary(r.reconcile(usual_basket()))

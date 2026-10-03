@@ -420,6 +420,26 @@ class RelayDecide(unittest.TestCase):
             o.plan_relay_decide(DecisionRecord()._opened(), SLUG, "D-001", "Z", "x")
 
 
+class HypothesisUpdate(unittest.TestCase):
+    def test_adds_a_missing_test_column_and_refreshes_the_issue(self):
+        snap = usual_basket()  # its register predates the Test column
+        actions = o.plan_hypothesis_update(snap, SLUG, "H-02", {"Test": "conversion vs App by speed",
+                                                                "Origin": "business stakeholder, in the intake demand"})
+        self.assertEqual([a["kind"] for a in actions], ["write_file", "edit_body", "commit"])
+        register = actions[0]["text"]
+        self.assertIn("| Test | Status |", register)
+        self.assertIn("| conversion vs App by speed | open |", register)
+        self.assertIn("**How it gets tested:** conversion vs App by speed", actions[1]["body"])
+        after = apply_to_snapshot(snap, actions)
+        self.assertEqual(v.validate_snapshot(after) + v.validate_files_and_comments(after), [])
+
+    def test_refuses_file_paths_and_unknown_fields(self):
+        with self.assertRaises(o.OpsError):
+            o.plan_hypothesis_update(usual_basket(), SLUG, "H-02", {"Origin": "see evals/x/input.md"})
+        with self.assertRaises(o.OpsError):
+            o.plan_hypothesis_update(usual_basket(), SLUG, "H-02", {"Status": "validated"})
+
+
 class CheckpointAndSummary(unittest.TestCase):
     def test_summary_never_cuts_an_answer(self):
         snap = snap_with_readme()
