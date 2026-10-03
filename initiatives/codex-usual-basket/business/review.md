@@ -1,3 +1,7 @@
+## Review · B-05 · rejected
+
+Blocking: B-05 declara evidenciados o registro completo e o encaminhamento de H-01 a H-04, mas as evidências autorizadas não demonstram suas origens nem o encaminhamento de H-01/H-02 exigidos por B5. · Return to: B-05
+
 ## Review · B-03 · approved
 
 Blocking: none · Return to: none
