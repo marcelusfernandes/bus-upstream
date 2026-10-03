@@ -23,8 +23,13 @@ def _text(cm):
 
 def is_agent_comment(cm):
     """Agents comment with the PM's own GitHub account today, so authorship cannot tell them
-    apart. Every agent comment starts with a `## ` title line (spec/v1/04); PM comments do not."""
-    first = next((line for line in _text(cm).splitlines() if line.strip()), "")
+    apart. An agent comment carries the hidden Enceladus marker (outside any quote) or, for
+    comments written before the signature existed, starts with a `## ` title line. A PM who
+    quote-replies an agent comment is still the PM."""
+    lines = _text(cm).splitlines()
+    if any(re.search(c.AGENT_MARKER, line) and not line.lstrip().startswith(">") for line in lines):
+        return True
+    first = next((line for line in lines if line.strip()), "")
     return first.startswith("## ")
 
 
@@ -120,6 +125,20 @@ def answer_text(issue, decision_id, choice):
     if choice.startswith("other: "):
         return choice[len("other: "):].strip()
     return requests(issue)[decision_id]["options"].get(choice)
+
+
+def expected_labels(issue, blocked=False, autonomous=False):
+    """The decision labels an issue should carry, from its comments. One human: label at most:
+    human:pending while anything waits for the PM (or the layer is blocked), otherwise
+    human:decided once the PM has decided something here. agent:decided is history: it is
+    expected once an agent record exists and is never removed (None = leave as is)."""
+    waiting = (bool(awaiting_pm(issue)) and not autonomous) or blocked
+    pm_decided = bool(_pm_decisions(issue)) or any(
+        (by := recorded_by(issue, rid)) and by != "agent" for rid in records(issue))
+    agent_decided = any(recorded_by(issue, rid) == "agent" for rid in records(issue))
+    return {"human:pending": waiting,
+            "human:decided": (not waiting) and pm_decided,
+            "agent:decided": True if agent_decided else None}
 
 
 def open_request_ids(snap):

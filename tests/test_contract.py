@@ -61,6 +61,12 @@ class TemplatesMatchContract(unittest.TestCase):
         for row in rows[2:]:
             self.assertRegex(row, r"^\| " + c.HYPOTHESIS_ID + r" \|")
 
+    def test_answer_template_has_the_summary_lines(self):
+        text = (ROOT / "templates" / "answer.md").read_text(encoding="utf-8")
+        self.assertRegex(text, re.compile(rf"^# {c.ANSWER_ID} · .+$", re.M))
+        self.assertRegex(text, re.compile(r"^\*\*Answer:\*\* .+$", re.M))
+        self.assertRegex(text, re.compile(r"^\*\*State:\*\* (evidenced|bet|open)$", re.M))
+
     def test_decide_examples_are_inline_and_valid(self):
         text = (ROOT / "templates" / "decision-request.md").read_text(encoding="utf-8")
         self.assertFalse([l for l in text.splitlines() if l.startswith("/decide")],

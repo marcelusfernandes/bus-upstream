@@ -225,3 +225,6 @@ __pycache__/
 # Private, local only
 docs/upstream/proposals/
 SOURCES.local.md
+
+# Decision specs are working files; they belong in /tmp, never in the initiative
+initiatives/**/decision-*.json

@@ -104,6 +104,16 @@ class Obligations(unittest.TestCase):
         self.assertEqual(r.reconcile(snap)["agent_decide"], ["D-001"])
 
 
+class LabelObligation(unittest.TestCase):
+    def test_both_human_labels_become_a_fix_labels_obligation(self):
+        snap = with_decision(usual_basket(), comments=[comment(PM, "/decide A", T1)])
+        by_number(snap, 1)["labels"].append("human:decided")
+        report = r.reconcile(snap)
+        self.assertEqual(report["label_fixes"], [{"issue": 1, "add": [], "remove": ["human:pending"]}])
+        self.assertTrue(report["obligations"][0].startswith("fix labels on #1"))
+        self.assertEqual(len(report["obligations"]), 2, "fix labels + record D-001, no duplicate drift line")
+
+
 class Summary(unittest.TestCase):
     def test_summary_is_short_and_factual(self):
         text = r.summary(r.reconcile(usual_basket()))

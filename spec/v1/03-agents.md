@@ -22,10 +22,14 @@
 - **The orchestrator** runs `route`, `review`, `answer`, `score`, `decision-record`, and
   `decision-open` for blocked layers (accept as risk / change approach / park). Decisions
   are comments in the issue that needs them, never separate issues.
-- **Every agent comment starts with a `## ` title line**, because agents comment with the
-  PM's account; that is how a comment is known not to be the PM's.
-- **Leads** write answer drafts and READMEs in their layer folder, and run
-  `decision-open` and `hypothesis-close`.
+- **Agents are Enceladus.** Every agent comment carries the invisible
+  `<!-- enceladus:<role> -->` marker (`upstream_ops --agent <role>`), because agents
+  comment with the PM's account; that is how a comment is known not to be the PM's.
+- **Leads** write answer drafts and READMEs in their layer folder, prepare decision specs
+  in /tmp (they do not open them), and run `hypothesis-close`.
+- **The orchestrator reviews drafts before the PM sees them**, then opens the decisions
+  (`decision-open`), and also runs `fix-labels`, `reply`, `relay-decide` (only for an
+  answer the PM typed in Codex), `summary` and `checkpoint`.
 - **Collectors** write exactly one evidence file each.
 - **Reviewers and scorers are read-only.** They return JSON, and the orchestrator
   records it, so a reviewer never edits what it reviews.

@@ -30,7 +30,7 @@ At most **one value per exclusive family**. Different families can combine freel
 | `state:` | `ready`, `in-progress`, `in-review`, `qa-failed`, `blocked`, `done` | yes | epics and sub-issues |
 | `type:` | `question`, `evidence`, `review`, `hypothesis` | yes | sub-issues |
 | `hyp:` | `open`, `validated`, `invalidated`, `reframed`, `merged`, `parked` | yes | hypothesis sub-issues |
-| `human:` | `pending`, `decided` | yes | the issue holding the decision request (piloted mode) |
+| `human:` | `pending`, `decided` | yes, **one at most** | `pending` while a decision on the issue waits for the PM; otherwise `decided` once the PM decided there |
 | `agent:` | `decided` | — | the issue holding a decision the agent made (autonomous mode) |
 | `mode:` | `piloted`, `autonomous` | yes | epics (same on all epics of a milestone) |
 | `epic` | — | — | the four epics |
@@ -93,9 +93,9 @@ D-001 decided by @pm: A                            the /decide Action acknowledg
    or `/decide other: <the PM's own option>`. When several decisions are waiting on the
    same issue, the PM names one: `/decide D-001 A`.
 3. **The `/decide` Action** (runs from `main`, reads the issue's comments):
-   - A valid `/decide` from the assigned PM adds `human:decided` (permanent). It removes
-     `human:pending` when nothing else waits for the PM, and acknowledges. It never closes
-     the issue.
+   - A valid `/decide` from the assigned PM acknowledges. When it was the last decision
+     waiting, it swaps `human:pending` for `human:decided`; while another still waits,
+     `human:pending` stays (one `human:` label per issue). It never closes the issue.
    - A bare `/decide` with several decisions waiting, an unknown or already decided
      D-id, or an option that does not exist all get a reply, and nothing changes.
    - `/decide` from anyone other than the assignee gets a reply naming the assignee. Bots and
@@ -107,10 +107,35 @@ D-001 decided by @pm: A                            the /decide Action acknowledg
    (who decided, when, the PM's why), ticks the checklist line
    (`- [x] D-001 · <question> → <answer>`), and commits `decisions/D-001.md`.
 
-**Agent comments always start with a `## ` title line.** Agents comment with the PM's
-GitHub account today, so authorship cannot tell them apart. A comment starting with
-`## ` never counts as a PM decision, and agent comments never put `/decide` at the start
-of a line.
+**Agents are Enceladus, and every agent comment is signed.** Agents comment with the
+PM's GitHub account today, so authorship cannot tell them apart. Every agent comment
+carries the invisible marker `<!-- enceladus:<role> -->`, added by
+`upstream_ops --agent <role>`. A comment with that marker (outside a quote) never counts
+as a PM decision, so a PM who quote-replies an agent comment is still the PM. Comments
+written before the marker existed are recognized by their `## ` title. Agent comments
+never put `/decide` at the start of a line.
+
+**One `human:` label per issue, and a guard.** An issue carries `human:pending` while any
+decision on it waits for the PM, and `human:decided` once nothing waits and the PM has
+decided there. A new request on a decided issue swaps it back to `pending`. The labels
+follow the comments: if they disagree (for example, both labels present, or `pending`
+after the PM decided everything), `upstream_ops fix-labels` sets the correct one in the
+agent's next action and posts `## Labels fixed` saying what changed and why. The history
+of decisions stays in the comments, the records and GitHub's label timeline.
+
+**Deciding from Codex.** When the PM pilots the process in Codex, the agent shows the same
+request there. If the PM types the answer in Codex, the agent posts it verbatim with
+`upstream_ops relay-decide` as `/decide D-nnn <option>` plus `Why:` and the invisible
+`<!-- relayed-from:codex -->` note, with no Enceladus marker, because it is the PM's
+decision. The agent never turns a PM's GitHub comment, or its own reading of the PM's
+intent, into a `/decide`.
+
+**The issue is self-contained.** A PM reading only GitHub must be able to decide. Each
+request has a short **Context** (at most 700 characters), a question of at most 120
+characters, and options of at most 140 characters each. `upstream_ops summary` keeps the
+epic body current: statement, key questions with one-line answer and state, a link to
+the files on the branch, and the Decisions checklist. Before stopping, the agent runs
+`summary` and `checkpoint`, so the drafts are pushed too.
 
 In **autonomous mode** the agent decides with `decision-record --agent-choice`, posts the
 same record, and labels the issue `agent:decided`. Filtering `human:decided` vs

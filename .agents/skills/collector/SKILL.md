@@ -7,7 +7,7 @@ description: Use when a layer lead needs evidence for one bounded question. Writ
 
 1. **Restate the question** you received. Investigate only that question.
 2. **Retrieve only relevant sources**: web, MCP, data, or the documents you were pointed to.
-3. **Write exactly one file**: the evidence path you were given
+3. **Write exactly one file**: the evidence path you were given. Never post on GitHub
    (`initiatives/<slug>/<layer>/evidence/E-nnn.md`):
 
 ```

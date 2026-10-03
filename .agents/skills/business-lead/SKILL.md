@@ -1,6 +1,6 @@
 ---
 name: business-lead
-description: Use when the orchestrator routes work to the Business layer. Answers B1-B5 with evidence from collectors, drafts answer files, opens gate-1 and metric decisions as proposed options, and resolves hypotheses routed to B.
+description: Use when the orchestrator routes work to the Business layer. Answers B1-B5 with evidence from collectors, drafts answer files, prepares gate-1 and metric decisions as specs for the orchestrator, and resolves hypotheses routed to B.
 ---
 
 # Business lead
@@ -16,7 +16,7 @@ orchestrator's brief (gap: `define` or `ground`).
 
 | ID | Question | You produce |
 |---|---|---|
-| B1 | What is the business problem? | One sentence: the outcome at stake and what is going wrong, in business terms. **Gate 1**: request a decision (a comment on the B epic, never a separate issue) with 2–3 candidate statements and your recommendation. |
+| B1 | What is the business problem? | One sentence: the outcome at stake and what is going wrong, in business terms. **Gate 1**: prepare a decision spec with 2–3 candidate statements and your recommendation. |
 | B2 | How do we know it exists? | The baseline with its source, population and time window |
 | B3 | How will we know we succeeded? | **One primary** metric plus guardrails, proposed as decision options for the PM to pick |
 | B4 | Why is it relevant now? | The trigger, and what waiting costs |
@@ -31,21 +31,29 @@ orchestrator's brief (gap: `define` or `ground`).
    next free E number in the initiative. Cite only evidence that exists as a file.
    If you cannot dispatch subagents, return the bounded questions (with their target
    files) to the orchestrator, which dispatches the collectors and calls you back.
-3. **Draft each answer** in `initiatives/<slug>/business/answers/B-0n.md`:
-   question · answer (B1 is one sentence) · state (`evidenced`, `bet` or `open`) ·
-   reasoning · evidence IDs · what this does **not** let us conclude.
-4. **Open decisions instead of asking.** First draft the answer file the decision is
-   about (state `open`, listing the candidates): `upstream_ops` refuses a decision whose
-   answer has no draft. Then write a JSON spec (id, ref, question, options
-   with trade-offs and reversibility, recommendation, why, would_change, evidence,
-   blocks) and run
-   `python3 scripts/upstream_ops.py <slug> decision-open --spec <file>`.
+3. **Draft each answer** in `initiatives/<slug>/business/answers/B-0n.md`, following
+   `templates/answer.md` exactly: `# B-0n · <question>`, then `**Answer:** <one line>`,
+   then `**State:** evidenced|bet|open`, then reasoning, evidence IDs and what this does
+   **not** let us conclude. The first three lines feed the epic summary on GitHub.
+4. **Prepare decisions instead of asking; do not open them.** First draft the answer file
+   the decision is about (state `open`, listing the candidates). Then write a JSON spec
+   in **/tmp** (never in the initiative folder) and return its path; the orchestrator
+   opens it after the review. The spec has `id`, `ref`, `question`, `context`, `options`
+   (each with `key`, `text`, `tradeoffs`, `reversibility`), `recommendation`, `why`,
+   `would_change`, `evidence` and `blocks`. Keep it readable on GitHub:
+   - `question` at most 120 characters, with no prefix like "Gate 1:";
+   - `context` at most 700 characters: why this question exists and what the evidence
+     says, so the PM can decide without opening any file;
+   - each option `text` and `tradeoffs` at most 140 characters (one short line each).
+   When evidence is missing, include a **bet** option: "commit to X as a bet, owned by
+   the PM, validated by <how> in parallel". Accepting it is gate 4 (accepted risk); say so
+   in its trade-offs. Do not only offer "wait for a diagnosis".
 5. **Resolve hypotheses routed to B** (for example "is recurrence or AOV in scope?") when
    evidence or a decision settles them:
-   `upstream_ops <slug> hypothesis-close --id H-nn --status <...> --why "<...>" [--evidence ...] [--into H-nn]`.
+   `upstream_ops <slug> --agent business_lead hypothesis-close --id H-nn --status <...> --why "<...>" [--evidence ...] [--into H-nn]`.
 6. **Update `business/README.md`** with the current statement and state of each question.
 7. **Return at most 15 lines:** the answer IDs drafted and ready for review, the
-   decisions opened, the hypotheses closed, and what is still open.
+   decision spec paths in /tmp, the hypotheses closed, and what is still open.
 
 ## Self-check before returning
 

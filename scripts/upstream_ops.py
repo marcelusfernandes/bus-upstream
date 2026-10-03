@@ -8,6 +8,14 @@
     upstream_ops.py <slug> decision-open --spec decision.json
     upstream_ops.py <slug> decision-record --id D-001 [--agent-choice B --agent-why ..]
     upstream_ops.py <slug> hypothesis-close --id H-01 --status invalidated --why .. [--evidence E-007 ..] [--into H-04]
+    upstream_ops.py <slug> fix-labels
+    upstream_ops.py <slug> reply --decision D-001 --text "<options and a recommendation>"
+    upstream_ops.py <slug> relay-decide --decision D-001 --choice B --why "<the PM's words, typed in Codex>"
+    upstream_ops.py <slug> checkpoint --reason "<why we stop here>"
+    upstream_ops.py <slug> summary --layer B
+
+Every comment carries the invisible Enceladus marker for the role given with
+--agent (default: orchestrator), except a relayed PM decision.
 
 Add --dry-run to print the actions without executing them. Writes and commits happen
 only on the initiative's own branch (upstream/<slug>).
@@ -35,7 +43,20 @@ def _parser():
     p.add_argument("slug")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--repo")
+    p.add_argument("--agent", default="orchestrator", help="role signed on every comment")
     sub = p.add_subparsers(dest="command", required=True)
+    sub.add_parser("fix-labels")
+    s = sub.add_parser("reply")
+    s.add_argument("--decision", required=True)
+    s.add_argument("--text", required=True)
+    s = sub.add_parser("relay-decide")
+    s.add_argument("--decision", required=True)
+    s.add_argument("--choice", required=True)
+    s.add_argument("--why")
+    s = sub.add_parser("checkpoint")
+    s.add_argument("--reason", required=True)
+    s = sub.add_parser("summary")
+    s.add_argument("--layer", required=True, choices=["B", "U", "S"])
     s = sub.add_parser("route")
     s.add_argument("--layer", required=True, choices=["B", "U", "S", "PRD"])
     s.add_argument("--state", required=True)
@@ -70,7 +91,17 @@ def _parser():
     return p
 
 
-def plan(args, snap):
+def plan(args, snap, repo=None):
+    if args.command == "fix-labels":
+        return o.plan_fix_labels(snap)
+    if args.command == "reply":
+        return o.plan_reply(snap, args.decision, args.text)
+    if args.command == "relay-decide":
+        return o.plan_relay_decide(snap, args.slug, args.decision, args.choice, args.why)
+    if args.command == "checkpoint":
+        return o.plan_checkpoint(args.slug, args.reason)
+    if args.command == "summary":
+        return o.plan_summary(snap, args.slug, args.layer, repo)
     if args.command == "route":
         return o.plan_route(snap, args.layer, args.state)
     if args.command == "score":
@@ -84,7 +115,7 @@ def plan(args, snap):
         spec = json.loads(Path(args.spec).read_text(encoding="utf-8"))
         return o.plan_decision_open(snap, args.slug, spec["id"], spec["ref"], spec["question"], spec["options"],
                                     spec["recommendation"], spec["why"], spec["would_change"],
-                                    spec.get("evidence", []), spec["blocks"])
+                                    spec.get("evidence", []), spec["blocks"], spec.get("context"))
     if args.command == "decision-record":
         return o.plan_decision_record(snap, args.slug, args.id, args.agent_choice, args.agent_why)
     return o.plan_hypothesis_close(snap, args.slug, args.id, args.status, args.why, args.evidence, args.into)
@@ -117,6 +148,8 @@ def execute(actions, repo, slug, milestone, git=None):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(a["text"], encoding="utf-8")
         elif kind == "commit":
+            if a.get("skip_if_clean") and not git(["status", "--porcelain", "--", *a["paths"]]).strip():
+                continue
             git_ops.commit_and_push(a["paths"], a["message"], branch, git, a.get("allow_empty", False))
 
 
@@ -128,7 +161,7 @@ def main(argv=None, load=None):
         snap = (load or github_snapshot.load_initiative)(repo, folder, ROOT)
         if snap is None:
             raise o.OpsError(f"initiatives/{args.slug} has no milestone yet")
-        actions = plan(args, snap)
+        actions = o.sign(plan(args, snap, repo), args.agent)
         if args.dry_run:
             print(json.dumps(actions, indent=2, ensure_ascii=False))
             return 0

@@ -168,6 +168,32 @@ def check_decision_authorship(snap):
     return errors
 
 
+# ---------- check 11: labels match the story in the comments ----------
+
+def _autonomous(snap, issue):
+    parent = next((i for i in _issues(snap) if i["number"] == issue.get("parent")), None)
+    return _has(issue, "mode:autonomous") or bool(parent and _has(parent, "mode:autonomous"))
+
+
+def label_fixes(snap):
+    """[(issue, add, remove)] to make decision labels match the comments: one human: label at
+    most (pending while anything waits, else decided); agent:decided is never removed."""
+    fixes = []
+    for issue in _issues(snap):
+        expected = decisions.expected_labels(issue, blocked=_has(issue, "state:blocked"),
+                                             autonomous=_autonomous(snap, issue))
+        add = [l for l, want in expected.items() if want and not _has(issue, l)]
+        remove = [l for l, want in expected.items() if want is False and _has(issue, l)]
+        if add or remove:
+            fixes.append((issue, add, remove))
+    return fixes
+
+
+def check_labels_match_comments(snap):
+    return [Error(11, _where(issue), f"labels disagree with the comments: add {add or '-'}, remove {remove or '-'}")
+            for issue, add, remove in label_fixes(snap)]
+
+
 # ---------- check 10: no silent hypotheses ----------
 
 def _hypotheses(snap):
@@ -360,12 +386,13 @@ def check_commit_message(message):
 # ---------- entry points ----------
 
 SNAPSHOT_CHECKS = (check_exclusive_families, check_blocked_needs_human, check_no_advance_while_pending,
-                   check_anti_loop, check_score_header, check_decision_authorship, check_no_silent_hypotheses)
+                   check_anti_loop, check_score_header, check_decision_authorship, check_no_silent_hypotheses,
+                   check_labels_match_comments)
 FILE_CHECKS = (check_ids_resolve, check_verdicts_match)
 
 
 def validate_snapshot(snap):
-    """GitHub-only checks (3, 4, 5, 6, 7, 9, 10). Safe to run from a GitHub Action."""
+    """GitHub-only checks (3, 4, 5, 6, 7, 9, 10, 11). Safe to run from a GitHub Action."""
     return [e for check in SNAPSHOT_CHECKS for e in check(snap)]
 
 

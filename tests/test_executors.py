@@ -173,8 +173,8 @@ class DecideMain(unittest.TestCase):
             self.assertEqual(decide_action.main(["decide_action.py", f.name]), 0)
         self.assertEqual(calls[0], ["gh", "api", "--paginate", "repos/o/r/issues/1/comments", "--jq", ".[]"])
         edits = [c for c in calls if c[:3] == ["gh", "issue", "edit"]]
-        self.assertEqual(edits, [["gh", "issue", "edit", "1", "--add-label", "human:decided"],
-                                 ["gh", "issue", "edit", "1", "--remove-label", "human:pending"]])
+        self.assertEqual(edits, [["gh", "issue", "edit", "1", "--remove-label", "human:pending"],
+                                 ["gh", "issue", "edit", "1", "--add-label", "human:decided"]])
 
 
 class HooksMain(unittest.TestCase):
