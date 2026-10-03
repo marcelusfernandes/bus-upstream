@@ -76,6 +76,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-39 | One `human:` label per issue (pending while anything waits, otherwise decided); `fix-labels` repairs disagreements from the comments and says so. | agreed |
 | R-40 | Agents are **Enceladus**: every agent comment carries the invisible `<!-- enceladus:<role> -->` marker. A PM answer typed in Codex is relayed verbatim (`relay-decide`) without it. | agreed |
 | R-41 | The issue is self-contained: drafts are reviewed before the PM decides; requests carry a Context and short options; `summary` keeps the epic body current; `checkpoint` pushes work before stopping. | agreed |
+| R-42 | Decision records follow Apollo's pattern: `Decision (@pm, date, recorded by Enceladus) — D-nnn → option: text. why. Unlocks: …`; one PM comment may decide several (`/decide D-nnn <option>` per line). | agreed |
 | R-28 | Grounding is capped at 5 when a layer rests mostly on bets. | agreed |
 
 ## Out of scope for v1

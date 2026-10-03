@@ -55,28 +55,39 @@ def _refusal(issue, target_id, choice, author):
 
 
 def plan(comment, issue):
-    """comment: {author, body, url, association}; issue: the issue with the comments BEFORE this one."""
+    """comment: {author, body, url, association}; issue: the issue with the comments BEFORE this one.
+    A comment may answer several decisions, one `/decide D-nnn <option>` line each."""
     if comment["author"].endswith("[bot]") or comment.get("association", "OWNER") not in TRUSTED_ASSOCIATIONS:
         return []
-    if d.is_agent_comment(comment):  # agents share the PM's account; their comments start with "## "
+    if d.is_agent_comment(comment):  # agents share the PM's account; their comments carry the marker
         return []
-    parsed = parse_decide(comment["body"])
-    if parsed is None:
+    commands = d.decide_commands(comment["body"])
+    if not commands:
         return []
-    target_id, choice = parsed
-    refusal = _refusal(issue, target_id, choice, comment["author"])
-    if refusal:
-        return _reply(issue, refusal)
-    waiting = d.awaiting_pm(issue)
-    target_id = target_id or waiting[0]
+    waiting, accepted, refusals = list(d.awaiting_pm(issue)), [], []
+    for target_id, choice, _ in commands:
+        if target_id is None and len(commands) > 1:
+            refusals.append("A comment with several `/decide` lines must name each decision: `/decide D-nnn <option>`.")
+            continue
+        refusal = _refusal(dict(issue, comments=issue.get("comments", [])), target_id, choice, comment["author"]) \
+            if target_id not in [a[0] for a in accepted] else f"{target_id} appears twice in this comment."
+        if refusal:
+            refusals.append(refusal)
+            continue
+        target_id = target_id or waiting[0]
+        accepted.append((target_id, choice, d.answer_text(issue, target_id, choice)))
     n = issue["number"]
-    still_waiting = [w for w in waiting if w != target_id]
-    actions = [] if still_waiting else [{"kind": "remove_label", "issue": n, "label": "human:pending"},
-                                        {"kind": "add_label", "issue": n, "label": "human:decided"}]
-    chosen = d.answer_text(issue, target_id, choice)  # write the option out, so anyone reading understands
-    actions.append({"kind": "comment", "issue": n,
-                    "body": f"{target_id} decided by @{comment['author']}: **{choice} — {chosen}** ({comment['url']}). "
-                            "The orchestrator will post the decision record here."})
+    actions = []
+    still_waiting = [w for w in waiting if w not in [a[0] for a in accepted]]
+    if accepted and not still_waiting:
+        actions += [{"kind": "remove_label", "issue": n, "label": "human:pending"},
+                    {"kind": "add_label", "issue": n, "label": "human:decided"}]
+    lines = [f"{rid} decided by @{comment['author']}: **{choice} — {text}**" for rid, choice, text in accepted]
+    if lines:
+        lines.append(f"({comment['url']}). The orchestrator will post the decision record here.")
+    lines += refusals
+    if lines:
+        actions.append({"kind": "comment", "issue": n, "body": "\n".join(lines)})
     return actions
 
 

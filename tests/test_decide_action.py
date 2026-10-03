@@ -58,6 +58,18 @@ class Plan(unittest.TestCase):
         self.assertEqual(kinds(actions), ["comment"])
         self.assertIn("/decide D-001", actions[0]["body"])
 
+    def test_several_decisions_in_one_comment(self):
+        actions = d.plan(comment("/decide D-001 A\nWhy: x\n/decide D-002 B\nWhy: y"), epic("D-001", "D-002"))
+        self.assertEqual(kinds(actions), ["remove_label", "add_label", "comment"])
+        self.assertIn("D-001 decided by @junior-pm: **A — Conversion**", actions[2]["body"])
+        self.assertIn("D-002 decided by @junior-pm: **B — Cost**", actions[2]["body"])
+
+    def test_bare_line_among_several_is_refused(self):
+        actions = d.plan(comment("/decide A\n/decide D-002 B"), epic("D-001", "D-002"))
+        self.assertEqual(kinds(actions), ["comment"])
+        self.assertIn("must name each decision", actions[0]["body"])
+        self.assertIn("D-002 decided", actions[0]["body"])
+
     def test_targeted_keeps_only_pending_while_another_waits(self):
         actions = d.plan(comment("/decide D-002 B"), epic("D-001", "D-002"))
         self.assertEqual(kinds(actions), ["comment"], "one human: label: pending stays, decided waits")

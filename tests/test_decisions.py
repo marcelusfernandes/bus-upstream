@@ -74,6 +74,27 @@ class Decides(unittest.TestCase):
         self.assertEqual(d.pm_decision(issue, "D-002")["choice"], "B")
 
 
+class SeveralAtOnce(unittest.TestCase):
+    """Like Apollo: the PM can answer several decisions in one comment, one line each."""
+
+    def test_two_named_decisions_in_one_comment(self):
+        issue = epic([comment("agent", REQ1, T0), comment("agent", REQ2, T0),
+                      comment(PM, "/decide D-001 A\nWhy: conversion first\n/decide D-002 B\nWhy: time matters", T1)])
+        self.assertEqual(d.pm_decision(issue, "D-001")["why"], "conversion first")
+        self.assertEqual(d.pm_decision(issue, "D-002")["choice"], "B")
+        self.assertEqual(d.pm_decision(issue, "D-002")["why"], "time matters")
+        self.assertEqual(d.awaiting_pm(issue), [])
+
+    def test_bare_decide_is_not_valid_among_several_lines(self):
+        issue = epic([comment("agent", REQ1, T0), comment(PM, "/decide A\n/decide D-009 B", T1)])
+        self.assertIsNone(d.pm_decision(issue, "D-001"))
+
+    def test_record_names_who_decided_in_apollo_style(self):
+        rec = "## Decision D-001 · B-01 · Conversion\n\nDecision (@junior-pm, 2026-10-03, recorded by Enceladus) — **D-001 → A: x.**"
+        issue = epic([comment("agent", REQ1, T0), comment(PM, "/decide A", T1), comment("agent", rec, T2)])
+        self.assertEqual(d.recorded_by(issue, "D-001"), "junior-pm")
+
+
 class AgentComments(unittest.TestCase):
     def test_agent_comment_with_decide_line_never_counts(self):
         """Agents use the PM's account: a request quoting `/decide A` must not decide itself."""

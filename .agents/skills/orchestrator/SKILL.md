@@ -21,7 +21,7 @@ with `--agent orchestrator` (it signs your comments with the invisible Enceladus
 |---|---|
 | fix labels on #N | `upstream_ops <slug> fix-labels`. It sets the one correct `human:` label from the comments (pending while anything waits for the PM, otherwise decided) and posts a short "Labels fixed" comment saying what changed and why. |
 | fix drift | Read the validator errors. Fix them through `upstream_ops` or by correcting the initiative files. Never edit labels by hand. Then reconcile again. |
-| record decision D-nnn | `upstream_ops <slug> decision-record --id D-nnn` |
+| record decision D-nnn | `upstream_ops <slug> decision-record --id D-nnn` (one per decided D-id; a PM comment may decide several). The record follows Apollo's pattern: who, when, recorded by Enceladus, `D-nnn → option: text`, the PM's why, and what it unlocks. |
 | reply to the PM on D-nnn | The PM commented without `/decide`. `upstream_ops <slug> reply --decision D-nnn --text "<...>"`: acknowledge what you understood, restate the options and your recommendation, and show how to decide (`/decide D-nnn <option>` with `Why:`), inline, never at the start of a line. Never decide for the PM. If the PM is talking to you in this Codex session, also offer to post their answer for them (see "Deciding from Codex"). |
 | decide D-nnn (autonomous) | Decide with the recommendation unless the evidence since changes it: `upstream_ops <slug> decision-record --id D-nnn --agent-choice <key> --agent-why "<...>"`. The senior PM reviews it at handoff. |
 | layer blocked, no decision | Open a decision whose ref is the looping answer, with options: accept the gap as risk, change approach (say how), or park the question. |
