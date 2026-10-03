@@ -105,6 +105,8 @@ def execute(actions, repo, slug, milestone, git=None):
             gh.edit_body(repo, a["issue"], a["body"])
         elif kind == "labels":
             gh.edit_labels(repo, a["issue"], a["add"], a["remove"])
+        elif kind == "assign":
+            gh.add_assignees(repo, a["issue"], a["assignees"])
         elif kind == "close":
             gh.close_issue(repo, a["issue"])
         elif kind == "create_issue":

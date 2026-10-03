@@ -9,7 +9,7 @@ If a file and a comment disagree, a drift has happened (see [08-validator-and-ho
 ```
 Milestone  <demand title>          description = static intake snapshot
 ├─ Epic  B · Business problem      layer state + score header
-│   └─ sub-issues: questions (B-nn), evidence tasks, decisions (D-nnn)
+│   └─ sub-issues: questions (B-nn), evidence tasks, hypotheses (H-nn); decisions live as comments here
 ├─ Epic  U · User problem
 ├─ Epic  S · Solution              bets as sub-issues later (S-A, S-B…)
 └─ Epic  PRD
@@ -28,10 +28,10 @@ At most **one value per exclusive family**. Different families can combine freel
 |---|---|---|---|
 | `layer:` | `business`, `user`, `solution`, `prd` | yes | epics and their sub-issues |
 | `state:` | `ready`, `in-progress`, `in-review`, `qa-failed`, `blocked`, `done` | yes | epics and sub-issues |
-| `type:` | `question`, `evidence`, `decision`, `review`, `hypothesis` | yes | sub-issues |
+| `type:` | `question`, `evidence`, `review`, `hypothesis` | yes | sub-issues |
 | `hyp:` | `open`, `validated`, `invalidated`, `reframed`, `merged`, `parked` | yes | hypothesis sub-issues |
-| `human:` | `pending`, `decided` | yes | decision sub-issues (piloted mode) |
-| `agent:` | `decided` | — | decision sub-issues decided by the agent (autonomous mode) |
+| `human:` | `pending`, `decided` | yes | the issue holding the decision request (piloted mode) |
+| `agent:` | `decided` | — | the issue holding a decision the agent made (autonomous mode) |
 | `mode:` | `piloted`, `autonomous` | yes | epics (same on all epics of a milestone) |
 | `epic` | — | — | the four epics |
 
@@ -53,7 +53,7 @@ over. Their meaning is adapted for upstream:
 reopening comment cites the invalidated ID and the evidence or decision that
 invalidated it. These comments are the trail of wrong assumptions.
 
-No state may advance while the issue has an open `human:pending` decision.
+No state may advance while a decision on the issue waits for the PM.
 
 A layer epic cannot reach `state:done` while a hypothesis routed to it has `hyp:open`.
 
@@ -74,39 +74,50 @@ waiting for an answer.
 
 ## Human decisions
 
-1. The agent opens a **decision sub-issue** with `type:decision` and `human:pending`,
-   assigned to the PM. Its body: Question / Recommendation / Why / Trade-offs /
-   Reversibility / What would change the recommendation / Evidence IDs / Blocks.
-2. The **PM decides with a `/decide` command in their own comment**. An agent
-   transcribing a decision made elsewhere does not count.
-
-   ```
-   /decide A
-   Why: <PM's reasoning, optional but encouraged>
-   ```
-
-   From another issue (for example the epic): `/decide D-004 A`.
-   To propose something not on the list: `/decide other: <the PM's own option>`.
-3. A **GitHub Action** handles the comment:
-   - `/decide` from the assigned PM → swaps `human:pending` → `human:decided` (permanent)
-     and triggers the orchestrator, which posts the decision record and closes the issue.
-     A `/decide D-nnn` posted elsewhere is applied to D-nnn, with a link back.
-   - Any other comment from the PM on a pending decision (a clarification, a new
-     option) → the Action does nothing; the label stays pending. The orchestrator runs
-     locally, so the Action cannot trigger it: the orchestrator's reconcile finds PM
-     comments newer than its last reply on a pending decision and answers them.
-   - `/decide` from anyone other than the assignee → ignored, with a reply explaining why.
-
-In **autonomous mode** the agent decides, posts the same record, and labels the issue
-`agent:decided`. Filtering `human:decided` vs `agent:decided` shows who made each decision.
-
-Decision comment title, which must be matchable by regex:
+**A decision lives inside the issue that requested it**, never in a separate issue, so
+that issue tells the whole story in order (the same pattern as lohra-ts and Apollo):
 
 ```
-## Decision D-004 · U-02 · <answer in one line>
+## Decision request D-001 · B-01 · <question>      agent: options, recommendation, trade-offs
+/decide A                                          the assigned PM, in their own comment
+Why: <the PM's reasoning>
+D-001 decided by @pm: A                            the /decide Action acknowledges
+## Decision D-001 · B-01 · <answer>                agent: the record, quoting the PM
 ```
 
-Regex: `^## Decision D-\d{3} · (?:[BUS]-\d{2}|BU-fit|US-fit) · .+$`
+1. **Request.** `upstream_ops decision-open` posts the request comment on the issue that
+   needs it (usually the layer epic), assigns the PM to that issue, adds `human:pending`
+   (piloted mode), and adds `- [ ] D-001 · <question>` to the issue body's **Decisions**
+   checklist. The answer it is about must already be drafted.
+2. **The PM decides in their own comment:** `/decide A` (with `Why: …` on the next line),
+   or `/decide other: <the PM's own option>`. When several decisions are waiting on the
+   same issue, the PM names one: `/decide D-001 A`.
+3. **The `/decide` Action** (runs from `main`, reads the issue's comments):
+   - A valid `/decide` from the assigned PM adds `human:decided` (permanent). It removes
+     `human:pending` when nothing else waits for the PM, and acknowledges. It never closes
+     the issue.
+   - A bare `/decide` with several decisions waiting, an unknown or already decided
+     D-id, or an option that does not exist all get a reply, and nothing changes.
+   - `/decide` from anyone other than the assignee gets a reply naming the assignee. Bots and
+     non-collaborators are ignored silently.
+   - Any other PM comment changes nothing. The orchestrator's reconcile finds it and
+     replies with a `## Reply · D-nnn` comment (options and a recommendation, never an
+     open question).
+4. **Record.** `upstream_ops decision-record` posts `## Decision D-001 · <ref> · <answer>`
+   (who decided, when, the PM's why), ticks the checklist line
+   (`- [x] D-001 · <question> → <answer>`), and commits `decisions/D-001.md`.
+
+**Agent comments always start with a `## ` title line.** Agents comment with the PM's
+GitHub account today, so authorship cannot tell them apart. A comment starting with
+`## ` never counts as a PM decision, and agent comments never put `/decide` at the start
+of a line.
+
+In **autonomous mode** the agent decides with `decision-record --agent-choice`, posts the
+same record, and labels the issue `agent:decided`. Filtering `human:decided` vs
+`agent:decided` shows who decided where.
+
+Regexes: request `^## Decision request D-\d{3} · (?:[BUS]-\d{2}|BU-fit|US-fit) · .+$`,
+record `^## Decision D-\d{3} · (?:[BUS]-\d{2}|BU-fit|US-fit) · .+$`.
 
 ## Comment patterns
 
@@ -161,7 +172,7 @@ and a link. The file holds the detail. The IDs and verdicts must match between t
 | `BU-fit`, `US-fit` | Link fit reviews |
 | `PRD` | Target of the final PRD review (`## Review · PRD · …`) |
 | `S-A`, `S-B`… | Solution bets |
-| `D-nnn` | Human decision |
+| `D-nnn` | Decision: a request comment and a record comment in the issue that needed it |
 | `E-nnn` | Evidence record |
 | `H-nn` | Hypothesis (sub-issue under the epic of the layer it is routed to) |
 

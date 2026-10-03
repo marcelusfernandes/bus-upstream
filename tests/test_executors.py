@@ -151,18 +151,30 @@ class GhClient(unittest.TestCase):
 
 
 class DecideMain(unittest.TestCase):
-    def test_event_file_drives_gh_commands(self):
-        event = {"comment": {"user": {"login": "junior-pm"}, "body": "/decide D-001 A", "html_url": "u",
+    def test_event_and_issue_comments_drive_gh_commands(self):
+        request = ("## Decision request D-001 · B-01 · Which outcome?\n\n"
+                   "- **A** — Conversion · trade-offs: x · reversibility: easy\n"
+                   "- **B** — Cost · trade-offs: y · reversibility: easy\n")
+        event = {"comment": {"id": 2, "user": {"login": "junior-pm"}, "body": "/decide A", "html_url": "u",
                              "author_association": "COLLABORATOR"},
-                 "issue": {"number": 1, "title": "B · Business problem", "labels": [{"name": "epic"}], "assignees": []}}
+                 "issue": {"number": 1, "title": "B · Business problem", "labels": [{"name": "human:pending"}],
+                           "assignees": [{"login": "junior-pm"}]},
+                 "repository": {"full_name": "o/r"}}
+        api_comments = [{"id": 1, "user": {"login": "junior-pm"}, "body": request, "created_at": "2026-10-02T10:00:00Z"},
+                        {"id": 2, "user": {"login": "junior-pm"}, "body": "/decide A", "created_at": "2026-10-02T11:00:00Z"}]
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
             json.dump(event, f)
-        fake = FakeGh()
-        with mock.patch.object(gh_client, "run", fake):
+        calls = []
+
+        def fake(cmd, stdin=None):
+            calls.append(cmd)
+            return "\n".join(json.dumps(c) for c in api_comments) if cmd[:3] == ["gh", "api", "--paginate"] else ""
+        with mock.patch.object(gh_client, "run", fake), mock.patch.dict("os.environ", {"GH_REPO": "o/r"}):
             self.assertEqual(decide_action.main(["decide_action.py", f.name]), 0)
-        edits = [c for c in fake.calls if c[:3] == ["gh", "issue", "edit"]]
-        self.assertEqual(edits, [["gh", "issue", "edit", "8", "--remove-label", "human:pending"],
-                                 ["gh", "issue", "edit", "8", "--add-label", "human:decided"]])
+        self.assertEqual(calls[0], ["gh", "api", "--paginate", "repos/o/r/issues/1/comments", "--jq", ".[]"])
+        edits = [c for c in calls if c[:3] == ["gh", "issue", "edit"]]
+        self.assertEqual(edits, [["gh", "issue", "edit", "1", "--add-label", "human:decided"],
+                                 ["gh", "issue", "edit", "1", "--remove-label", "human:pending"]])
 
 
 class HooksMain(unittest.TestCase):

@@ -95,18 +95,21 @@ class Cli(unittest.TestCase):
         self.assertEqual((gh_calls, written), ([], {}))
         self.assertIn("switch to upstream/usual-basket", output)
 
-    def test_decision_open_creates_assigned_sub_issue(self):
+    def test_decision_open_comments_in_the_epic_and_assigns_the_pm(self):
         spec = {"id": "D-001", "ref": "B-01", "question": "Which outcome first?",
                 "options": [{"key": "A", "text": "Conversion"}, {"key": "B", "text": "Cost"}],
                 "recommendation": "A", "why": "largest gap", "would_change": "cost data", "blocks": "B"}
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
             json.dump(spec, f)
-        code, gh_calls, _, _, _ = run(["decision-open", "--spec", f.name], usual_basket())
+        code, gh_calls, git_calls, _, _ = run(["decision-open", "--spec", f.name], usual_basket())
         self.assertEqual(code, 0)
-        payload = json.loads(gh_calls[0][1])
-        self.assertEqual((payload["assignees"], payload["milestone"]), ([PM], 7))
-        self.assertIn("human:pending", payload["labels"])
-        self.assertTrue(gh_calls[-1][0][2].endswith("/issues/1/sub_issues"))
+        cmds = [c[0] for c in gh_calls]
+        self.assertEqual(cmds[0][:4], ["gh", "issue", "comment", "1"])
+        self.assertIn("## Decision request D-001 · B-01 · Which outcome first?", cmds[0][-1])
+        self.assertIn(["gh", "issue", "edit", "1", "--repo", "o/r", "--add-assignee", PM], cmds)
+        self.assertIn(["gh", "issue", "edit", "1", "--repo", "o/r", "--add-label", "human:pending"], cmds)
+        self.assertFalse(any("POST" in c for c in cmds), "no separate decision issue")
+        self.assertEqual(git_calls, [])
 
     def test_rule_violation_is_reported_without_writes(self):
         code, gh_calls, _, _, output = run(["route", "--layer", "B", "--state", "done"], usual_basket())

@@ -45,6 +45,8 @@ def apply_to_snapshot(snap, actions, now=T2):
                                        for l in a["add"]]
         elif a["kind"] == "close":
             target["state"] = "closed"
+        elif a["kind"] == "assign":
+            target["assignees"] = sorted(set(target.get("assignees", [])) | set(a["assignees"]))
         elif a["kind"] == "write_file":
             snap["files"][a["path"]] = a["text"]
         elif a["kind"] == "create_issue":
@@ -189,25 +191,47 @@ OPTIONS = [{"key": "A", "text": "Conversion against the App", "tradeoffs": "need
            {"key": "B", "text": "Cost per order", "tradeoffs": "ignores recurrence", "reversibility": "easy"}]
 
 
+def open_d001(snap):
+    return o.plan_decision_open(snap, SLUG, "D-001", "B-01", "Which outcome do we serve first?", OPTIONS,
+                                recommendation="A", why="largest gap", would_change="cost data", evidence=[],
+                                blocks="B1")
+
+
 class DecisionOpen(unittest.TestCase):
-    def test_piloted_assigns_pm_and_waits(self):
-        actions = o.plan_decision_open(snap_with_readme(), SLUG, "D-001", "B-01", "Which outcome do we serve first?",
-                                       OPTIONS, recommendation="A", why="largest gap", would_change="cost data",
-                                       evidence=[], blocks="B cannot be done")
-        a = actions[0]
-        self.assertEqual(a["kind"], "create_issue")
-        self.assertEqual(a["assignees"], [PM])
-        self.assertEqual(a["parent"], 1)
-        self.assertIn("human:pending", a["labels"])
-        self.assertTrue(a["title"].startswith("D-001 · "))
-        for line in [l for l in a["body"].splitlines() if l.startswith("/decide")]:
-            self.assertRegex(line, c.DECIDE_COMMAND)
-        self.assertIn("**Ref:** B-01", a["body"])
+    """A decision is requested inside the issue that needs it (the layer epic), never as its own issue."""
+
+    def test_piloted_request_in_the_epic_assigns_pm_and_waits(self):
+        actions = open_d001(snap_with_readme())
+        self.assertEqual(kinds(actions), ["comment", "edit_body", "assign", "labels"])
+        self.assertTrue(all(a["issue"] == 1 for a in actions))
+        self.assertNotIn("create_issue", kinds(actions))
+        self.assertRegex(actions[0]["body"].splitlines()[0], c.DECISION_REQUEST_TITLE)
+        self.assertEqual(actions[2]["assignees"], [PM])
+        self.assertEqual(actions[3]["add"], ["human:pending"])
+        self.assertIn("- [ ] D-001 · Which outcome do we serve first?", actions[1]["body"])
+        self.assertTrue(actions[1]["body"].startswith("> **Definition:**"), "score header stays first")
+
+    def test_second_request_shares_the_checklist_and_keeps_the_header_first(self):
+        snap = snap_with_readme()
+        snap = apply_to_snapshot(snap, o.plan_score(snap, "B", [(6, 4), (6, 4)], why="x"), now=T0)
+        snap = apply_to_snapshot(snap, open_d001(snap), now=T0)
+        snap["files"][f"{BASE}/business/answers/B-03.md"] = "# B-03 draft"
+        actions = o.plan_decision_open(snap, SLUG, "D-002", "B-03", "Which success metric?", OPTIONS,
+                                       recommendation="A", why="w", would_change="x", evidence=[], blocks="B3")
+        body = next(a for a in actions if a["kind"] == "edit_body")["body"]
+        self.assertEqual(body.count("### Decisions"), 1)
+        self.assertTrue(body.startswith("> **Definition:** 6 · **Grounding:** 4"))
+        self.assertIn("- [ ] D-001 · Which outcome do we serve first?\n- [ ] D-002 · Which success metric?", body)
+        self.assertNotIn("labels", [a["kind"] for a in actions], "human:pending is already there")
+
+    def test_request_never_has_a_decide_line_of_its_own(self):
+        """Agents share the PM's account: a line starting with /decide would decide by itself."""
+        body = open_d001(snap_with_readme())[0]["body"]
+        self.assertFalse(any(line.startswith("/decide") for line in body.splitlines()))
 
     def test_autonomous_has_no_pending_label(self):
-        actions = o.plan_decision_open(snap_with_readme("autonomous"), SLUG, "D-001", "B-01", "q", OPTIONS,
-                                       recommendation="A", why="w", would_change="x", evidence=[], blocks="b")
-        self.assertNotIn("human:pending", actions[0]["labels"])
+        actions = open_d001(snap_with_readme("autonomous"))
+        self.assertNotIn("labels", kinds(actions))
 
     def test_validation(self):
         bad = [dict(options=OPTIONS[:1]), dict(recommendation="C"), dict(decision_id="D-1"), dict(ref="X-01")]
@@ -219,75 +243,78 @@ class DecisionOpen(unittest.TestCase):
                                      recommendation=args["recommendation"], why="w", would_change="x", evidence=[],
                                      blocks="b")
 
+    def test_duplicate_id_refused(self):
+        snap = apply_to_snapshot(snap_with_readme(), open_d001(snap_with_readme()))
+        with self.assertRaises(o.OpsError):
+            open_d001(snap)
+
     def test_requires_the_answer_draft(self):
         snap = snap_with_readme()
         del snap["files"][DRAFT_B1]
         with self.assertRaises(o.OpsError):
-            o.plan_decision_open(snap, SLUG, "D-001", "B-01", "q", OPTIONS, recommendation="A", why="w",
-                                 would_change="x", evidence=[], blocks="b")
+            open_d001(snap)
 
     def test_opened_decision_causes_no_drift(self):
         snap = snap_with_readme()
-        actions = o.plan_decision_open(snap, SLUG, "D-001", "B-01", "q", OPTIONS, recommendation="A", why="w",
-                                       would_change="x", evidence=[], blocks="b")
-        after = apply_to_snapshot(snap, actions)
+        after = apply_to_snapshot(snap, open_d001(snap), now=T0)
         self.assertEqual(v.validate_snapshot(after) + v.validate_files_and_comments(after), [])
 
     def test_requires_pm_in_readme(self):
         snap = usual_basket()
         snap["files"][DRAFT_B1] = "draft"
         with self.assertRaises(o.OpsError):
-            o.plan_decision_open(snap, SLUG, "D-001", "B-01", "q", OPTIONS, recommendation="A", why="w",
-                                 would_change="x", evidence=[], blocks="b")
+            open_d001(snap)
 
 
 class DecisionRecord(unittest.TestCase):
     def _opened(self, mode="piloted"):
         snap = snap_with_readme(mode)
-        actions = o.plan_decision_open(snap, SLUG, "D-001", "B-01", "Which outcome do we serve first?", OPTIONS,
-                                       recommendation="A", why="w", would_change="x", evidence=[], blocks="b")
-        snap = apply_to_snapshot(snap, actions, now=T0)
-        d = by_number(snap, 8)
-        d["label_events"] = [{"label": l, "action": "added", "created_at": T0, "actor": "agent"} for l in d["labels"]]
-        return snap, d
+        if mode == "autonomous":
+            by_number(snap, 1)["labels"] = ["epic", "state:ready", "mode:autonomous", "layer:business"]
+        return apply_to_snapshot(snap, open_d001(snap), now=T0)
 
-    def test_records_pm_choice_and_closes(self):
-        snap, d = self._opened()
-        d["comments"].append(comment(PM, "/decide A\nWhy: biggest gap", T1))
-        d["labels"] = [l for l in d["labels"] if l != "human:pending"] + ["human:decided"]
-        d["label_events"].append({"label": "human:decided", "action": "added", "created_at": T1, "actor": "bot"})
+    def _pm_decides(self, snap, body, at=T1):
+        epic = by_number(snap, 1)
+        epic["comments"].append(comment(PM, body, at))
+        epic["labels"] = [l for l in epic["labels"] if l != "human:pending"] + ["human:decided"]
+        epic["label_events"].append({"label": "human:decided", "action": "added", "created_at": at, "actor": "bot"})
+        return snap
+
+    def test_records_in_the_same_issue_and_ticks_the_checklist(self):
+        snap = self._pm_decides(self._opened(), "/decide A\nWhy: biggest gap")
         actions = o.plan_decision_record(snap, SLUG, "D-001")
-        self.assertEqual(kinds(actions), ["write_file", "comment", "close", "commit"])
+        self.assertEqual(kinds(actions), ["write_file", "comment", "edit_body", "commit"])
+        self.assertNotIn("close", kinds(actions))
         title = actions[1]["body"].splitlines()[0]
         self.assertRegex(title, c.DECISION_TITLE)
         self.assertIn("Conversion against the App", title)
+        self.assertIn("@junior-pm (/decide A)", actions[1]["body"])
         self.assertIn("biggest gap", actions[1]["body"])
-        after = apply_to_snapshot(snap, actions)
-        self.assertEqual(v.check_decision_authorship(after), [])
+        self.assertIn("- [x] D-001 · Which outcome do we serve first? → Conversion against the App", actions[2]["body"])
+        after = apply_to_snapshot(snap, actions, now=T2)
+        self.assertEqual(v.validate_snapshot(after) + v.validate_files_and_comments(after), [])
 
     def test_other_choice_uses_pm_text(self):
-        snap, d = self._opened()
-        d["comments"].append(comment(PM, "/decide other: start with recurrence", T1))
-        d["labels"] = [l for l in d["labels"] if l != "human:pending"] + ["human:decided"]
-        actions = o.plan_decision_record(snap, SLUG, "D-001")
-        self.assertIn("start with recurrence", actions[1]["body"].splitlines()[0])
+        snap = self._pm_decides(self._opened(), "/decide other: start with recurrence")
+        self.assertIn("start with recurrence", o.plan_decision_record(snap, SLUG, "D-001")[1]["body"].splitlines()[0])
 
     def test_pending_cannot_be_recorded(self):
-        snap, _ = self._opened()
         with self.assertRaises(o.OpsError):
-            o.plan_decision_record(snap, SLUG, "D-001")
+            o.plan_decision_record(self._opened(), SLUG, "D-001")
 
     def test_autonomous_agent_choice(self):
-        snap, _ = self._opened("autonomous")
-        by_number(snap, 1)["labels"] = ["epic", "state:ready", "mode:autonomous", "layer:business"]
-        actions = o.plan_decision_record(snap, SLUG, "D-001", agent_choice="B", agent_why="cheaper to measure")
-        self.assertIn({"kind": "labels", "issue": 8, "add": ["agent:decided"], "remove": []}, actions)
+        actions = o.plan_decision_record(self._opened("autonomous"), SLUG, "D-001", agent_choice="B",
+                                         agent_why="cheaper to measure")
+        self.assertEqual(actions[0], {"kind": "labels", "issue": 1, "add": ["agent:decided"], "remove": []})
         self.assertIn("Decided by: agent", actions[2]["body"])
 
     def test_agent_choice_refused_in_piloted_mode(self):
-        snap, _ = self._opened()
         with self.assertRaises(o.OpsError):
-            o.plan_decision_record(snap, SLUG, "D-001", agent_choice="B", agent_why="x")
+            o.plan_decision_record(self._opened(), SLUG, "D-001", agent_choice="B", agent_why="x")
+
+    def test_unknown_or_recorded_decision(self):
+        with self.assertRaises(o.OpsError):
+            o.plan_decision_record(self._opened(), SLUG, "D-009")
 
 
 class HypothesisClose(unittest.TestCase):
@@ -330,14 +357,12 @@ class GoldenPath(unittest.TestCase):
         self.assert_clean(snap, "intake")
         snap = apply_to_snapshot(snap, o.plan_route(snap, "B", "in-progress"), now=T0)
         self.assert_clean(snap, "route")
-        snap = apply_to_snapshot(snap, o.plan_decision_open(
-            snap, SLUG, "D-001", "B-01", "Which outcome do we serve first?", OPTIONS, recommendation="A",
-            why="largest gap", would_change="cost data", evidence=[], blocks="B1"), now=T0)
+        snap = apply_to_snapshot(snap, open_d001(snap), now=T0)
         self.assert_clean(snap, "decision-open")
-        d = by_number(snap, 8)
-        d["comments"].append(comment(PM, "/decide A\nWhy: it is the gap leadership tracks", T1))
-        d["labels"] = [l for l in d["labels"] if l != "human:pending"] + ["human:decided"]
-        d["label_events"].append({"label": "human:decided", "action": "added", "created_at": T1, "actor": "bot"})
+        epic = by_number(snap, 1)
+        epic["comments"].append(comment(PM, "/decide A\nWhy: it is the gap leadership tracks", T1))
+        epic["labels"] = [l for l in epic["labels"] if l != "human:pending"] + ["human:decided"]
+        epic["label_events"].append({"label": "human:decided", "action": "added", "created_at": T1, "actor": "bot"})
         self.assert_clean(snap, "/decide")
         snap = apply_to_snapshot(snap, o.plan_decision_record(snap, SLUG, "D-001"))
         self.assert_clean(snap, "decision-record")

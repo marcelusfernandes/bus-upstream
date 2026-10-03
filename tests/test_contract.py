@@ -31,6 +31,7 @@ class TemplatesMatchContract(unittest.TestCase):
     def test_comment_titles(self):
         titles = lines_starting("comments.md", "## ")
         kinds = {
+            "## Decision request": c.DECISION_REQUEST_TITLE,
             "## Answer": c.ANSWER_TITLE,
             "## Score": c.SCORE_TITLE,
             "## Review": c.REVIEW_TITLE,
@@ -40,11 +41,15 @@ class TemplatesMatchContract(unittest.TestCase):
         }
         seen = set()
         for title in titles:
-            for prefix, pattern in kinds.items():
+            for prefix in sorted(kinds, key=len, reverse=True):  # "## Decision request" before "## Decision"
                 if title.startswith(prefix + " "):
-                    self.assertRegex(title, pattern)
+                    self.assertRegex(title, kinds[prefix])
                     seen.add(prefix)
+                    break
         self.assertEqual(seen, set(kinds))
+
+    def test_decision_request_template(self):
+        self.assert_all_match(c.DECISION_REQUEST_TITLE, lines_starting("decision-request.md", "## Decision request"))
 
     def test_review_file_example(self):
         self.assert_all_match(c.REVIEW_TITLE, lines_starting("review-file.md", "## Review"))
@@ -56,8 +61,15 @@ class TemplatesMatchContract(unittest.TestCase):
         for row in rows[2:]:
             self.assertRegex(row, r"^\| " + c.HYPOTHESIS_ID + r" \|")
 
-    def test_decide_examples(self):
-        self.assert_all_match(c.DECIDE_COMMAND, lines_starting("decision-body.md", "/decide"))
+    def test_decide_examples_are_inline_and_valid(self):
+        text = (ROOT / "templates" / "decision-request.md").read_text(encoding="utf-8")
+        self.assertFalse([l for l in text.splitlines() if l.startswith("/decide")],
+                         "a line starting with /decide in an agent comment would decide by itself")
+        examples = re.findall(r"`(/decide [^`]+)`", text)
+        self.assertTrue(examples)
+        for example in examples:
+            if "<" not in example:
+                self.assertRegex(example, c.DECIDE_COMMAND)
 
     def test_regexes_compile(self):
         for name in dir(c):

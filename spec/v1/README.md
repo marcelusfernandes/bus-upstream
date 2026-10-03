@@ -48,7 +48,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-10 | GitHub issues, comments and labels are the main source of truth. Files hold the details. No YAML state file. | agreed |
 | R-11 | v1 structure: a milestone plus B/U/S/PRD epics, no hub issue. | agreed |
 | R-12 | Scores live in the epic body header; each change is a structured comment. Scores are never labels. | agreed |
-| R-13 | `human:pending` → `human:decided` (the latter is permanent), plus a decision comment title pattern. | agreed |
+| R-13 | `human:pending` → `human:decided` (the latter is permanent) on the issue holding the decision, plus decision comment title patterns. | agreed |
 | R-14 | One commit per decided answer, carrying the reasoning, the learnings and trailers. | agreed |
 | R-15 | One branch per intake, `upstream/<slug>`, created from an updated main. | agreed |
 | R-16 | The PRD is an epic in the demand's milestone in v1. Bets get their own IDs and folders from day one. | agreed |
@@ -72,6 +72,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-35 | Reviewers and scorers are read-only; the orchestrator records their verdicts through `upstream_ops`. | agreed |
 | R-36 | An open decision needs no `decisions/D-nnn.md` until it is recorded. | agreed |
 | R-37 | Scripts handle mechanics only. Routing and process judgment live in skill text; `reconcile.py` reports facts and obligations, never a layer order. One-sentence checks are left to the reviewer. | agreed |
+| R-38 | A decision lives in the issue that requested it: request comment → the PM's `/decide` → record comment, plus a Decisions checklist in the issue body. No decision issues. Agent comments start with a `## ` title. | agreed |
 | R-28 | Grounding is capped at 5 when a layer rests mostly on bets. | agreed |
 
 ## Out of scope for v1

@@ -20,10 +20,10 @@ judge in isolation. Every contract write goes through `scripts/upstream_ops.py`.
 |---|---|
 | fix drift | Read the validator errors. Fix them through `upstream_ops` or by correcting the initiative files. Never edit labels by hand. Then reconcile again. |
 | record decision D-nnn | `upstream_ops <slug> decision-record --id D-nnn` |
-| reply to the PM on D-nnn | The PM commented without `/decide`. Answer on that issue with options and a recommendation, never an open question. The decision stays pending. |
+| reply to the PM on D-nnn | The PM commented without `/decide`. Answer on that issue with a comment that starts with `## Reply · D-nnn`, giving options and a recommendation, never an open question. The decision stays pending. |
 | decide D-nnn (autonomous) | Decide with the recommendation unless the evidence since changes it: `upstream_ops <slug> decision-record --id D-nnn --agent-choice <key> --agent-why "<...>"`. The senior PM reviews it at handoff. |
 | layer blocked, no decision | Open a decision through `upstream_ops decision-open` whose ref is the looping answer, with options: accept the gap as risk, change approach (say how), or park the question. |
-| layer blocked, decided | Act on the PM's decision, then `upstream_ops <slug> route --layer <L> --state in-progress`. |
+| layer blocked, decided | Check that the recorded decision is the one about the block (its ref is the looping answer), act on it, then `upstream_ops <slug> route --layer <L> --state in-progress`. |
 
 4. **Choose where to work.** This is judgment, not a formula. Edit this section freely;
    it is the process. Write one line in your report explaining your choice.
@@ -78,6 +78,12 @@ back and forth between layers.
    `upstream_ops <slug> route --layer <L> --state done`. The helper refuses otherwise.
 6. Reconcile again and choose again. Stop at any human gate in piloted mode, or when
    the next step needs an agent that does not exist yet.
+
+## Comments
+
+Every comment you post starts with a `## ` title line (see `templates/comments.md`). You
+comment with the PM's GitHub account, so that title is how anyone, including the
+`/decide` Action, knows a comment is not the PM's. Never start a line with `/decide`.
 
 ## Never
 

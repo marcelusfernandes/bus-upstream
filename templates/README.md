@@ -7,7 +7,7 @@ validator parses the same lines: `scripts/upstream_contract.py` holds the regexe
 | File | Used by | For |
 |---|---|---|
 | [epic-body.md](epic-body.md) | intake, orchestrator | Body of each B/U/S layer epic |
-| [decision-body.md](decision-body.md) | orchestrator | Body of a decision sub-issue, plus how the PM answers |
+| [decision-request.md](decision-request.md) | leads, orchestrator | Decision request **comment** on the issue that needs the decision |
 | [hypothesis-body.md](hypothesis-body.md) | intake, leads | Body of a hypothesis sub-issue |
 | [comments.md](comments.md) | all agents | Comment title patterns |
 | [hypotheses-register.md](hypotheses-register.md) | leads, orchestrator | `initiatives/<slug>/hypotheses.md` |
@@ -21,6 +21,8 @@ validator parses the same lines: `scripts/upstream_contract.py` holds the regexe
   always equals the latest score comment (validator check 7).
 - **Labels:** the orchestrator, except `human:decided`, which the `/decide` GitHub
   Action applies when the assigned PM decides.
+- **Decisions:** comments in the issue that needs them (`decision-request.md`), never a
+  separate issue. Every agent comment starts with a `## ` title line.
 - **Review comments and `review.md`:** the orchestrator records the read-only
   reviewer's verdict (`upstream_ops review`). The comment and the file carry the same
   title line (check 2).

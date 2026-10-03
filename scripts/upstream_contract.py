@@ -37,7 +37,6 @@ LABEL_FAMILIES = (
     LabelFamily("type:", True, "C5DEF5", (
         ("question", "A key question being answered"),
         ("evidence", "An evidence-gathering task"),
-        ("decision", "A decision (human or agent)"),
         ("review", "An adversarial review"),
         ("hypothesis", "A registered hypothesis"),
     )),
@@ -89,6 +88,8 @@ SCORE_TITLE = (r"^## Score · (?P<layer>[BUS]) · Definition (?P<d0>\d+|–) →
 REVIEW_TITLE = rf"^## Review · (?P<id>{ANSWER_ID}|{FIT_ID}|PRD) · (?P<verdict>approved|rejected)$"
 REOPEN_TITLE = rf"^## Reopened · (?P<id>{ANSWER_ID}) invalidated by (?P<by>{EVIDENCE_ID}|{DECISION_ID})$"
 DECISION_TITLE = rf"^## Decision (?P<id>{DECISION_ID}) · (?P<ref>{ANSWER_ID}|{FIT_ID}) · (?P<text>.+)$"
+DECISION_REQUEST_TITLE = (rf"^## Decision request (?P<id>{DECISION_ID}) · (?P<ref>{ANSWER_ID}|{FIT_ID})"
+                          rf" · (?P<question>.+)$")
 HYPOTHESIS_TITLE = (rf"^## Hypothesis (?P<id>{HYPOTHESIS_ID}) · "
                     rf"(?P<status>validated|invalidated|parked|(?:reframed|merged) → {HYPOTHESIS_ID})$")
 DECIDE_COMMAND = rf"^/decide(?: (?P<target>{DECISION_ID}))? (?P<choice>[A-Z]|other: .+)$"

@@ -72,6 +72,18 @@ class NoAdvanceWhilePending(unittest.TestCase):  # check 5
         epic["label_events"] = [event("state:in-review", "added", T2)]
         self.assertEqual(checks(v.validate_snapshot(snap)), [5])
 
+    def test_second_request_after_a_recorded_one_does_not_backdate_pending(self):
+        """B1 decided and recorded, then the epic moved to in-review, then B3 was requested."""
+        snap = usual_basket()
+        epic = by_number(snap, 1)
+        epic["assignees"] = [PM]
+        epic["labels"] = ["epic", "state:in-review", "mode:piloted", "layer:business", "human:pending"]
+        epic["comments"] += [comment("agent", REQUEST, T0), comment(PM, "/decide A", T0),
+                             comment("agent", "## Decision D-001 · B-01 · Conversion\nDecided by: @junior-pm", T1),
+                             comment("agent", REQUEST.replace("D-001", "D-002"), T3)]
+        epic["label_events"] = [event("human:pending", "added", T0), event("state:in-review", "added", T2)]
+        self.assertEqual(v.check_no_advance_while_pending(snap), [])
+
     def test_state_change_before_pending_passes(self):
         snap = self._with_pending_decision()
         epic = by_number(snap, 1)
@@ -105,18 +117,25 @@ class ScoreHeader(unittest.TestCase):  # check 7
         self.assertEqual(v.check_score_header(snap), [])
 
 
+REQUEST = ("## Decision request D-001 · B-01 · Which outcome?\n\n"
+           "- **A** — Conversion · trade-offs: x · reversibility: easy\n"
+           "- **B** — Cost · trade-offs: y · reversibility: easy\n")
+
+
 class DecisionAuthorship(unittest.TestCase):  # check 9
-    def _decided(self, comments):
+    """Decisions live in the requesting issue: request, the PM's /decide, record."""
+
+    def _decided(self, pm_comments, assignees=(PM,)):
         snap = usual_basket()
-        snap["issues"].append(issue(
-            8, "D-001 · outcome", ["type:decision", "human:decided", "layer:business"],
-            parent=1, state="closed", assignees=[PM], comments=comments,
-            label_events=[event("human:pending", "added", T0), event("human:pending", "removed", T2),
-                          event("human:decided", "added", T2)]))
+        epic = by_number(snap, 1)
+        epic["labels"].append("human:decided")
+        epic["assignees"] = list(assignees)
+        epic["comments"] += [comment("agent", REQUEST, T0)] + list(pm_comments)
+        epic["label_events"] = [event("human:decided", "added", T2)]
         return snap
 
     def test_decided_without_pm_decide_fails(self):
-        snap = self._decided([comment("agent", "## Decision D-001 · B-01 · Conversion first", T2)])
+        snap = self._decided([comment("agent", "## Decision D-001 · B-01 · Conversion", T2)])
         self.assertEqual(checks(v.validate_snapshot(snap)), [9])
 
     def test_decide_from_non_assignee_fails(self):
@@ -127,23 +146,38 @@ class DecisionAuthorship(unittest.TestCase):  # check 9
         snap = self._decided([comment(PM, "/decide A\nWhy: cost matters most", T1)])
         self.assertEqual(v.check_decision_authorship(snap), [])
 
-    def test_decide_with_target_from_another_issue_passes(self):
-        snap = self._decided([])
-        by_number(snap, 1)["comments"].append(comment(PM, "/decide D-001 A", T1))
-        self.assertEqual(v.check_decision_authorship(snap), [])
+    def test_targeted_and_other_pass(self):
+        for body in ("/decide D-001 B", "/decide other: start with cost per order"):
+            self.assertEqual(v.check_decision_authorship(self._decided([comment(PM, body, T1)])), [])
 
-    def test_bare_decide_on_another_issue_does_not_count(self):
+    def test_decide_on_another_issue_does_not_count(self):
         snap = self._decided([])
-        by_number(snap, 1)["comments"].append(comment(PM, "/decide A", T1))
+        by_number(snap, 2)["comments"].append(comment(PM, "/decide D-001 A", T1))
         self.assertEqual(checks(v.validate_snapshot(snap)), [9])
 
-    def test_decide_other_passes(self):
-        snap = self._decided([comment(PM, "/decide other: start with cost per order", T1)])
+    def test_every_record_needs_its_own_decide(self):
+        """Two decisions on one epic: D-002's record without the PM's /decide for D-002 fails."""
+        snap = self._decided([comment(PM, "/decide A", T1),
+                              comment("agent", "## Decision D-001 · B-01 · Conversion\nDecided by: @junior-pm (/decide A)", T2),
+                              comment("agent", REQUEST.replace("D-001", "D-002"), T2),
+                              comment("agent", "## Decision D-002 · B-01 · Cost\nDecided by: @junior-pm (/decide B)", T3)])
+        snap["files"]["initiatives/usual-basket/decisions/D-001.md"] = "x"
+        snap["files"]["initiatives/usual-basket/decisions/D-002.md"] = "x"
+        snap["files"]["initiatives/usual-basket/business/answers/B-01.md"] = "x"
+        errors = v.check_decision_authorship(snap)
+        self.assertEqual([e.message for e in errors], ["D-002 record names @junior-pm but there is no matching /decide"])
+
+    def test_agent_record_needs_agent_label(self):
+        snap = usual_basket()
+        by_number(snap, 1)["comments"] += [comment("agent", REQUEST, T0),
+                                          comment("agent", "## Decision D-001 · B-01 · Cost\nDecided by: agent (autonomous mode)", T1)]
+        self.assertEqual(checks(v.validate_snapshot(snap)), [9])
+        by_number(snap, 1)["labels"].append("agent:decided")
         self.assertEqual(v.check_decision_authorship(snap), [])
 
     def test_agent_decided_needs_no_pm(self):
         snap = usual_basket()
-        snap["issues"].append(issue(8, "D-001", ["type:decision", "agent:decided"], parent=1, state="closed"))
+        by_number(snap, 1)["labels"].append("agent:decided")
         self.assertEqual(v.check_decision_authorship(snap), [])
 
 
@@ -198,11 +232,12 @@ class IdsResolve(unittest.TestCase):  # check 1
         by_number(snap, 7)["body"] = "| Basis | E-001 |"
         self.assertEqual(v.check_ids_resolve(snap), [])
 
-    def test_open_decision_needs_no_file_until_recorded(self):
+    def test_open_decision_request_needs_no_file_until_recorded(self):
         snap = usual_basket()
-        snap["issues"].append(issue(8, "D-001 · outcome", ["type:decision", "human:pending"], parent=1))
+        snap["files"]["initiatives/usual-basket/business/answers/B-01.md"] = "# B-01 draft"
+        by_number(snap, 1)["comments"].append(comment("agent", REQUEST, T1))
         self.assertEqual(v.check_ids_resolve(snap), [])
-        by_number(snap, 8)["state"] = "closed"
+        by_number(snap, 1)["comments"].append(comment("agent", "## Decision D-001 · B-01 · Conversion", T2))
         self.assertTrue(any("D-001" in e.message for e in v.check_ids_resolve(snap)))
 
     def test_matching_ids_pass(self):

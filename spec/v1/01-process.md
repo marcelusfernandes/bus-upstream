@@ -124,8 +124,9 @@ Silence is never approval. A decision exists only as the PM's own comment.
 
 - **Piloted** (default, junior PM): all five gates stop and wait for the PM.
 - **Autonomous** (senior PM, opt-in per milestone): the whole process runs without
-  stopping. At each gate the agent still opens the decision sub-issue with the full
-  recommendation, decides, and marks it `agent:decided`. The senior PM reviews all
+  stopping. At each gate the agent still posts the decision request in the issue that
+  needs it, with the full recommendation, then decides, records it there, and marks the
+  issue `agent:decided`. The senior PM reviews all
   agent decisions together with the conclusions at the handoff PR, and can roll back
   to any answer commit. The exception is `state:blocked` (anti-loop): it still needs a
   human, because the process cannot continue on its own.
