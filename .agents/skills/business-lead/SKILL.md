@@ -43,11 +43,12 @@ orchestrator's brief (gap: `define` or `ground`).
    in **/tmp** (never in the initiative folder) and return its path; the orchestrator
    opens it after the review. The spec has `id`, `ref`, `question`, `context`, `options`
    (each with `key`, `text`, `tradeoffs`, `reversibility`), `recommendation`, `why`,
-   `would_change`, `evidence` and `blocks`. Keep it readable on GitHub:
-   - `question` at most 120 characters, with no prefix like "Gate 1:";
-   - `context` at most 700 characters: why this question exists and what the evidence
-     says, so the PM can decide without opening any file;
-   - each option `text` and `tradeoffs` at most 140 characters (one short line each).
+   `would_change`, `evidence` and `blocks`. A PM reading only the GitHub comment must
+   understand what they are deciding, so prefer complete information over brevity:
+   - `question`: one clear sentence, with no prefix like "Gate 1:";
+   - `context`: up to about three paragraphs: why this question exists, what the evidence
+     says (with each E-id's claim), and what each choice changes;
+   - each option `text` and `tradeoffs`: a sentence or two each.
    When evidence is missing, include a **bet** option: "commit to X as a bet, owned by
    the PM, validated by <how> in parallel". Accepting it is gate 4 (accepted risk); say so
    in its trade-offs. Do not only offer "wait for a diagnosis".

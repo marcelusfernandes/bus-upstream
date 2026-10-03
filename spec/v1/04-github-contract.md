@@ -136,10 +136,11 @@ decision. The agent never turns a PM's GitHub comment, or its own reading of the
 intent, into a `/decide`.
 
 **The issue is self-contained.** A PM reading only GitHub must be able to decide. Each
-request has a short **Context** (at most 700 characters), a question of at most 120
-characters, and options of at most 140 characters each. `upstream_ops summary` keeps the
-epic body current: statement, key questions with one-line answer and state, a link to
-the files on the branch, and the Decisions checklist. Before stopping, the agent runs
+request has its own **Context** (up to about three paragraphs: never cut what the PM
+needs), a clear question, and options of a sentence or two each. Every epic (B, U and S) is self-contained from creation, and `upstream_ops summary`
+keeps it current: statement, a link to the files on the branch, key questions with a
+one-line answer and state, the hypotheses raised in or routed to the layer, and the
+Decisions checklist. Before stopping, the agent runs
 `summary` and `checkpoint`, so the drafts are pushed too.
 
 In **autonomous mode** the agent decides with `decision-record --agent-choice`, posts the

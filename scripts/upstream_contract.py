@@ -112,9 +112,9 @@ def signature(role):
 
 # ---------- Decision request limits (format, so a PM can read it in the issue) ----------
 
-REQUEST_QUESTION_MAX = 120
-REQUEST_OPTION_MAX = 140
-REQUEST_CONTEXT_MAX = 700
+REQUEST_QUESTION_MAX = 200
+REQUEST_OPTION_MAX = 300
+REQUEST_CONTEXT_MAX = 2000  # about three paragraphs: never cut what the PM needs to decide
 
 # ---------- Commits ----------
 

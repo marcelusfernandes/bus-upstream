@@ -137,6 +137,17 @@ class Plan(unittest.TestCase):
             self.assertIn("state:ready", epic["labels"])
             self.assertIn("mode:piloted", epic["labels"])
 
+    def test_every_epic_is_self_contained_from_creation(self):
+        for epic in self.plan["epics"][:3]:
+            body = epic["body"]
+            self.assertNotIn("Reading order", body)
+            self.assertIn("**Files:** [initiatives/usual-basket/", body)
+            self.assertIn("{repo}", body, "filled in when the initiative is created")
+            self.assertIn("### Key questions", body)
+            self.assertIn("### Hypotheses", body)
+        user = self.plan["epics"][1]["body"]
+        self.assertIn("| H-02 | if it is faster, it converts more than the App | causal | B → U | open |", user)
+
     def test_layer_epics_have_header_and_first_score_comment(self):
         for epic in self.plan["epics"][:3]:
             self.assertRegex(epic["body"], re.compile(c.SCORE_HEADER, re.MULTILINE))

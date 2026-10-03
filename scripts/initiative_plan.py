@@ -122,12 +122,21 @@ def _cell(text):
     return str(text).replace("|", "/").replace("\n", " ")
 
 
-def _epic_body(code, name, layer):
+def _epic_body(code, name, layer, slug, hypotheses):
+    """Self-contained from creation: the same sections `upstream_ops summary` keeps current.
+    `{repo}` is filled in when the initiative is created."""
+    folder = LAYER_FOLDER[code]
     statement = layer.get("statement") or "not yet writable"
+    link = f"https://github.com/{{repo}}/tree/upstream/{slug}/initiatives/{slug}/{folder}"
+    rows = [h for h in hypotheses if code in (h["raised_at"], h["routed_to"])]
+    hyp = ("### Hypotheses\n\n| ID | Hypothesis | Kind | Raised at → Routed to | Status |\n|---|---|---|---|---|\n"
+           + "".join(f"| {h['id']} | {_cell(h['statement'])} | {h['kind']} | {h['raised_at']} → {h['routed_to']} | open |\n"
+                     for h in rows)) if rows else "### Hypotheses\n\nNone raised in or routed to this layer.\n"
     return (f"> **Definition:** {layer['definition']} · **Grounding:** {layer['grounding']} · **Spread:** 0\n\n"
-            f"## {name}\n\n**Statement:** {statement}\n\n"
-            f"**Reading order:** `initiatives/<slug>/README.md` → `{LAYER_FOLDER[code]}/README.md`\n\n"
-            "This layer cannot reach `state:done` while a hypothesis routed here is `hyp:open`.\n")
+            f"## {name}\n\n**Statement:** {statement}\n\n**Files:** [initiatives/{slug}/{folder}]({link})\n\n"
+            f"**Why these scores:** {layer['why']}\n\n"
+            "This layer cannot reach `state:done` while a hypothesis routed here is `hyp:open`.\n\n"
+            "### Key questions\n\nNo answer drafted yet.\n\n" + hyp)
 
 
 def _first_score(code, layer):
@@ -138,7 +147,7 @@ def _first_score(code, layer):
 def _epics(data):
     common = ["epic", "state:ready", f"mode:{data.get('mode', 'piloted')}"]
     epics = [{"layer": code, "title": f"{code} · {name}", "labels": common + [label],
-              "body": _epic_body(code, name, data["layers"][code]).replace("<slug>", data["slug"]),
+              "body": _epic_body(code, name, data["layers"][code], data["slug"], data.get("hypotheses", [])),
               "first_comment": _first_score(code, data["layers"][code])}
              for code, label, name, _ in LAYERS]
     epics.append({"layer": "PRD", "title": "PRD", "labels": common + ["layer:prd"],

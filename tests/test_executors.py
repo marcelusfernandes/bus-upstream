@@ -39,10 +39,11 @@ class FakeGh:
     """Records gh commands and answers the few whose output the scripts parse."""
 
     def __init__(self):
-        self.calls, self.next_issue = [], 100
+        self.calls, self.next_issue, self.stdins = [], 100, []
 
     def __call__(self, cmd, stdin=None):
         self.calls.append(cmd)
+        self.stdins.append((cmd, stdin))
         if cmd[:2] == ["gh", "api"] and cmd[2].endswith("/milestones"):
             return json.dumps({"number": 7})
         if cmd[:2] == ["gh", "api"] and cmd[2].endswith("/issues") and "POST" in cmd:
@@ -90,6 +91,9 @@ class CreateInitiative(unittest.TestCase):
         self.assertEqual(set(numbers), {"B", "U", "S", "PRD", "hypotheses"})
         self.assertEqual(len(numbers["hypotheses"]), 3)
         self.assertIn("Milestone: #7", readme)
+        bodies = [json.loads(c[1]) for c in fake.stdins if c[1]]
+        self.assertTrue(all("{repo}" not in b["body"] for b in bodies))
+        self.assertIn("https://github.com/o/r/tree/upstream/usual-basket", bodies[0]["body"])
         creates = [c for c in fake.calls if c[:2] == ["gh", "api"] and c[2].endswith("/issues") and "POST" in c]
         self.assertEqual(len(creates), 4 + 3)
         self.assertEqual(len([c for c in fake.calls if c[2:3] and str(c[2]).endswith("sub_issues")]), 3)
