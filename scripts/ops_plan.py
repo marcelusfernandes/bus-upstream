@@ -129,6 +129,7 @@ def plan_route(snap, layer, state):
     add = [target]
     if state == "blocked":  # anti-loop: a blocked layer always waits for a human (check 4)
         add.append("human:pending")
+        remove += [l for l in ("human:decided",) if l in epic["labels"]]  # one human: label
     elif "human:pending" in epic["labels"]:
         remove.append("human:pending")
     return [{"kind": "labels", "issue": epic["number"], "add": add, "remove": remove}]
@@ -225,9 +226,10 @@ def plan_answer(snap, slug, answer_id, text, why, evidence, reasoning, learning,
 
 # ---------- decisions (they live in the issue that requests them) ----------
 
-def _request_comment(decision_id, ref, question, options, recommendation, why, would_change, evidence, blocks,
-                     piloted):
-    lines = [f"## Decision request {decision_id} · {ref} · {question}", "", "**Options**"]
+def _request_comment(decision_id, ref, question, context, options, recommendation, why, would_change, evidence,
+                     blocks, piloted):
+    lines = [f"## Decision request {decision_id} · {ref} · {question}", "", f"**Context:** {context}", "",
+             "**Options**"]
     lines += [f"- **{o['key']}** — {_one_line(o['text'], 'option')} · trade-offs: {o.get('tradeoffs', '—')}"
               f" · reversibility: {o.get('reversibility', '—')}" for o in options]
     lines += ["", f"**Recommendation:** {recommendation} — {why}",
@@ -258,8 +260,20 @@ def _all_decision_ids(snap):
     return {rid for i in snap["issues"] for rid in list(decisions.requests(i)) + list(decisions.records(i))}
 
 
+def _check_request_lengths(question, context, options):
+    """Format limits, so a PM can decide from the issue alone (detail lives in the answer draft)."""
+    if len(question) > c.REQUEST_QUESTION_MAX:
+        raise OpsError(f"question is longer than {c.REQUEST_QUESTION_MAX} characters; move detail to the context")
+    if not context or len(context) > c.REQUEST_CONTEXT_MAX:
+        raise OpsError(f"context is required and at most {c.REQUEST_CONTEXT_MAX} characters")
+    for o in options:
+        for field in ("text", "tradeoffs"):
+            if len(o.get(field, "")) > c.REQUEST_OPTION_MAX:
+                raise OpsError(f"option {o.get('key')} {field} is longer than {c.REQUEST_OPTION_MAX} characters")
+
+
 def plan_decision_open(snap, slug, decision_id, ref, question, options, recommendation, why, would_change,
-                       evidence, blocks):
+                       evidence, blocks, context):
     if not re.fullmatch(c.DECISION_ID, decision_id):
         raise OpsError(f"{decision_id} is not a decision ID")
     if decision_id in _all_decision_ids(snap):
@@ -272,6 +286,7 @@ def plan_decision_open(snap, slug, decision_id, ref, question, options, recommen
     if recommendation not in keys:
         raise OpsError("the recommendation must be one of the option keys")
     _one_line(question, "question")
+    _check_request_lengths(question, context, options)
     _require_evidence(snap, slug, evidence)
     _require_answer_file(snap, slug, ref)
     pm, mode = _readme_value(snap, slug, "PM"), _readme_value(snap, slug, "Mode") or "piloted"
@@ -281,13 +296,15 @@ def plan_decision_open(snap, slug, decision_id, ref, question, options, recommen
     epic = _epic(snap, _layer_of(ref))
     n = epic["number"]
     actions = [{"kind": "comment", "issue": n, "body": _request_comment(
-        decision_id, ref, question, options, recommendation, why, would_change, evidence, blocks, piloted)},
+        decision_id, ref, question, context, options, recommendation, why, would_change, evidence, blocks, piloted)},
         {"kind": "edit_body", "issue": n,
          "body": _with_checklist_line(epic["body"], f"- [ ] {decision_id} · {question}")}]
     if pm not in epic.get("assignees", []):
         actions.append({"kind": "assign", "issue": n, "assignees": [pm]})
-    if piloted and "human:pending" not in epic["labels"]:
-        actions.append({"kind": "labels", "issue": n, "add": ["human:pending"], "remove": []})
+    if piloted and ("human:pending" not in epic["labels"] or "human:decided" in epic["labels"]):
+        # one human: label: a new request makes the issue pending again
+        actions.append({"kind": "labels", "issue": n, "add": ["human:pending"],
+                        "remove": [l for l in ("human:decided",) if l in epic["labels"]]})
     return actions
 
 
@@ -320,6 +337,8 @@ def plan_decision_record(snap, slug, decision_id, agent_choice=None, agent_why=N
     title = f"## Decision {decision_id} · {req['ref']} · {_one_line(answer, 'answer')}"
     still_waiting = [w for w in decisions.awaiting_pm(issue) if w != decision_id]
     remove = ["human:pending"] if "human:pending" in issue["labels"] and not still_waiting else []
+    if decided and not still_waiting and "human:decided" not in issue["labels"]:
+        add_labels.append("human:decided")  # the Action normally did this already
     if add_labels or remove:
         actions.append({"kind": "labels", "issue": issue["number"], "add": add_labels, "remove": remove})
     body = _with_checklist_line(issue.get("body"), f"- [x] {decision_id} · {req['question']} → {answer}",
@@ -372,3 +391,119 @@ def plan_hypothesis_close(snap, slug, hid, status, why, evidence, into=None):
             {"kind": "labels", "issue": h["number"], "add": [f"hyp:{status}"], "remove": ["hyp:open"]},
             {"kind": "close", "issue": h["number"]},
             _commit(f"chore({slug}): close {hid} as {status}", [path])]
+
+
+# ---------- label guard, replies, relayed decisions, checkpoints, summaries ----------
+
+def plan_fix_labels(snap):
+    """Make the decision labels match the comments (one human: label at most) and say so."""
+    actions = []
+    for issue, add, remove in v.label_fixes(snap):
+        why = ("a decision is waiting for the PM" if "human:pending" in add
+               else "nothing is waiting for the PM and the PM decided" if "human:decided" in add
+               else "a decision is still waiting for the PM; `human:decided` returns once nothing waits"
+               if "human:decided" in remove
+               else "the comments show no decision waiting" if "human:pending" in remove
+               else "the comments show the state")
+        changes = ", ".join([f"added `{l}`" for l in add] + [f"removed `{l}`" for l in remove])
+        actions += [{"kind": "labels", "issue": issue["number"], "add": add, "remove": remove},
+                    {"kind": "comment", "issue": issue["number"], "body": f"## Labels fixed\n{changes}: {why}."}]
+    return actions
+
+
+def _open_request(snap, decision_id):
+    issue, req = decisions.find_request(snap, decision_id)
+    if not issue or decision_id not in decisions.open_requests(issue):
+        raise OpsError(f"{decision_id} is not an open decision request")
+    return issue, req
+
+
+def plan_reply(snap, decision_id, text):
+    """Answer a PM comment on a pending decision: options and a recommendation, never an open question."""
+    issue, _ = _open_request(snap, decision_id)
+    if not text.strip() or any(line.startswith("/decide") for line in text.splitlines()):
+        raise OpsError("reply text is required and must never start a line with /decide")
+    return [{"kind": "comment", "issue": issue["number"], "body": f"## Reply · {decision_id}\n\n{text.strip()}"}]
+
+
+def plan_relay_decide(snap, slug, decision_id, choice, why):
+    """Post the PM's own answer, typed in Codex, verbatim. It is the PM's decision: no agent marker."""
+    import decide_action
+    issue, _ = _open_request(snap, decision_id)
+    pm = (_readme_value(snap, slug, "PM") or "").lstrip("@")
+    refusal = decide_action._refusal(issue, decision_id, choice, pm)
+    if refusal:
+        raise OpsError(refusal)
+    body = f"/decide {decision_id} {choice}" + (f"\nWhy: {_one_line(why, 'why')}" if why else "") + \
+        f"\n{c.RELAY_MARKER}"
+    return [{"kind": "comment", "issue": issue["number"], "body": body, "sign": False}]
+
+
+def plan_checkpoint(slug, reason):
+    """Save work in progress (drafts, evidence) on the branch before stopping, so GitHub shows it."""
+    return [{"kind": "commit", "paths": [_base(slug)], "message": f"chore({slug}): checkpoint {_one_line(reason, 'reason')}",
+             "allow_empty": False, "skip_if_clean": True}]
+
+
+def _answer_rows(snap, slug, folder):
+    pattern = re.compile(rf"^{re.escape(_base(slug))}/{folder}/answers/({c.ANSWER_ID})\.md$")
+    rows = []
+    for path in sorted(snap["files"]):
+        m = pattern.match(path)
+        if not m:
+            continue
+        text = snap["files"][path]
+        title = re.search(r"^# \S+ · (.+)$", text, re.MULTILINE)
+        answer = re.search(r"^\*\*Answer:\*\* (.+)$", text, re.MULTILINE)
+        state = re.search(r"^\*\*State:\*\* (\w+)", text, re.MULTILINE)
+        rows.append((m.group(1), title.group(1) if title else "—", state.group(1) if state else "—",
+                     answer.group(1) if answer else "—"))
+    return rows
+
+
+def _replace_section(body, heading, section):
+    """Replace (or insert before ### Decisions) a `### heading` section of the issue body."""
+    lines, out, skipping = body.rstrip("\n").split("\n"), [], False
+    for line in lines:
+        if line.startswith("### "):
+            skipping = line == heading
+            if skipping:
+                continue
+        if not skipping:
+            out.append(line)
+    text = "\n".join(out)
+    if "### Decisions" in out:
+        return text.replace("### Decisions", section.rstrip("\n") + "\n\n### Decisions", 1) + "\n"
+    return text.rstrip("\n") + "\n\n" + section
+
+
+def plan_summary(snap, slug, layer, repo):
+    """Make the layer epic self-contained: statement, key questions with answer and state, and a
+    link to the files on the branch. A PM reading only GitHub can follow and decide."""
+    epic = _epic(snap, layer)
+    folder = LAYER[layer][1]
+    rows = _answer_rows(snap, slug, folder)
+    table = "### Key questions\n\n| ID | Question | State | Answer |\n|---|---|---|---|\n" + "".join(
+        f"| {i} | {_cell(q)} | {s} | {_cell(a if len(a) <= 160 else a[:157] + '…')} |\n" for i, q, s, a in rows) \
+        if rows else "### Key questions\n\nNo answer drafted yet.\n"
+    statement_id = {"B": "B-01", "U": "U-01", "S": "S-02"}.get(layer)
+    statement = next((a for i, _, s, a in rows if i == statement_id and s in ("evidenced", "bet")), "not yet writable")
+    link = f"https://github.com/{repo}/tree/{('upstream/' + slug)}/{_base(slug)}/{folder}"
+    statement_line, files_line = f"**Statement:** {_cell(statement)}", f"**Files:** [{_base(slug)}/{folder}]({link})"
+    body = epic["body"]
+    if not re.search(r"^\*\*Statement:\*\* ", body, re.M):  # older or minimal bodies: insert below the header
+        first, _, rest = body.partition("\n")
+        body = f"{first}\n\n{statement_line}\n\n{files_line}\n{rest}"
+    body = re.sub(r"^\*\*Statement:\*\* .*$", statement_line, body, count=1, flags=re.M)
+    if re.search(r"^\*\*(?:Reading order|Files):\*\* ", body, re.M):
+        body = re.sub(r"^\*\*(?:Reading order|Files):\*\* .*$", files_line, body, count=1, flags=re.M)
+    else:
+        body = body.replace(statement_line, f"{statement_line}\n\n{files_line}", 1)
+    body = _replace_section(body, "### Key questions", table)
+    return [{"kind": "edit_body", "issue": epic["number"], "body": body}]
+
+
+def sign(actions, role):
+    """Every agent comment carries the invisible Enceladus marker, except a relayed PM decision."""
+    return [dict(a, body=a["body"] + c.signature(role)) if a["kind"] == "comment" and a.get("sign", True) else a
+            for a in actions]

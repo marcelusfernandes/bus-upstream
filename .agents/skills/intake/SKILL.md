@@ -13,8 +13,9 @@ The JSON needs the PM's GitHub login (`pm`): every decision is assigned to it.
 
 1. **Preserve the demand literally.** Copy it as it arrived, with no rewording.
 2. **Gather context**: the product, the journey step, and any comparison the demand
-   makes. If nothing says otherwise, assume the App and write that down. Only when the
-   context is genuinely ambiguous, propose options to the PM. Never ask an open question.
+   makes. If nothing says otherwise, assume the App and write that down. Keep `context`
+   short. When the context is genuinely ambiguous, say so in one line and list it in your
+   report as the first decision the orchestrator should request; never ask an open question.
 3. **Split the demand into fragments per layer** (B, U, S). One sentence often contains
    all three: a solution, a business outcome and an open question.
 4. **Register hypotheses.** Every user-problem, solution or causal claim that arrived
@@ -25,7 +26,9 @@ The JSON needs the PM's GitHub login (`pm`): every decision is assigned to it.
    population, time window, freshness and limitations when known. Never cite an ID you did
    not record, and never record one you do not cite.
 6. **Score each layer** on Definition and Grounding, using the 0/5/10 anchors only. In
-   `why`, say why the score is not closer to the other extreme. A solution-shaped demand
+   `why`, say why the score is not closer to the other extreme. Grounding is about the
+   layer's statement: with no statement yet it stays low, and a `decision` (what someone
+   wants) is not evidence that a problem exists. A solution-shaped demand
    usually means S has high Definition and low Grounding, and B and U are low.
 7. **Write each statement as one sentence**, or `null` when it cannot be written yet. A
    null statement is the expected result for most demands.

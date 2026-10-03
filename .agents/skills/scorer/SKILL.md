@@ -24,6 +24,12 @@ Only these anchors exist. Decide which one the layer is closer to, and by how mu
 Score the two axes independently: a crisp feature request is high Definition and low
 Grounding.
 
+Grounding is about the layer's **statement**, so:
+- With no statement yet (Definition near 0), there is little to ground. Grounding stays
+  low, whatever related signals exist; name those signals in `why` instead.
+- A `decision` (what someone wants) or an intent is not evidence that a problem exists.
+  It does not raise Grounding on its own.
+
 Return only this JSON:
 
 ```json

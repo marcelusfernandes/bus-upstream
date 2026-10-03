@@ -79,6 +79,19 @@ class Route(unittest.TestCase):
         actions = o.plan_route(snap, "B", "in-progress")
         self.assertEqual(sorted(actions[0]["remove"]), ["human:pending", "state:blocked"])
 
+    def test_blocking_a_decided_layer_keeps_one_human_label(self):
+        snap = usual_basket()
+        by_number(snap, 1)["labels"] = ["epic", "state:in-progress", "human:decided", "mode:piloted", "layer:business"]
+        action = o.plan_route(snap, "B", "blocked")[0]
+        self.assertIn("human:pending", action["add"])
+        self.assertIn("human:decided", action["remove"])
+
+    def test_fix_labels_explains_removing_decided_while_a_decision_waits(self):
+        snap = DecisionRecord()._opened()
+        by_number(snap, 1)["labels"].append("human:decided")
+        body = o.plan_fix_labels(snap)[1]["body"]
+        self.assertIn("removed `human:decided`: a decision is still waiting for the PM", body)
+
     def test_unknown_state(self):
         with self.assertRaises(o.OpsError):
             o.plan_route(usual_basket(), "B", "finished")
@@ -194,7 +207,7 @@ OPTIONS = [{"key": "A", "text": "Conversion against the App", "tradeoffs": "need
 def open_d001(snap):
     return o.plan_decision_open(snap, SLUG, "D-001", "B-01", "Which outcome do we serve first?", OPTIONS,
                                 recommendation="A", why="largest gap", would_change="cost data", evidence=[],
-                                blocks="B1")
+                                blocks="B1", context="Two outcomes named, no baseline yet.")
 
 
 class DecisionOpen(unittest.TestCase):
@@ -217,7 +230,7 @@ class DecisionOpen(unittest.TestCase):
         snap = apply_to_snapshot(snap, open_d001(snap), now=T0)
         snap["files"][f"{BASE}/business/answers/B-03.md"] = "# B-03 draft"
         actions = o.plan_decision_open(snap, SLUG, "D-002", "B-03", "Which success metric?", OPTIONS,
-                                       recommendation="A", why="w", would_change="x", evidence=[], blocks="B3")
+                                       recommendation="A", why="w", would_change="x", evidence=[], blocks="B3", context="Two outcomes named, no baseline yet.")
         body = next(a for a in actions if a["kind"] == "edit_body")["body"]
         self.assertEqual(body.count("### Decisions"), 1)
         self.assertTrue(body.startswith("> **Definition:** 6 · **Grounding:** 4"))
@@ -241,7 +254,7 @@ class DecisionOpen(unittest.TestCase):
             with self.assertRaises(o.OpsError):
                 o.plan_decision_open(snap_with_readme(), SLUG, args["decision_id"], args["ref"], "q", args["options"],
                                      recommendation=args["recommendation"], why="w", would_change="x", evidence=[],
-                                     blocks="b")
+                                     blocks="b", context="Two outcomes named, no baseline yet.")
 
     def test_duplicate_id_refused(self):
         snap = apply_to_snapshot(snap_with_readme(), open_d001(snap_with_readme()))
@@ -344,6 +357,87 @@ class HypothesisClose(unittest.TestCase):
             o.plan_hypothesis_close(usual_basket(), SLUG, "H-09", "parked", why="x", evidence=[])
 
 
+class LabelGuard(unittest.TestCase):
+    def test_both_human_labels_are_fixed_and_explained(self):
+        snap = DecisionRecord()._opened()
+        epic = by_number(snap, 1)
+        epic["comments"].append(comment(PM, "/decide A", T1))
+        epic["labels"].append("human:decided")  # both labels: pending is stale, nothing waits
+        actions = o.plan_fix_labels(snap)
+        self.assertEqual(actions[0], {"kind": "labels", "issue": 1, "add": [], "remove": ["human:pending"]})
+        self.assertTrue(actions[1]["body"].startswith("## Labels fixed"))
+        self.assertIn("removed `human:pending`", actions[1]["body"])
+        self.assertEqual(v.check_labels_match_comments(apply_to_snapshot(snap, actions)), [])
+
+    def test_clean_issue_needs_no_fix(self):
+        self.assertEqual(o.plan_fix_labels(usual_basket()), [])
+
+
+class Reply(unittest.TestCase):
+    def test_reply_goes_to_the_issue_holding_the_request(self):
+        snap = DecisionRecord()._opened()
+        actions = o.plan_reply(snap, "D-001", "Option C is recurrence. To confirm A, reply `/decide A`.")
+        self.assertEqual((actions[0]["issue"], actions[0]["body"].splitlines()[0]), (1, "## Reply · D-001"))
+
+    def test_reply_never_starts_a_line_with_decide(self):
+        with self.assertRaises(o.OpsError):
+            o.plan_reply(DecisionRecord()._opened(), "D-001", "ok\n/decide A")
+
+    def test_reply_needs_an_open_request(self):
+        with self.assertRaises(o.OpsError):
+            o.plan_reply(snap_with_readme(), "D-001", "x")
+
+
+class RelayDecide(unittest.TestCase):
+    def test_relays_the_pm_answer_verbatim_without_agent_marker(self):
+        snap = DecisionRecord()._opened()
+        snap["files"][f"{BASE}/README.md"] = README
+        actions = o.sign(o.plan_relay_decide(snap, SLUG, "D-001", "B", "typed in Codex"), "orchestrator")
+        body = actions[0]["body"]
+        self.assertTrue(body.startswith("/decide D-001 B\nWhy: typed in Codex"))
+        self.assertIn(c.RELAY_MARKER, body)
+        self.assertNotIn("enceladus", body)
+        after = apply_to_snapshot(snap, actions, now=T1)
+        by_number(after, 1)["comments"][-1]["author"] = PM  # Codex posts with the PM's account
+        self.assertEqual(o.decisions.pm_decision(by_number(after, 1), "D-001")["choice"], "B")
+
+    def test_invalid_choice_is_refused(self):
+        with self.assertRaises(o.OpsError):
+            o.plan_relay_decide(DecisionRecord()._opened(), SLUG, "D-001", "Z", "x")
+
+
+class CheckpointAndSummary(unittest.TestCase):
+    def test_checkpoint_commits_the_whole_initiative_only_if_dirty(self):
+        actions = o.plan_checkpoint(SLUG, "waiting for D-002")
+        self.assertEqual(actions[0]["paths"], [BASE])
+        self.assertTrue(actions[0]["skip_if_clean"])
+        self.assertEqual(o.v.check_commit_message(actions[0]["message"]), [])
+
+    def test_summary_makes_the_epic_self_contained(self):
+        snap = snap_with_readme()
+        snap["files"][DRAFT_B1] = (ROOT / "templates" / "answer.md").read_text(encoding="utf-8").split("-->\n", 1)[1]
+        snap = apply_to_snapshot(snap, open_d001(snap), now=T0)
+        body = o.plan_summary(snap, SLUG, "B", "o/r")[0]["body"]
+        self.assertTrue(body.startswith("> **Definition:**"))
+        self.assertIn("**Statement:** The repurchase flow converts below the App.", body)
+        self.assertIn("| B-01 | What is the business problem? | bet | The repurchase flow converts below the App. |", body)
+        self.assertIn("**Files:** [initiatives/usual-basket/business](https://github.com/o/r/tree/upstream/usual-basket/"
+                      "initiatives/usual-basket/business)", body)
+        self.assertLess(body.index("### Key questions"), body.index("### Decisions"))
+        twice = o.plan_summary(apply_to_snapshot(snap, [{"kind": "edit_body", "issue": 1, "body": body}]),
+                               SLUG, "B", "o/r")[0]["body"]
+        self.assertEqual(twice, body, "summary is idempotent")
+
+
+class Signing(unittest.TestCase):
+    def test_every_comment_is_signed_except_relays(self):
+        actions = o.sign([{"kind": "comment", "issue": 1, "body": "x"},
+                          {"kind": "comment", "issue": 1, "body": "/decide A", "sign": False},
+                          {"kind": "labels", "issue": 1, "add": [], "remove": []}], "business_lead")
+        self.assertEqual(actions[0]["body"], "x\n<!-- enceladus:business_lead -->")
+        self.assertEqual(actions[1]["body"], "/decide A")
+
+
 class GoldenPath(unittest.TestCase):
     """Walks the Business layer of usual-basket through every operation. The validator
     must stay clean after each step: proof that the contracts compose."""
@@ -357,8 +451,13 @@ class GoldenPath(unittest.TestCase):
         self.assert_clean(snap, "intake")
         snap = apply_to_snapshot(snap, o.plan_route(snap, "B", "in-progress"), now=T0)
         self.assert_clean(snap, "route")
+        snap["files"][f"{BASE}/business/evidence/E-002.md"] = "id: E-002\n"
+        snap = apply_to_snapshot(snap, o.plan_review(snap, SLUG, "B-01", "approved"), now=T0)
+        self.assert_clean(snap, "review of the draft, before the PM decides")
         snap = apply_to_snapshot(snap, open_d001(snap), now=T0)
         self.assert_clean(snap, "decision-open")
+        snap = apply_to_snapshot(snap, o.plan_summary(snap, SLUG, "B", "o/r"), now=T0)
+        self.assert_clean(snap, "summary")
         epic = by_number(snap, 1)
         epic["comments"].append(comment(PM, "/decide A\nWhy: it is the gap leadership tracks", T1))
         epic["labels"] = [l for l in epic["labels"] if l != "human:pending"] + ["human:decided"]
@@ -366,9 +465,6 @@ class GoldenPath(unittest.TestCase):
         self.assert_clean(snap, "/decide")
         snap = apply_to_snapshot(snap, o.plan_decision_record(snap, SLUG, "D-001"))
         self.assert_clean(snap, "decision-record")
-        snap["files"][f"{BASE}/business/evidence/E-002.md"] = "id: E-002\n"
-        snap = apply_to_snapshot(snap, o.plan_review(snap, SLUG, "B-01", "approved"))
-        self.assert_clean(snap, "review")
         snap = apply_to_snapshot(snap, o.plan_answer(
             snap, SLUG, "B-01", "The repurchase flow converts below the App", why="decided in D-001",
             evidence=["E-002"], reasoning="PM chose conversion", learning="cost is a guardrail", decision="D-001"))

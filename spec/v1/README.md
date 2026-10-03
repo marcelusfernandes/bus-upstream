@@ -48,7 +48,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-10 | GitHub issues, comments and labels are the main source of truth. Files hold the details. No YAML state file. | agreed |
 | R-11 | v1 structure: a milestone plus B/U/S/PRD epics, no hub issue. | agreed |
 | R-12 | Scores live in the epic body header; each change is a structured comment. Scores are never labels. | agreed |
-| R-13 | `human:pending` → `human:decided` (the latter is permanent) on the issue holding the decision, plus decision comment title patterns. | agreed |
+| R-13 | `human:pending` → `human:decided` on the issue holding the decision, one `human:` label at most (see R-39), plus decision comment title patterns. | agreed |
 | R-14 | One commit per decided answer, carrying the reasoning, the learnings and trailers. | agreed |
 | R-15 | One branch per intake, `upstream/<slug>`, created from an updated main. | agreed |
 | R-16 | The PRD is an epic in the demand's milestone in v1. Bets get their own IDs and folders from day one. | agreed |
@@ -73,6 +73,9 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-36 | An open decision needs no `decisions/D-nnn.md` until it is recorded. | agreed |
 | R-37 | Scripts handle mechanics only. Routing and process judgment live in skill text; `reconcile.py` reports facts and obligations, never a layer order. One-sentence checks are left to the reviewer. | agreed |
 | R-38 | A decision lives in the issue that requested it: request comment → the PM's `/decide` → record comment, plus a Decisions checklist in the issue body. No decision issues. Agent comments start with a `## ` title. | agreed |
+| R-39 | One `human:` label per issue (pending while anything waits, otherwise decided); `fix-labels` repairs disagreements from the comments and says so. | agreed |
+| R-40 | Agents are **Enceladus**: every agent comment carries the invisible `<!-- enceladus:<role> -->` marker. A PM answer typed in Codex is relayed verbatim (`relay-decide`) without it. | agreed |
+| R-41 | The issue is self-contained: drafts are reviewed before the PM decides; requests carry a Context and short options; `summary` keeps the epic body current; `checkpoint` pushes work before stopping. | agreed |
 | R-28 | Grounding is capped at 5 when a layer rests mostly on bets. | agreed |
 
 ## Out of scope for v1

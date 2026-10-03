@@ -104,12 +104,24 @@ def pre_tool_use(event, load):
     return "\n".join(reasons) or None
 
 
-def stop(event, snapshots):
-    """Reason to keep going (once), or None."""
+def stop(event, snapshots, uncommitted=""):
+    """Reason to keep going (once), or None. Uncommitted initiative work is invisible on GitHub,
+    so the agent checkpoints it (upstream_ops checkpoint) before stopping."""
     if event.get("stop_hook_active"):
         return None
-    errors = [str(e) for snap in snapshots for e in v.validate_files_and_comments(snap)]
-    return ("Files and GitHub have drifted; fix before stopping:\n" + "\n".join(errors)) if errors else None
+    reasons = [str(e) for snap in snapshots for e in v.validate_files_and_comments(snap)]
+    if uncommitted.strip():
+        reasons.append("uncommitted initiative work; run `upstream_ops <slug> checkpoint --reason ...` so GitHub shows it:\n"
+                       + uncommitted.strip())
+    return ("Before stopping:\n" + "\n".join(reasons)) if reasons else None
+
+
+def _uncommitted():
+    import git_ops
+    try:
+        return git_ops.run_git(["status", "--porcelain", "--", "initiatives"])
+    except git_ops.GitError:
+        return ""
 
 
 # ---------- live loading ----------
@@ -144,7 +156,8 @@ def main(argv):
         if mode == "pre-tool-use":
             reason = pre_tool_use(event, _live_loader())
         elif mode == "stop":
-            reason = stop(event, [] if event.get("stop_hook_active") else _live_snapshots())
+            active = event.get("stop_hook_active")
+            reason = stop(event, [] if active else _live_snapshots(), "" if active else _uncommitted())
         else:
             print("usage: codex_hooks.py pre-tool-use|stop", file=sys.stderr)
             return 0

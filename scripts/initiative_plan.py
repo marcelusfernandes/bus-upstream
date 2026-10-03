@@ -128,7 +128,7 @@ def _epic_body(code, name, layer):
 
 def _first_score(code, layer):
     return (f"## Score · {code} · Definition – → {layer['definition']} · Grounding – → {layer['grounding']}\n"
-            f"Why: {layer['why']}")
+            f"Why: {layer['why']}" + c.signature("intake"))
 
 
 def _epics(data):

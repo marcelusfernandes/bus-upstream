@@ -46,7 +46,7 @@ class BlockedNeedsHuman(unittest.TestCase):  # check 4
         snap = usual_basket()
         epic = by_number(snap, 2)
         epic["labels"] = [l for l in epic["labels"] if not l.startswith("state:")] + ["state:blocked"]
-        self.assertEqual(checks(v.validate_snapshot(snap)), [4])
+        self.assertEqual(checks(v.validate_snapshot(snap)), [4, 11])
 
     def test_blocked_with_human_pending_passes(self):
         snap = usual_basket()
@@ -70,7 +70,7 @@ class NoAdvanceWhilePending(unittest.TestCase):  # check 5
         epic = by_number(snap, 1)
         epic["labels"] = ["epic", "state:in-review", "mode:piloted", "layer:business"]
         epic["label_events"] = [event("state:in-review", "added", T2)]
-        self.assertEqual(checks(v.validate_snapshot(snap)), [5])
+        self.assertEqual(checks(v.validate_snapshot(snap)), [5, 11])
 
     def test_second_request_after_a_recorded_one_does_not_backdate_pending(self):
         """B1 decided and recorded, then the epic moved to in-review, then B3 was requested."""
@@ -136,11 +136,11 @@ class DecisionAuthorship(unittest.TestCase):  # check 9
 
     def test_decided_without_pm_decide_fails(self):
         snap = self._decided([comment("agent", "## Decision D-001 · B-01 · Conversion", T2)])
-        self.assertEqual(checks(v.validate_snapshot(snap)), [9])
+        self.assertEqual(checks(v.validate_snapshot(snap)), [9, 11])
 
     def test_decide_from_non_assignee_fails(self):
         snap = self._decided([comment("someone-else", "/decide A", T1)])
-        self.assertEqual(checks(v.validate_snapshot(snap)), [9])
+        self.assertEqual(checks(v.validate_snapshot(snap)), [9, 11])
 
     def test_decide_from_assignee_before_label_passes(self):
         snap = self._decided([comment(PM, "/decide A\nWhy: cost matters most", T1)])
@@ -153,7 +153,7 @@ class DecisionAuthorship(unittest.TestCase):  # check 9
     def test_decide_on_another_issue_does_not_count(self):
         snap = self._decided([])
         by_number(snap, 2)["comments"].append(comment(PM, "/decide D-001 A", T1))
-        self.assertEqual(checks(v.validate_snapshot(snap)), [9])
+        self.assertEqual(checks(v.validate_snapshot(snap)), [9, 11])
 
     def test_every_record_needs_its_own_decide(self):
         """Two decisions on one epic: D-002's record without the PM's /decide for D-002 fails."""
@@ -171,7 +171,7 @@ class DecisionAuthorship(unittest.TestCase):  # check 9
         snap = usual_basket()
         by_number(snap, 1)["comments"] += [comment("agent", REQUEST, T0),
                                           comment("agent", "## Decision D-001 · B-01 · Cost\nDecided by: agent (autonomous mode)", T1)]
-        self.assertEqual(checks(v.validate_snapshot(snap)), [9])
+        self.assertEqual(checks(v.validate_snapshot(snap)), [9, 11])
         by_number(snap, 1)["labels"].append("agent:decided")
         self.assertEqual(v.check_decision_authorship(snap), [])
 
@@ -179,6 +179,39 @@ class DecisionAuthorship(unittest.TestCase):  # check 9
         snap = usual_basket()
         by_number(snap, 1)["labels"].append("agent:decided")
         self.assertEqual(v.check_decision_authorship(snap), [])
+
+
+class LabelsMatchComments(unittest.TestCase):  # check 11
+    def _epic(self, labels, comments, mode="piloted"):
+        snap = usual_basket()
+        epic = by_number(snap, 1)
+        epic["assignees"] = [PM]
+        epic["labels"] = ["epic", "state:in-progress", f"mode:{mode}", "layer:business"] + labels
+        epic["comments"] += comments
+        epic["label_events"] = [event(l, "added", T3) for l in labels]
+        return snap
+
+    def _d001_recorded_then_d002(self):
+        return [comment("agent", REQUEST, T0), comment(PM, "/decide A", T1),
+                comment("agent", "## Decision D-001 · B-01 · Conversion\nDecided by: @junior-pm (/decide A)", T2),
+                comment("agent", REQUEST.replace("D-001", "D-002"), T3)]
+
+    def test_both_human_labels_never_coexist(self):
+        snap = self._epic(["human:decided", "human:pending"], self._d001_recorded_then_d002())
+        self.assertEqual(checks(v.validate_snapshot(snap)), [3, 11])
+        self.assertEqual([(f[1], f[2]) for f in v.label_fixes(snap)], [([], ["human:decided"])])
+
+    def test_waiting_request_after_a_decision_is_pending_only(self):
+        snap = self._epic(["human:pending"], self._d001_recorded_then_d002())
+        self.assertEqual(v.check_labels_match_comments(snap), [])
+
+    def test_stale_pending_becomes_decided(self):
+        snap = self._epic(["human:pending"], [comment("agent", REQUEST, T0), comment(PM, "/decide A", T1)])
+        self.assertEqual([(f[1], f[2]) for f in v.label_fixes(snap)], [(["human:decided"], ["human:pending"])])
+
+    def test_autonomous_requests_need_no_pending(self):
+        snap = self._epic([], [comment("agent", REQUEST, T0)], mode="autonomous")
+        self.assertEqual(v.check_labels_match_comments(snap), [])
 
 
 class NoSilentHypotheses(unittest.TestCase):  # check 10
