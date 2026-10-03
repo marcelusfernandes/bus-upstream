@@ -314,6 +314,11 @@ class DecisionRecord(unittest.TestCase):
         after = apply_to_snapshot(snap, actions, now=T2)
         self.assertEqual(v.validate_snapshot(after) + v.validate_files_and_comments(after), [])
 
+    def test_record_never_doubles_the_final_period(self):
+        snap = self._pm_decides(self._opened(), "/decide other: start with recurrence.")
+        line = o.plan_decision_record(snap, SLUG, "D-001")[1]["body"]
+        self.assertNotIn("..", line)
+
     def test_other_choice_uses_pm_text(self):
         snap = self._pm_decides(self._opened(), "/decide other: start with recurrence")
         self.assertIn("start with recurrence", o.plan_decision_record(snap, SLUG, "D-001")[1]["body"].splitlines()[0])
