@@ -13,6 +13,10 @@ Mode: piloted
 
 ## Checkpoint · 2026-10-03
 
-D-003 B foi registrada no epic B #19: o PM aceita investigar conversão como aposta e obter diagnóstico comparável em paralelo, antes de solução, meta ou sucesso. B-01 a B-05 foram atualizadas, aprovadas por revisores isolados e registradas. O painel independente mantém B em Definition 4 / Grounding 2, agora com Spread 1; B permanece `in-progress`, com B-01/B-02/B-03/B-04 abertas e H-03/H-04 sem resolução.
+A direção do PM nesta execução é fechar apenas Business. B-01 a B-05 receberam propostas de disposição explícita, apoiadas nas auditorias documentais E-012/E-013 dos collectors; cinco revisões isoladas aprovaram os rascunhos. D-004 foi solicitada no epic B #19 após revisão e aguarda o PM: [pedido completo](https://github.com/marcelusfernandes/bus-upstream/issues/19#issuecomment-5970106403).
 
-A próxima lacuna escolhida é H-02 em U: examinar o vínculo entre velocidade e conversão na investigação paralela autorizada. O User lead ainda não existe; a execução para nesse limite, mantendo U `ready`. Nenhuma nova decisão foi solicitada. O diagnóstico comparável continua como tarefa do PM já aceita em D-003, sem fonte acessível ou prazo confirmado. As únicas fontes de evidência deste teste são `evals/usual-basket/evidence.md` e os arquivos da iniciativa.
+D-004 propõe concluir Business mantendo B1–B4 conscientemente abertas e estacionando H-03/H-04 sem veredicto; a alternativa mantém Business em andamento até resolver as lacunas. A recomendação é A, mas nenhuma escolha foi inferida. D-001/D-002/D-003 continuam válidas; o diagnóstico permanece obrigatório antes de solução, meta ou sucesso.
+
+B permanece `in-progress` e `human:pending`; H-03/H-04 continuam abertas, sem `hypothesis-close` nesta execução. Nenhuma resposta final dependente de D-004 foi registrada. As fontes se limitaram a `evals/usual-basket/evidence.md` e aos arquivos da iniciativa. U/S não foram trabalhadas. Os scores atuais ficam no cabeçalho e no comentário de painel do epic B.
+
+A execução para na decisão D-004. Se o PM aceitar A, registrar a decisão, aplicar as disposições revisadas, encerrar H-03/H-04 com razões, reavaliar o painel e usar `upstream_ops route --layer B --state done` somente quando não restar decisão pendente.
