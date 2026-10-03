@@ -1,3 +1,7 @@
+## Review · B-05 · approved
+
+Blocking: none · Return to: none
+
 ## Review · B-05 · rejected
 
 Blocking: O registro sustenta a completude documental, mas nenhuma fonte autorizada comprova as alegações de execução via hypothesis-update, os quatro commits citados ou a atualização dos bodies das hipóteses. · Return to: B-05
