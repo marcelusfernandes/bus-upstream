@@ -107,6 +107,12 @@ class Score(unittest.TestCase):
         self.assertIn("Definition 5 → 6 · Grounding 3 → 4", actions[1]["body"])
         self.assertEqual(v.check_score_header(apply_to_snapshot(snap, actions)), [])
 
+    def test_rescore_updates_the_why_in_the_body(self):
+        snap = usual_basket()
+        by_number(snap, 1)["body"] += "\n**Why these scores:** intake baseline\n"
+        body = o.plan_score(snap, "B", [(6, 4), (6, 4)], why="baseline found")[0]["body"]
+        self.assertIn("**Why these scores:** baseline found", body)
+
     def test_grounding_cap_when_mostly_bets(self):
         actions = o.plan_score(usual_basket(), "B", [(8, 8), (8, 9)], why="x", mostly_bets=True)
         self.assertIn("**Grounding:** 5", actions[0]["body"])
