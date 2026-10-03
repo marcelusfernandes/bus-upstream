@@ -96,7 +96,8 @@ D-001 decided by @pm: A                            the /decide Action acknowledg
    checklist. The answer it is about must already be drafted.
 2. **The PM decides in their own comment:** `/decide A` (with `Why: …` on the next line),
    or `/decide other: <the PM's own option>`. When several decisions are waiting on the
-   same issue, the PM names one: `/decide D-001 A`.
+   same issue, the PM names one: `/decide D-001 A`. Several can be answered in one comment
+   (as in Apollo), one `/decide D-nnn <option>` line each, each followed by its own `Why:`.
 3. **The `/decide` Action** (runs from `main`, reads the issue's comments):
    - A valid `/decide` from the assigned PM acknowledges. When it was the last decision
      waiting, it swaps `human:pending` for `human:decided`; while another still waits,
@@ -108,9 +109,11 @@ D-001 decided by @pm: A                            the /decide Action acknowledg
    - Any other PM comment changes nothing. The orchestrator's reconcile finds it and
      replies with a `## Reply · D-nnn` comment (options and a recommendation, never an
      open question).
-4. **Record.** `upstream_ops decision-record` posts `## Decision D-001 · <ref> · <answer>`
-   (who decided, when, the PM's why), ticks the checklist line
-   (`- [x] D-001 · <question> → <answer>`), and commits `decisions/D-001.md`.
+4. **Record** (Apollo's pattern). `upstream_ops decision-record` posts
+   `## Decision D-001 · <ref> · <answer>` followed by one line that says it all:
+   `Decision (@pm, <date>, recorded by Enceladus) — **D-001 → A: <option text>.** <the PM's why>. Unlocks: <what it was blocking>`.
+   It ticks the checklist line (`- [x] D-001 · <question> → A: <option text> (@pm, <date>)`)
+   and commits `decisions/D-001.md`.
 
 **Agents are Enceladus, and every agent comment is signed.** Agents comment with the
 PM's GitHub account today, so authorship cannot tell them apart. Every agent comment
@@ -130,8 +133,8 @@ of decisions stays in the comments, the records and GitHub's label timeline.
 
 **Deciding from Codex.** When the PM pilots the process in Codex, the agent shows the same
 request there. If the PM types the answer in Codex, the agent posts it verbatim with
-`upstream_ops relay-decide` as `/decide D-nnn <option>` plus `Why:` and the invisible
-`<!-- relayed-from:codex -->` note, with no Enceladus marker, because it is the PM's
+`upstream_ops relay-decide` as `/decide D-nnn <option>` plus `Why:`, the chosen option
+written out (`Choice: <option> — <text>`), and the invisible `<!-- relayed-from:codex -->` note, with no Enceladus marker, because it is the PM's
 decision. The agent never turns a PM's GitHub comment, or its own reading of the PM's
 intent, into a `/decide`.
 

@@ -40,7 +40,7 @@ Options, recommendation and how to decide: see [decision-request.md](decision-re
 
 ## Decision D-004 · U-02 · Bet on basket rebuilding as the user problem
 
-Decided by: @<pm> (/decide A) on 2026-10-03 · Why: <PM's reason, if given>
+Decision (@<pm>, 2026-10-03, recorded by Enceladus) — **D-004 → A: Bet on basket rebuilding as the user problem.** <the PM's reason, in their words>. Unlocks: <what the request said it blocks>
 
 ## Reply · D-004
 

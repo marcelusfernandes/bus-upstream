@@ -239,7 +239,8 @@ def _request_comment(decision_id, ref, question, context, options, recommendatio
     if piloted:  # instructions stay inline: a line starting with /decide must only ever come from the PM
         lines += ["", f"To decide, reply on this issue with `/decide {recommendation}` (add `Why: <your reasoning>` on "
                       f"the next line) or `/decide other: <your option>`. If several decisions are waiting here, "
-                      f"name this one: `/decide {decision_id} {recommendation}`. Other comments keep it pending."]
+                      f"name this one: `/decide {decision_id} {recommendation}`; you can answer several in one comment, "
+                      f"one `/decide D-nnn <option>` line each with its own `Why:`. Other comments keep it pending."]
     return "\n".join(lines) + "\n"
 
 
@@ -314,7 +315,7 @@ def _autonomous(snap, issue):
     return "mode:autonomous" in issue["labels"] or bool(parent and "mode:autonomous" in parent["labels"])
 
 
-def plan_decision_record(snap, slug, decision_id, agent_choice=None, agent_why=None):
+def plan_decision_record(snap, slug, decision_id, agent_choice=None, agent_why=None, now=None):
     issue, req = decisions.find_request(snap, decision_id)
     if not issue:
         raise OpsError(f"no request for {decision_id}")
@@ -324,11 +325,14 @@ def plan_decision_record(snap, slug, decision_id, agent_choice=None, agent_why=N
     decided = decisions.pm_decision(issue, decision_id)
     if decided:
         choice, why = decided["choice"], decided["why"]
-        by = f"@{decided['author']} (/decide {choice}) on {decided['created_at'][:10]}"
+        who, when = f"@{decided['author']}", decided["created_at"][:10]
     elif agent_choice:
         if not _autonomous(snap, issue):
             raise OpsError("only autonomous mode lets the agent decide")
-        choice, why, by = agent_choice, agent_why, "agent (autonomous mode)"
+        choice, why = agent_choice, agent_why
+        import datetime
+        who = "agent"
+        when = (now or datetime.datetime.now(datetime.timezone.utc).isoformat())[:10]
         add_labels.append("agent:decided")
     else:
         raise OpsError(f"{decision_id} is not decided yet")
@@ -336,20 +340,23 @@ def plan_decision_record(snap, slug, decision_id, agent_choice=None, agent_why=N
     if not answer:
         raise OpsError(f"choice {choice} is not one of the options {sorted(req['options'])}")
     title = f"## Decision {decision_id} · {req['ref']} · {_one_line(answer, 'answer')}"
+    mode_note = ", autonomous mode" if who == "agent" else ""
+    line = (f"Decision ({who}, {when}{mode_note}, recorded by {c.AGENT_NAME}) — **{decision_id} → {choice}: {answer}.**"
+            + (f" {why.rstrip('.')}." if why else "") + (f" Unlocks: {req['blocks']}" if req.get("blocks") else ""))
     still_waiting = [w for w in decisions.awaiting_pm(issue) if w != decision_id]
     remove = ["human:pending"] if "human:pending" in issue["labels"] and not still_waiting else []
     if decided and not still_waiting and "human:decided" not in issue["labels"]:
         add_labels.append("human:decided")  # the Action normally did this already
     if add_labels or remove:
         actions.append({"kind": "labels", "issue": issue["number"], "add": add_labels, "remove": remove})
-    body = _with_checklist_line(issue.get("body"), f"- [x] {decision_id} · {req['question']} → {answer}",
+    body = _with_checklist_line(issue.get("body"),
+                                f"- [x] {decision_id} · {req['question']} → {choice}: {answer} ({who}, {when})",
                                 replace_prefix=f"- [ ] {decision_id} ·")
     path = f"{_base(slug)}/decisions/{decision_id}.md"
     return actions + [
         {"kind": "write_file", "path": path,
-         "text": f"{title}\n\nQuestion: {req['question']}\nDecided by: {by}\nWhy: {why or '—'}\n"
-                 f"Issue: #{issue['number']}\n"},
-        {"kind": "comment", "issue": issue["number"], "body": f"{title}\nDecided by: {by} · Why: {why or '—'}"},
+         "text": f"{title}\n\nQuestion: {req['question']}\n\n{line}\n\nIssue: #{issue['number']}\n"},
+        {"kind": "comment", "issue": issue["number"], "body": f"{title}\n\n{line}"},
         {"kind": "edit_body", "issue": issue["number"], "body": body},
         _commit(f"chore({slug}): record decision {decision_id}", [path])]
 
@@ -430,13 +437,16 @@ def plan_reply(snap, decision_id, text):
 def plan_relay_decide(snap, slug, decision_id, choice, why):
     """Post the PM's own answer, typed in Codex, verbatim. It is the PM's decision: no agent marker."""
     import decide_action
-    issue, _ = _open_request(snap, decision_id)
+    issue, req = _open_request(snap, decision_id)
     pm = (_readme_value(snap, slug, "PM") or "").lstrip("@")
     refusal = decide_action._refusal(issue, decision_id, choice, pm)
     if refusal:
         raise OpsError(refusal)
-    body = f"/decide {decision_id} {choice}" + (f"\nWhy: {_one_line(why, 'why')}" if why else "") + \
-        f"\n{c.RELAY_MARKER}"
+    # A reader of the issue must see what was chosen, not only a letter.
+    chosen = decisions.answer_text(issue, decision_id, choice)
+    body = (f"/decide {decision_id} {choice}" + (f"\nWhy: {_one_line(why, 'why')}" if why else "")
+            + f"\n\n**Choice:** {choice} — {chosen}\n_(Answered by the PM in Codex and relayed verbatim.)_"
+            + f"\n{c.RELAY_MARKER}")
     return [{"kind": "comment", "issue": issue["number"], "body": body, "sign": False}]
 
 
@@ -506,7 +516,7 @@ def plan_summary(snap, slug, layer, repo):
     folder = LAYER[layer][1]
     rows = _answer_rows(snap, slug, folder)
     table = "### Key questions\n\n| ID | Question | State | Answer |\n|---|---|---|---|\n" + "".join(
-        f"| {i} | {_cell(q)} | {s} | {_cell(a if len(a) <= 160 else a[:157] + '…')} |\n" for i, q, s, a in rows) \
+        f"| {i} | {_cell(q)} | {s} | {_cell(a)} |\n" for i, q, s, a in rows) \
         if rows else "### Key questions\n\nNo answer drafted yet.\n"
     statement_id = {"B": "B-01", "U": "U-01", "S": "S-02"}.get(layer)
     statement = next((a for i, _, s, a in rows if i == statement_id and s in ("evidenced", "bet")), "not yet writable")

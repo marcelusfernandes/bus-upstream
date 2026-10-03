@@ -307,9 +307,10 @@ class DecisionRecord(unittest.TestCase):
         title = actions[1]["body"].splitlines()[0]
         self.assertRegex(title, c.DECISION_TITLE)
         self.assertIn("Conversion against the App", title)
-        self.assertIn("@junior-pm (/decide A)", actions[1]["body"])
-        self.assertIn("biggest gap", actions[1]["body"])
-        self.assertIn("- [x] D-001 · Which outcome do we serve first? → Conversion against the App", actions[2]["body"])
+        self.assertIn("Decision (@junior-pm, 2026-10-02, recorded by Enceladus) — "
+                      "**D-001 → A: Conversion against the App.** biggest gap. Unlocks: B1", actions[1]["body"])
+        self.assertIn("- [x] D-001 · Which outcome do we serve first? → A: Conversion against the App "
+                      "(@junior-pm, 2026-10-02)", actions[2]["body"])
         after = apply_to_snapshot(snap, actions, now=T2)
         self.assertEqual(v.validate_snapshot(after) + v.validate_files_and_comments(after), [])
 
@@ -323,9 +324,10 @@ class DecisionRecord(unittest.TestCase):
 
     def test_autonomous_agent_choice(self):
         actions = o.plan_decision_record(self._opened("autonomous"), SLUG, "D-001", agent_choice="B",
-                                         agent_why="cheaper to measure")
+                                         agent_why="cheaper to measure", now="2026-10-03T00:00:00Z")
         self.assertEqual(actions[0], {"kind": "labels", "issue": 1, "add": ["agent:decided"], "remove": []})
-        self.assertIn("Decided by: agent", actions[2]["body"])
+        self.assertIn("Decision (agent, 2026-10-03, autonomous mode, recorded by Enceladus) — **D-001 → B: Cost per order.**",
+                      actions[2]["body"])
 
     def test_agent_choice_refused_in_piloted_mode(self):
         with self.assertRaises(o.OpsError):
@@ -401,6 +403,7 @@ class RelayDecide(unittest.TestCase):
         actions = o.sign(o.plan_relay_decide(snap, SLUG, "D-001", "B", "typed in Codex"), "orchestrator")
         body = actions[0]["body"]
         self.assertTrue(body.startswith("/decide D-001 B\nWhy: typed in Codex"))
+        self.assertIn("**Choice:** B — Cost per order", body)
         self.assertIn(c.RELAY_MARKER, body)
         self.assertNotIn("enceladus", body)
         after = apply_to_snapshot(snap, actions, now=T1)
@@ -413,6 +416,14 @@ class RelayDecide(unittest.TestCase):
 
 
 class CheckpointAndSummary(unittest.TestCase):
+    def test_summary_never_cuts_an_answer(self):
+        snap = snap_with_readme()
+        long_answer = "x " * 200
+        snap["files"][DRAFT_B1] = f"# B-01 · What is the business problem?\n\n**Answer:** {long_answer.strip()}\n\n**State:** open\n"
+        body = o.plan_summary(snap, SLUG, "B", "o/r")[0]["body"]
+        self.assertIn(long_answer.strip(), body)
+        self.assertNotIn("…", body)
+
     def test_checkpoint_commits_the_whole_initiative_only_if_dirty(self):
         actions = o.plan_checkpoint(SLUG, "waiting for D-002")
         self.assertEqual(actions[0]["paths"], [BASE])
