@@ -424,6 +424,10 @@ class CheckpointAndSummary(unittest.TestCase):
         self.assertIn("**Files:** [initiatives/usual-basket/business](https://github.com/o/r/tree/upstream/usual-basket/"
                       "initiatives/usual-basket/business)", body)
         self.assertLess(body.index("### Key questions"), body.index("### Decisions"))
+        self.assertIn("### Hypotheses", body)
+        self.assertIn("| H-03 | it helps recurrence or changes AOV | causal | B → B | open |", body)
+        self.assertIn("| H-01 | a faster flow | solution | B → S | open |", body, "raised at B, routed to S")
+        self.assertLess(body.index("### Hypotheses"), body.index("### Decisions"))
         twice = o.plan_summary(apply_to_snapshot(snap, [{"kind": "edit_body", "issue": 1, "body": body}]),
                                SLUG, "B", "o/r")[0]["body"]
         self.assertEqual(twice, body, "summary is idempotent")
