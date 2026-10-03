@@ -119,6 +119,13 @@ class Cli(unittest.TestCase):
         comment_cmd = next(c[0] for c in gh_calls if c[0][:3] == ["gh", "issue", "comment"])
         self.assertTrue(comment_cmd[-1].endswith("<!-- enceladus:business_lead -->"))
 
+    def test_agent_flag_works_after_the_subcommand(self):
+        code, gh_calls, _, _, _ = run(["hypothesis-close", "--agent", "business_lead", "--id", "H-01", "--status",
+                                       "parked", "--why", "out of scope"], usual_basket())
+        self.assertEqual(code, 0)
+        comment_cmd = next(c[0] for c in gh_calls if c[0][:3] == ["gh", "issue", "comment"])
+        self.assertTrue(comment_cmd[-1].endswith("<!-- enceladus:business_lead -->"))
+
     def test_checkpoint_skips_when_clean(self):
         code, _, git_calls, _, _ = run(["checkpoint", "--reason", "waiting for D-002"], usual_basket())
         self.assertEqual(code, 0)

@@ -341,7 +341,8 @@ def plan_decision_record(snap, slug, decision_id, agent_choice=None, agent_why=N
         raise OpsError(f"choice {choice} is not one of the options {sorted(req['options'])}")
     title = f"## Decision {decision_id} · {req['ref']} · {_one_line(answer, 'answer')}"
     mode_note = ", autonomous mode" if who == "agent" else ""
-    line = (f"Decision ({who}, {when}{mode_note}, recorded by {c.AGENT_NAME}) — **{decision_id} → {choice}: {answer}.**"
+    line = (f"Decision ({who}, {when}{mode_note}, recorded by {c.AGENT_NAME}) — "
+            f"**{decision_id} → {choice}: {answer.rstrip('.')}.**"
             + (f" {why.rstrip('.')}." if why else "") + (f" Unlocks: {req['blocks']}" if req.get("blocks") else ""))
     still_waiting = [w for w in decisions.awaiting_pm(issue) if w != decision_id]
     remove = ["human:pending"] if "human:pending" in issue["labels"] and not still_waiting else []

@@ -45,6 +45,14 @@ def _parser():
     p.add_argument("--repo")
     p.add_argument("--agent", default="orchestrator", help="role signed on every comment")
     sub = p.add_subparsers(dest="command", required=True)
+    # --agent is accepted before or after the subcommand
+    sub_add = sub.add_parser
+
+    def add_parser(name, **kw):
+        sp = sub_add(name, **kw)
+        sp.add_argument("--agent", dest="agent_sub", default=None, help="role signed on every comment")
+        return sp
+    sub.add_parser = add_parser
     sub.add_parser("fix-labels")
     s = sub.add_parser("reply")
     s.add_argument("--decision", required=True)
@@ -161,7 +169,7 @@ def main(argv=None, load=None):
         snap = (load or github_snapshot.load_initiative)(repo, folder, ROOT)
         if snap is None:
             raise o.OpsError(f"initiatives/{args.slug} has no milestone yet")
-        actions = o.sign(plan(args, snap, repo), args.agent)
+        actions = o.sign(plan(args, snap, repo), getattr(args, "agent_sub", None) or args.agent)
         if args.dry_run:
             print(json.dumps(actions, indent=2, ensure_ascii=False))
             return 0
