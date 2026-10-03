@@ -165,7 +165,7 @@ def plan_score(snap, layer, panel, why, mostly_bets=False):
 
 # ---------- review ----------
 
-def plan_review(snap, slug, target, verdict, blocking="none", return_to="none"):
+def plan_review(snap, slug, target, verdict, blocking="none", return_to="none", limitations=None):
     if not re.fullmatch(rf"{c.ANSWER_ID}|{c.FIT_ID}|PRD", target):
         raise OpsError(f"{target} is not a reviewable ID")
     if verdict not in ("approved", "rejected"):
@@ -174,6 +174,8 @@ def plan_review(snap, slug, target, verdict, blocking="none", return_to="none"):
     layer = _layer_of(target)
     path = f"{_base(slug)}/{LAYER[layer][1]}/review.md"
     line = f"Blocking: {_one_line(blocking or 'none', 'blocking')} · Return to: {return_to or 'none'}"
+    if limitations:
+        line += f" · Limitations: {_one_line(limitations, 'limitations')}"
     entry = f"## Review · {target} · {verdict}\n\n{line}\n"
     existing = snap["files"].get(path, "")
     text = entry + ("\n" + existing if existing else "")
@@ -523,7 +525,13 @@ def plan_summary(snap, slug, layer, repo):
         f"| {i} | {_cell(q)} | {s} | {_cell(a)} |\n" for i, q, s, a in rows) \
         if rows else "### Key questions\n\nNo answer drafted yet.\n"
     statement_id = {"B": "B-01", "U": "U-01", "S": "S-02"}.get(layer)
-    statement = next((a for i, _, s, a in rows if i == statement_id and s in ("evidenced", "bet")), "not yet writable")
+    statement_row = next(((s, a) for i, _, s, a in rows if i == statement_id), None)
+    if statement_row and statement_row[0] in ("evidenced", "bet"):
+        statement = statement_row[1]
+    elif statement_row:  # knowingly open: say why instead of a bare "not yet writable"
+        statement = f"not yet written — {statement_id} is {statement_row[0]}: {statement_row[1]}"
+    else:
+        statement = "not yet writable"
     link = f"https://github.com/{repo}/tree/{('upstream/' + slug)}/{_base(slug)}/{folder}"
     statement_line, files_line = f"**Statement:** {_cell(statement)}", f"**Files:** [{_base(slug)}/{folder}]({link})"
     body = epic["body"]

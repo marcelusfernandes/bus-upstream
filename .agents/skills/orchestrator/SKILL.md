@@ -66,7 +66,7 @@ back and forth between layers.
    - Dispatch `reviewer` with only the answer file, the evidence files it cites, the
      decision spec if there is one, and the layer's section of
      `spec/v1/12-key-questions.md`. Do not pass the lead's reasoning.
-   - Record the verdict: `upstream_ops <slug> review --target B-nn --verdict <v> --blocking "<...>" --return-to <...>`
+   - Record the verdict: `upstream_ops <slug> review --target B-nn --verdict <v> --blocking "<...>" --return-to <...> --limitations "<what the reviewer did not check>"`
    - **Rejected:** send the blocking reasons back to the lead. If the same answer is
      rejected twice without new evidence, run
      `upstream_ops <slug> route --layer <L> --state blocked` and open the block decision.
