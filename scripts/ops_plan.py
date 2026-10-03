@@ -477,6 +477,27 @@ def _replace_section(body, heading, section):
     return text.rstrip("\n") + "\n\n" + section
 
 
+def _register_rows(snap, slug):
+    """[{ID, Statement, Kind, Raised at, Routed to, Status, ...}] from hypotheses.md, by header name."""
+    text, rows, header = snap["files"].get(f"{_base(slug)}/hypotheses.md", ""), [], None
+    for line in text.splitlines():
+        cells = [x.strip() for x in line.strip().strip("|").split("|")]
+        if "Status" in cells and "ID" in cells:
+            header = cells
+        elif header and cells and re.fullmatch(c.HYPOTHESIS_ID, cells[0]) and len(cells) == len(header):
+            rows.append(dict(zip(header, cells)))
+    return rows
+
+
+def _hypotheses_section(snap, slug, layer):
+    rows = [r for r in _register_rows(snap, slug) if layer in (r.get("Raised at"), r.get("Routed to"))]
+    if not rows:
+        return "### Hypotheses\n\nNone raised in or routed to this layer.\n"
+    return ("### Hypotheses\n\n| ID | Hypothesis | Kind | Raised at → Routed to | Status |\n|---|---|---|---|---|\n"
+            + "".join(f"| {r['ID']} | {r.get('Statement', '—')} | {r.get('Kind', '—')} | "
+                      f"{r.get('Raised at', '—')} → {r.get('Routed to', '—')} | {r.get('Status', '—')} |\n" for r in rows))
+
+
 def plan_summary(snap, slug, layer, repo):
     """Make the layer epic self-contained: statement, key questions with answer and state, and a
     link to the files on the branch. A PM reading only GitHub can follow and decide."""
@@ -500,6 +521,7 @@ def plan_summary(snap, slug, layer, repo):
     else:
         body = body.replace(statement_line, f"{statement_line}\n\n{files_line}", 1)
     body = _replace_section(body, "### Key questions", table)
+    body = _replace_section(body, "### Hypotheses", _hypotheses_section(snap, slug, layer))
     return [{"kind": "edit_body", "issue": epic["number"], "body": body}]
 
 

@@ -34,7 +34,10 @@ orchestrator's brief (gap: `define` or `ground`).
 3. **Draft each answer** in `initiatives/<slug>/business/answers/B-0n.md`, following
    `templates/answer.md` exactly: `# B-0n · <question>`, then `**Answer:** <one line>`,
    then `**State:** evidenced|bet|open`, then reasoning, evidence IDs and what this does
-   **not** let us conclude. The first three lines feed the epic summary on GitHub.
+   **not** let us conclude. The first three lines feed the epic summary on GitHub, so the
+   `**Answer:**` line must stand on its own: write the content (for B5, the hypotheses
+   themselves, briefly), never just "see hypotheses.md". A file reference for detail can
+   follow.
 4. **Prepare decisions instead of asking; do not open them.** First draft the answer file
    the decision is about (state `open`, listing the candidates). Then write a JSON spec
    in **/tmp** (never in the initiative folder) and return its path; the orchestrator
