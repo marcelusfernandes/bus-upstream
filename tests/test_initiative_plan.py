@@ -28,9 +28,10 @@ def usual_basket_intake():
         },
         "hypotheses": [
             {"id": "H-01", "statement": "a faster flow", "kind": "solution", "origin": "business demand",
-             "basis": "intake", "raised_at": "B", "routed_to": "S"},
+             "basis": "intake", "raised_at": "B", "routed_to": "S", "test": "faster flow, more repurchases"},
             {"id": "H-02", "statement": "if it is faster, it converts more than the App", "kind": "causal",
-             "origin": "business demand", "basis": "intake", "raised_at": "B", "routed_to": "U"},
+             "origin": "business demand", "basis": "intake", "raised_at": "B", "routed_to": "U",
+             "test": "conversion vs App by speed"},
         ],
     }
 
@@ -64,8 +65,26 @@ class Validation(unittest.TestCase):
     def test_agent_hypothesis_needs_basis(self):
         data = usual_basket_intake()
         data["hypotheses"].append({"id": "H-03", "statement": "x", "kind": "user-problem", "origin": "agent",
-                                   "basis": "", "raised_at": "U", "routed_to": "U"})
+                                   "basis": "", "raised_at": "U", "routed_to": "U", "test": "t"})
         self.assertTrue(any("basis" in e for e in p.validate_intake(data)))
+
+    def test_hypothesis_needs_a_test_and_a_readable_origin(self):
+        data = usual_basket_intake()
+        data["hypotheses"][0]["origin"] = "stakeholder, see evals/usual-basket/input.md"
+        del data["hypotheses"][1]["test"]
+        errors = p.validate_intake(data)
+        self.assertTrue(any("origin must say who and where" in e for e in errors))
+        self.assertTrue(any("H-02: test is required" in e for e in errors))
+
+    def test_hypothesis_issue_is_self_contained(self):
+        data = usual_basket_intake()
+        data["hypotheses"][1]["basis"] = "E-001"
+        data["evidence"] = [{"id": "E-001", "layer": "U", "kind": "fact", "claim": "recurrence exists", "source": "x"}]
+        body = p.plan_initiative(data)["hypotheses"][1]["body"]
+        self.assertIn("**As raised:** “if it is faster, it converts more than the App” — business demand", body)
+        self.assertIn("**How it gets tested:** conversion vs App by speed", body)
+        self.assertIn("- E-001 · recurrence exists", body)
+        self.assertIn("**Status:** open", body)
 
     def test_bad_hypothesis_id_and_duplicates(self):
         data = usual_basket_intake()

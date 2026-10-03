@@ -89,7 +89,8 @@ never silently dropped.**
 | ID | `H-nn` |
 | Statement | The hypothesis, in the words of whoever raised it |
 | Kind | `user-problem`, `solution`, `causal` |
-| Origin | Who raised it and where (stakeholder role, meeting, research, agent, designer) |
+| Origin | Who raised it and where, in words (stakeholder role, meeting, research, agent, designer); never a file path |
+| Test | What would validate or invalidate it, in one line |
 | Basis | The evidence IDs it came from, or `guess`. Required when the origin is `agent`. A guess is allowed, but it must be labeled as one |
 | Raised at | B, U or S |
 | Routed to | The layer that must test it |

@@ -47,28 +47,31 @@
       "id": "H-01",
       "statement": "a faster flow",
       "kind": "solution",
-      "origin": "business demand",
+      "origin": "business stakeholder, in the intake demand",
       "basis": "intake",
       "raised_at": "B",
-      "routed_to": "S"
+      "routed_to": "S",
+      "test": "users given a faster flow complete more repurchases than with the current flow"
     },
     {
       "id": "H-02",
       "statement": "if it is faster, it converts more than the App",
       "kind": "causal",
-      "origin": "business demand",
+      "origin": "business stakeholder, in the intake demand",
       "basis": "intake",
       "raised_at": "B",
-      "routed_to": "U"
+      "routed_to": "U",
+      "test": "comparable conversion of this flow vs the App, split by time to order"
     },
     {
       "id": "H-03",
       "statement": "it helps recurrence or changes AOV",
       "kind": "causal",
-      "origin": "business demand",
+      "origin": "business stakeholder, in the intake demand",
       "basis": "intake",
       "raised_at": "B",
-      "routed_to": "B"
+      "routed_to": "B",
+      "test": "recurrence and average order value before vs after, in the same population"
     }
   ],
   "evidence": [
