@@ -189,13 +189,21 @@ class IdsResolve(unittest.TestCase):  # check 1
     def test_id_defined_in_file_but_never_cited_fails(self):
         snap = usual_basket()
         snap["files"]["initiatives/usual-basket/user/answers/U-02.md"] = "# U-02"
-        self.assertTrue(any("U-02" in e.message for e in v.check_ids_resolve(snap)))
+        self.assertEqual(v.check_ids_resolve(snap), [])  # a draft mid-process is fine
+        self.assertTrue(any("U-02" in e.message for e in v.check_ids_resolve(snap, final=True)))
 
     def test_id_cited_only_in_issue_body_counts(self):
         snap = usual_basket()
         snap["files"]["initiatives/usual-basket/business/evidence/E-001.md"] = "id: E-001"
         by_number(snap, 7)["body"] = "| Basis | E-001 |"
         self.assertEqual(v.check_ids_resolve(snap), [])
+
+    def test_open_decision_needs_no_file_until_recorded(self):
+        snap = usual_basket()
+        snap["issues"].append(issue(8, "D-001 · outcome", ["type:decision", "human:pending"], parent=1))
+        self.assertEqual(v.check_ids_resolve(snap), [])
+        by_number(snap, 8)["state"] = "closed"
+        self.assertTrue(any("D-001" in e.message for e in v.check_ids_resolve(snap)))
 
     def test_matching_ids_pass(self):
         snap = usual_basket()

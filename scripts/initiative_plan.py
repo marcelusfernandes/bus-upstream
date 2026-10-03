@@ -15,6 +15,7 @@ LAYERS = (("B", "layer:business", "Business problem", "business"),
 LAYER_LABEL = {code: label for code, label, _, _ in LAYERS}
 LAYER_FOLDER = {code: folder for code, _, _, folder in LAYERS}
 SLUG = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
+GITHUB_LOGIN = r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$"
 MODES = ("piloted", "autonomous")
 KINDS = ("user-problem", "solution", "causal")
 REGISTER_HEADER = ("| ID | Statement | Kind | Origin | Basis | Raised at | Routed to | Status | Resolution |\n"
@@ -22,10 +23,6 @@ REGISTER_HEADER = ("| ID | Statement | Kind | Origin | Basis | Raised at | Route
 
 
 # ---------- validation ----------
-
-def _one_sentence(text):
-    return len([s for s in re.split(r"(?<=[.!?])\s+", text.strip()) if s]) <= 1
-
 
 def _validate_layer(code, layer):
     errors = []
@@ -38,8 +35,8 @@ def _validate_layer(code, layer):
     if not layer.get("why"):
         errors.append(f"layers.{code}.why is required (why the scores, not closer to the other extreme)")
     statement = layer.get("statement")
-    if statement is not None and not _one_sentence(statement):
-        errors.append(f"layers.{code}.statement must be one sentence")
+    if statement is not None and (not isinstance(statement, str) or "\n" in statement):
+        errors.append(f"layers.{code}.statement must be a single line (one sentence; the reviewer judges it)")
     return errors
 
 
@@ -100,6 +97,8 @@ def validate_intake(data):
     for field in ("title", "demand"):
         if not data.get(field):
             errors.append(f"{field} is required")
+    if not re.fullmatch(GITHUB_LOGIN, str(data.get("pm", ""))):
+        errors.append("pm must be the PM's GitHub login (decisions are assigned to it)")
     if data.get("mode", "piloted") not in MODES:
         errors.append(f"mode must be one of {MODES}")
     layers = data.get("layers") or {}
@@ -177,7 +176,8 @@ def _evidence_md(e):
 
 def _files(data):
     root = f"initiatives/{data['slug']}"
-    readme = (f"# {data['title']}\n\nMilestone: #{{milestone}}\n\n## Reading order\n\n"
+    readme = (f"# {data['title']}\n\nMilestone: #{{milestone}}\nPM: @{data['pm']}\n"
+              f"Mode: {data.get('mode', 'piloted')}\n\n## Reading order\n\n"
               "1. `intake.md` — the literal demand and context\n2. `hypotheses.md` — every hypothesis and its status\n"
               "3. `business/README.md`, `user/README.md`, `solution/README.md` — current answer per layer\n"
               "4. `prd/README.md` — the PRD, once written\n")
@@ -191,6 +191,11 @@ def _files(data):
     for e in data.get("evidence", []):
         files[f"{root}/{LAYER_FOLDER[e['layer']]}/evidence/{e['id']}.md"] = _evidence_md(e)
     return files
+
+
+def pm_from_readme(text):
+    m = re.search(r"^PM: @(\S+)\s*$", text, re.MULTILINE)
+    return m.group(1) if m else None
 
 
 def plan_initiative(data):

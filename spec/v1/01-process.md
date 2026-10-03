@@ -69,15 +69,18 @@ and low on B and U. That profile means "trace back to B and U". It does not mean
 
 ## Routing rules
 
-- **Confidence ceiling (invariant).** A layer cannot be committed with more confidence
-  than the layer below it supports. Solution work may *explore* at any time, because
+- **Confidence ceiling (invariant, judged).** A layer cannot be committed with more
+  confidence than the layer below it supports. Reviewers and the fit reviews judge this;
+  it is not computed. Solution work may *explore* at any time, because
   sketches are good probes for the user problem. It may only *commit* a direction up
   to what U and B justify. Any gap that remains is inherited as a named risk.
-- **B first by default.** Start from the business problem unless the PM decides on a
-  **U-first override** (for example harm, safety or urgency). The override is a human
-  decision.
-- **Pick one gap.** The orchestrator routes to the single gap that most limits the
-  next commit. The scores tell it whether to gather more information or move on.
+- **No fixed order.** Work can start at any layer and move back and forth between
+  layers. The PM's direction wins. Otherwise the orchestrator judges where the demand
+  is weakest relative to what it claims, and which gap blocks the next decision.
+- **Routing is judgment, not code.** The guidance lives in the orchestrator's skill
+  (`.agents/skills/orchestrator/SKILL.md`), as text PMs can edit. `scripts/reconcile.py`
+  only reports facts and contract obligations; it never decides which layer comes next.
+  Scores inform the choice, they do not make it.
 - **~70% rule.** Proceed when the critical questions of a layer are answered or
   deliberately bet on. Write the bets down. 10 is not a goal.
 - **Anti-loop.** If the same question fails twice without new evidence, mark it

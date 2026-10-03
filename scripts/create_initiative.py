@@ -2,7 +2,9 @@
 """Create an initiative from an intake JSON: milestone, B/U/S/PRD epics with the
 first score comments, hypothesis sub-issues, and the initiatives/<slug>/ skeleton.
 
-Dry-run by default. --apply writes to GitHub and to disk (existing files are kept).
+Dry-run by default. --apply first switches to the initiative's own branch
+(upstream/<slug>, created from an updated main), then writes to GitHub and to disk
+(existing files are kept), then commits and pushes the branch.
 """
 import argparse
 import json
@@ -10,6 +12,7 @@ import sys
 from pathlib import Path
 
 import gh_client as gh
+import git_ops
 import initiative_plan as p
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,11 +33,11 @@ def apply(plan, repo):
     milestone = gh.create_milestone(repo, title, plan["milestone"]["description"])
     numbers = {}
     for epic in plan["epics"]:
-        numbers[epic["layer"]] = gh.create_issue(repo, epic["title"], epic["body"], epic["labels"], title)
+        numbers[epic["layer"]] = gh.create_issue_api(repo, epic["title"], epic["body"], epic["labels"], [], milestone)
         if epic["first_comment"]:
             gh.comment(repo, numbers[epic["layer"]], epic["first_comment"])
     for h in plan["hypotheses"]:
-        child = gh.create_issue(repo, h["title"], h["body"], h["labels"], title)
+        child = gh.create_issue_api(repo, h["title"], h["body"], h["labels"], [], milestone)
         gh.add_sub_issue(repo, numbers[h["parent_layer"]], child)
     for rel, text in plan["files"].items():
         path = ROOT / rel
@@ -64,11 +67,18 @@ def main(argv=None):
         _print_plan(plan)
         return 0
     try:
-        milestone, numbers = apply(plan, args.repo or gh.current_repo())
-    except gh.GhError as err:
-        print(f"GitHub error, initiative partially created: {err}", file=sys.stderr)
+        branch = git_ops.ensure_branch(data["slug"], git_ops.run_git)
+    except git_ops.GitError as err:
+        print(f"cannot start the initiative branch: {err}", file=sys.stderr)
         return 1
-    print(f"created milestone #{milestone}, epics {numbers}")
+    try:
+        milestone, numbers = apply(plan, args.repo or gh.current_repo())
+        git_ops.commit_and_push([f"initiatives/{data['slug']}"], f"chore: intake {data['slug']}", branch,
+                                git_ops.run_git)
+    except (gh.GhError, git_ops.GitError) as err:
+        print(f"initiative partially created on {branch}: {err}", file=sys.stderr)
+        return 1
+    print(f"created milestone #{milestone}, epics {numbers}, branch {branch} pushed")
     return 0
 
 

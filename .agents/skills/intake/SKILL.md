@@ -7,6 +7,7 @@ description: Use when a new stakeholder demand arrives, to turn it into a BUS in
 
 References: `spec/v1/01-process.md` (Intake), `spec/v1/02-scoring.md`,
 `spec/v1/12-key-questions.md`, and `templates/intake.example.json` for the exact shape.
+The JSON needs the PM's GitHub login (`pm`): every decision is assigned to it.
 
 ## Steps
 
@@ -31,10 +32,12 @@ References: `spec/v1/01-process.md` (Intake), `spec/v1/02-scoring.md`,
 8. **Validate and plan:**
    `python3 scripts/create_initiative.py <intake.json>`. It prints the plan or the
    validation errors. Fix errors in the JSON, never in the script.
-9. **Create the initiative only when the orchestrator or PM asked for it:**
-   `python3 scripts/create_initiative.py <intake.json> --apply`. This creates the
-   milestone (holding the intake snapshot), the B/U/S/PRD epics with score headers and
-   first score comments, the hypothesis sub-issues, and `initiatives/<slug>/`.
+9. **Create the initiative:** `python3 scripts/create_initiative.py <intake.json> --apply`.
+   It first switches to the initiative's own branch `upstream/<slug>` (created from an
+   updated `main`; the PM never does this). Then it creates the milestone (holding the
+   intake snapshot), the B/U/S/PRD epics with score headers and first score comments,
+   the hypothesis sub-issues and `initiatives/<slug>/`, and finally commits and pushes the
+   branch. It refuses to start with uncommitted changes.
 10. **Stop.** Report the milestone number and anything the PM must decide first (as
     proposed options), then hand over to the orchestrator.
 

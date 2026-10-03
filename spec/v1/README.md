@@ -67,6 +67,11 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-30 | Codex hooks (repo-level) run the validator: PreToolUse blocks rule-breaking label changes, Stop runs drift checks. Format verified against the Codex docs. | agreed |
 | R-31 | Model routing: authors and reviewers on different models; mixed scorer panel. | proposed |
 | R-32 | Intake evidence: every cited E-id is recorded and every recorded one is cited. Intake scores are a single-agent baseline (Spread 0). | agreed |
+| R-33 | `scripts/upstream_ops.py` is the only write path for contract lines after intake. | agreed |
+| R-34 | The initiative branch is created automatically by `create_initiative.py --apply`. | agreed |
+| R-35 | Reviewers and scorers are read-only; the orchestrator records their verdicts through `upstream_ops`. | agreed |
+| R-36 | An open decision needs no `decisions/D-nnn.md` until it is recorded. | agreed |
+| R-37 | Scripts handle mechanics only. Routing and process judgment live in skill text; `reconcile.py` reports facts and obligations, never a layer order. One-sentence checks are left to the reviewer. | agreed |
 | R-28 | Grounding is capped at 5 when a layer rests mostly on bets. | agreed |
 
 ## Out of scope for v1

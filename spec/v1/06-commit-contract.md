@@ -38,4 +38,9 @@ Invalidates: a1b2c3d
 - Required trailers: `Layer`. Required when applicable: `Definition`, `Grounding`
   (when the scores changed), `Evidence`, `Decision`, `Invalidates`.
 - Scaffolding and housekeeping commits that are not answers use `chore:` and skip the
-  trailers.
+  trailers. Each operation commits only its own files (a review commits `review.md` and
+  the reviewed draft; a hypothesis close commits `hypotheses.md`; a decision record commits
+  its `decisions/D-nnn.md`).
+- The answer commit stages the answer file, its cited evidence and the layer README, and
+  is allowed to be empty: when the draft was already committed with its review, the
+  answer commit is still the checkpoint that carries the trailers.
