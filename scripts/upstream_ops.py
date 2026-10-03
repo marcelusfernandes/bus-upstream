@@ -84,6 +84,7 @@ def _parser():
     s.add_argument("--verdict", required=True)
     s.add_argument("--blocking", default="none")
     s.add_argument("--return-to", default="none")
+    s.add_argument("--limitations", help="what this review did not check")
     s = sub.add_parser("answer")
     for name in ("--id", "--text", "--why", "--reasoning", "--learning"):
         s.add_argument(name, required=True)
@@ -124,7 +125,8 @@ def plan(args, snap, repo=None):
     if args.command == "score":
         return o.plan_score(snap, args.layer, args.panel, args.why, args.mostly_bets)
     if args.command == "review":
-        return o.plan_review(snap, args.slug, args.target, args.verdict, args.blocking, args.return_to)
+        return o.plan_review(snap, args.slug, args.target, args.verdict, args.blocking, args.return_to,
+                             args.limitations)
     if args.command == "answer":
         return o.plan_answer(snap, args.slug, args.id, args.text, args.why, args.evidence, args.reasoning,
                              args.learning, args.decision)
@@ -138,8 +140,18 @@ def plan(args, snap, repo=None):
     return o.plan_hypothesis_close(snap, args.slug, args.id, args.status, args.why, args.evidence, args.into)
 
 
+LOCAL_FIRST = {"write_file": 0, "commit": 1}
+
+
+def local_first(actions):
+    """Files and the commit land before any GitHub write: a git failure (for example a sandbox
+    refusing .git) then leaves nothing half-applied on GitHub. GitHub writes keep their order."""
+    return sorted(actions, key=lambda a: LOCAL_FIRST.get(a["kind"], 2))
+
+
 def execute(actions, repo, slug, milestone, git=None):
     git = git or git_ops.run_git
+    actions = local_first(actions)
     branch = git_ops.branch_name(slug)
     if any(a["kind"] in ("write_file", "commit") for a in actions):
         current = git(["branch", "--show-current"]).strip()
