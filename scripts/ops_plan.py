@@ -154,6 +154,7 @@ def plan_score(snap, layer, panel, why, mostly_bets=False):
         raise OpsError(f"{layer} epic has no score header")
     header = f"> **Definition:** {d} · **Grounding:** {g} · **Spread:** {spread}"
     body = epic["body"].replace(old.group(0), header, 1)
+    body = re.sub(r"^\*\*Why these scores:\*\* .*$", f"**Why these scores:** {_cell(why)}", body, count=1, flags=re.M)
     title = f"## Score · {layer} · Definition {old['d']} → {d} · Grounding {old['g']} → {g}"
     return [{"kind": "edit_body", "issue": epic["number"], "body": body},
             {"kind": "comment", "issue": epic["number"],

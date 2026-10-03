@@ -34,7 +34,8 @@ def apply(plan, repo):
     milestone = gh.create_milestone(repo, title, plan["milestone"]["description"])
     numbers = {}
     for epic in plan["epics"]:
-        numbers[epic["layer"]] = gh.create_issue_api(repo, epic["title"], epic["body"], epic["labels"], [], milestone)
+        body = epic["body"].replace("{repo}", repo)
+        numbers[epic["layer"]] = gh.create_issue_api(repo, epic["title"], body, epic["labels"], [], milestone)
         if epic["first_comment"]:
             gh.comment(repo, numbers[epic["layer"]], epic["first_comment"])
     hypotheses = []
