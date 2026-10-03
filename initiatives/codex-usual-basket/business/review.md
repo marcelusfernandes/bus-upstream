@@ -1,3 +1,7 @@
+## Review · B-03 · approved
+
+Blocking: none · Return to: none
+
 ## Review · B-02 · rejected
 
 Blocking: B-02 afirma que E-001 confirma recompra, mas o arquivo citado não existe no diretório permitido; essa atribuição não é verificável. · Return to: B-02
