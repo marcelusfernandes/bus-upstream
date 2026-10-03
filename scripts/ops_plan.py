@@ -563,3 +563,55 @@ def sign(actions, role):
     """Every agent comment carries the invisible Enceladus marker, except a relayed PM decision."""
     return [dict(a, body=a["body"] + c.signature(role)) if a["kind"] == "comment" and a.get("sign", True) else a
             for a in actions]
+
+
+UPDATABLE_FIELDS = ("Test", "Origin", "Basis")
+
+
+def _set_register_fields(text, hid, fields):
+    """Set named columns of one register row; adds a missing column (e.g. Test on older registers)."""
+    lines = text.rstrip("\n").split("\n")
+    header_at = next((n for n, l in enumerate(lines) if "| ID |" in l and "Status" in l), None)
+    if header_at is None:
+        raise OpsError("hypotheses.md has no header row")
+    header = [x.strip() for x in lines[header_at].strip().strip("|").split("|")]
+    for name in fields:
+        if name not in header:  # insert before Status, in the header, the separator and every row
+            at = header.index("Status")
+            header.insert(at, name)
+            for n in range(header_at + 1, len(lines)):
+                cells = [x.strip() for x in lines[n].strip().strip("|").split("|")]
+                if len(cells) == len(header) - 1:
+                    cells.insert(at, "---" if set("".join(cells)) <= set("-:") else "—")
+                    lines[n] = "| " + " | ".join(cells) + " |"
+    lines[header_at] = "| " + " | ".join(header) + " |"
+    for n in range(header_at + 2, len(lines)):
+        cells = [x.strip() for x in lines[n].strip().strip("|").split("|")]
+        if cells and cells[0] == hid:
+            for name, value in fields.items():
+                cells[header.index(name)] = _cell(value)
+            lines[n] = "| " + " | ".join(cells) + " |"
+            return "\n".join(lines) + "\n"
+    raise OpsError(f"{hid} is not in hypotheses.md")
+
+
+def plan_hypothesis_update(snap, slug, hid, fields):
+    """Update a hypothesis's Test, Origin or Basis in the register and refresh its issue, together."""
+    import bodies
+    bad = sorted(set(fields) - set(UPDATABLE_FIELDS))
+    if bad or not fields:
+        raise OpsError(f"updatable fields are {UPDATABLE_FIELDS}")
+    for name, value in fields.items():
+        _one_line(value, name)
+        if name == "Origin" and re.search(r"\S+/\S+\.(md|json|txt)\b", value):
+            raise OpsError("origin must say who and where in words, never a file path")
+    if not _by_id(snap, hid, "type:hypothesis"):
+        raise OpsError(f"no issue for {hid}")
+    path = f"{_base(slug)}/hypotheses.md"
+    text = _set_register_fields(snap["files"].get(path, ""), hid, fields)
+    after = dict(snap, files=dict(snap["files"], **{path: text}))
+    row = next(r for r in _register_rows(after, slug) if r["ID"] == hid)
+    issue = _by_id(snap, hid, "type:hypothesis")
+    return [{"kind": "write_file", "path": path, "text": text},
+            {"kind": "edit_body", "issue": issue["number"], "body": bodies.hypothesis_body(row, _evidence_claims(snap, slug))},
+            _commit(f"chore({slug}): update {hid} " + ", ".join(sorted(fields)).lower(), [path])]
