@@ -1,3 +1,7 @@
+## Review · B-05 · rejected
+
+Blocking: O registro não contém o campo obrigatório Test nem testes individuais para H-01/H-02; reconhecer essa lacuna não satisfaz o contrato de registro exigido por B5. · Return to: B-05
+
 ## Review · B-04 · approved
 
 Blocking: none · Return to: none
