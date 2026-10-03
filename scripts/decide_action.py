@@ -79,7 +79,8 @@ def plan(comment, issue):
     n = issue["number"]
     actions = []
     still_waiting = [w for w in waiting if w not in [a[0] for a in accepted]]
-    if accepted and not still_waiting:
+    blocked = "state:blocked" in issue.get("labels", [])  # a blocked layer keeps human:pending until unblocked
+    if accepted and not still_waiting and not blocked:
         actions += [{"kind": "remove_label", "issue": n, "label": "human:pending"},
                     {"kind": "add_label", "issue": n, "label": "human:decided"}]
     lines = [f"{rid} decided by @{comment['author']}: **{choice} — {text}**" for rid, choice, text in accepted]

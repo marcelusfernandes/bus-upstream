@@ -130,8 +130,10 @@ def plan_route(snap, layer, state):
     if state == "blocked":  # anti-loop: a blocked layer always waits for a human (check 4)
         add.append("human:pending")
         remove += [l for l in ("human:decided",) if l in epic["labels"]]  # one human: label
-    elif "human:pending" in epic["labels"]:
+    elif "human:pending" in epic["labels"] and not decisions.awaiting_pm(epic):
         remove.append("human:pending")
+        if decisions.pm_decisions(epic) and "human:decided" not in epic["labels"]:
+            add.append("human:decided")  # leaving blocked: one human: label, from the comments
     return [{"kind": "labels", "issue": epic["number"], "add": add, "remove": remove}]
 
 
@@ -345,8 +347,9 @@ def plan_decision_record(snap, slug, decision_id, agent_choice=None, agent_why=N
             f"**{decision_id} → {choice}: {answer.rstrip('.')}.**"
             + (f" {why.rstrip('.')}." if why else "") + (f" Unlocks: {req['blocks']}" if req.get("blocks") else ""))
     still_waiting = [w for w in decisions.awaiting_pm(issue) if w != decision_id]
-    remove = ["human:pending"] if "human:pending" in issue["labels"] and not still_waiting else []
-    if decided and not still_waiting and "human:decided" not in issue["labels"]:
+    blocked = "state:blocked" in issue["labels"]  # stays human:pending until route leaves blocked
+    remove = ["human:pending"] if "human:pending" in issue["labels"] and not still_waiting and not blocked else []
+    if decided and not still_waiting and not blocked and "human:decided" not in issue["labels"]:
         add_labels.append("human:decided")  # the Action normally did this already
     if add_labels or remove:
         actions.append({"kind": "labels", "issue": issue["number"], "add": add_labels, "remove": remove})

@@ -50,6 +50,11 @@ class Plan(unittest.TestCase):
         self.assertIn("D-001 decided by @junior-pm: **A — Conversion**", actions[2]["body"])
         self.assertTrue(all(a["issue"] == 1 for a in actions))
 
+    def test_blocked_layer_keeps_pending_after_a_decision(self):
+        issue = epic("D-001")
+        issue["labels"].append("state:blocked")
+        self.assertEqual(kinds(d.plan(comment("/decide A"), issue)), ["comment"])
+
     def test_never_closes(self):
         self.assertNotIn("close", kinds(d.plan(comment("/decide A"), epic("D-001"))))
 
