@@ -18,8 +18,8 @@ SLUG = r"^[a-z0-9]+(?:-[a-z0-9]+)*$"
 GITHUB_LOGIN = r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$"
 MODES = ("piloted", "autonomous")
 KINDS = ("user-problem", "solution", "causal")
-REGISTER_HEADER = ("| ID | Statement | Kind | Origin | Basis | Raised at | Routed to | Status | Resolution |\n"
-                   "|---|---|---|---|---|---|---|---|---|\n")
+REGISTER_HEADER = ("| ID | Statement | Kind | Origin | Basis | Raised at | Routed to | Test | Status | Resolution |\n"
+                   "|---|---|---|---|---|---|---|---|---|---|\n")
 
 
 # ---------- validation ----------
@@ -54,6 +54,10 @@ def _validate_hypothesis(h):
             errors.append(f"{hid}: {field} must be B, U or S")
     if h.get("origin") == "agent" and not h.get("basis"):
         errors.append(f"{hid}: basis is required when origin is agent (evidence IDs or 'guess')")
+    if re.search(r"\S+/\S+\.(md|json|txt)\b", str(h.get("origin", ""))):
+        errors.append(f"{hid}: origin must say who and where in words (a PM on GitHub cannot open file paths)")
+    if not h.get("test"):
+        errors.append(f"{hid}: test is required (what would validate or invalidate it)")
     return errors
 
 
@@ -143,17 +147,19 @@ def _epics(data):
     return epics
 
 
-def _hypothesis_issue(h):
-    body = (f"## {h['id']} · {h['statement']}\n\n| Field | Value |\n|---|---|\n"
-            f"| Kind | {h['kind']} |\n| Origin | {_cell(h['origin'])} |\n| Basis | {_cell(h.get('basis', ''))} |\n"
-            f"| Raised at | {h['raised_at']} |\n| Routed to | {h['routed_to']} |\n")
-    return {"id": h["id"], "title": f"{h['id']} · {h['statement']}", "body": body,
+def _hypothesis_issue(h, claims):
+    import bodies
+    fields = {"ID": h["id"], "Statement": h["statement"], "Kind": h["kind"], "Origin": h["origin"],
+              "Basis": h.get("basis", ""), "Raised at": h["raised_at"], "Routed to": h["routed_to"],
+              "Test": h.get("test"), "Status": "open"}
+    return {"id": h["id"], "title": f"{h['id']} · {h['statement']}", "body": bodies.hypothesis_body(fields, claims),
             "labels": ["type:hypothesis", "hyp:open", LAYER_LABEL[h["routed_to"]]], "parent_layer": h["routed_to"]}
+
 
 
 def _register(hypotheses):
     rows = "".join(f"| {h['id']} | {_cell(h['statement'])} | {h['kind']} | {_cell(h['origin'])} | "
-                   f"{_cell(h.get('basis', ''))} | {h['raised_at']} | {h['routed_to']} | open | — |\n"
+                   f"{_cell(h.get('basis', ''))} | {h['raised_at']} | {h['routed_to']} | {_cell(h.get('test', '—'))} | open | — |\n"
                    for h in hypotheses)
     return REGISTER_HEADER + rows
 
@@ -207,7 +213,8 @@ def plan_initiative(data):
                                      f"Context: {data.get('context') or 'App (default)'}\n\n"
                                      f"Reading order: initiatives/{data['slug']}/README.md"},
         "epics": _epics(data),
-        "hypotheses": [_hypothesis_issue(h) for h in data.get("hypotheses", [])],
+        "hypotheses": [_hypothesis_issue(h, {e["id"]: e["claim"] for e in data.get("evidence", [])})
+                       for h in data.get("hypotheses", [])],
         "files": _files(data),
     }
 

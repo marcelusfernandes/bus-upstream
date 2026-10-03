@@ -4,7 +4,8 @@ first score comments, hypothesis sub-issues, and the initiatives/<slug>/ skeleto
 
 Dry-run by default. --apply first switches to the initiative's own branch
 (upstream/<slug>, created from an updated main), then writes to GitHub and to disk
-(existing files are kept), then commits and pushes the branch.
+(existing files are kept), then commits and pushes the branch, and opens a draft PR into
+main whose `Closes #N` lines link the branch to every issue (it becomes the handoff PR).
 """
 import argparse
 import json
@@ -36,9 +37,12 @@ def apply(plan, repo):
         numbers[epic["layer"]] = gh.create_issue_api(repo, epic["title"], epic["body"], epic["labels"], [], milestone)
         if epic["first_comment"]:
             gh.comment(repo, numbers[epic["layer"]], epic["first_comment"])
+    hypotheses = []
     for h in plan["hypotheses"]:
         child = gh.create_issue_api(repo, h["title"], h["body"], h["labels"], [], milestone)
         gh.add_sub_issue(repo, numbers[h["parent_layer"]], child)
+        hypotheses.append(child)
+    numbers["hypotheses"] = hypotheses
     for rel, text in plan["files"].items():
         path = ROOT / rel
         if path.exists():
@@ -75,11 +79,21 @@ def main(argv=None):
         milestone, numbers = apply(plan, args.repo or gh.current_repo())
         git_ops.commit_and_push([f"initiatives/{data['slug']}"], f"chore: intake {data['slug']}", branch,
                                 git_ops.run_git)
+        pr = gh.create_draft_pr(args.repo or gh.current_repo(), branch, "main", f"upstream: {data['title']}",
+                                draft_pr_body(data, milestone, numbers))
     except (gh.GhError, git_ops.GitError) as err:
         print(f"initiative partially created on {branch}: {err}", file=sys.stderr)
         return 1
-    print(f"created milestone #{milestone}, epics {numbers}, branch {branch} pushed")
+    print(f"created milestone #{milestone}, epics {numbers}, branch {branch} pushed, draft PR {pr}")
     return 0
+
+
+def draft_pr_body(data, milestone, numbers):
+    issues = [numbers[k] for k in ("B", "U", "S", "PRD") if k in numbers] + numbers.get("hypotheses", [])
+    return (f"Upstream for **{data['title']}** (milestone #{milestone}).\n\n"
+            f"> {data['demand']}\n\n"
+            "Draft until handoff: the final PRD review happens here, and merging it closes the upstream.\n\n"
+            + "\n".join(f"Closes #{n}" for n in issues) + "\n")
 
 
 if __name__ == "__main__":

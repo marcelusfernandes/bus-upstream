@@ -522,7 +522,29 @@ def plan_summary(snap, slug, layer, repo):
         body = body.replace(statement_line, f"{statement_line}\n\n{files_line}", 1)
     body = _replace_section(body, "### Key questions", table)
     body = _replace_section(body, "### Hypotheses", _hypotheses_section(snap, slug, layer))
-    return [{"kind": "edit_body", "issue": epic["number"], "body": body}]
+    return [{"kind": "edit_body", "issue": epic["number"], "body": body}] + _hypothesis_bodies(snap, slug)
+
+
+def _evidence_claims(snap, slug):
+    claims = {}
+    for eid, path in _evidence_files(snap, slug).items():
+        m = re.search(r'^claim: "?(.+?)"?\s*$', snap["files"][path], re.MULTILINE)
+        if m:
+            claims[eid] = m.group(1)
+    return claims
+
+
+def _hypothesis_bodies(snap, slug):
+    """Keep every hypothesis issue self-contained, from the register and the evidence files."""
+    import bodies
+    claims, actions = _evidence_claims(snap, slug), []
+    for row in _register_rows(snap, slug):
+        issue = _by_id(snap, row["ID"], "type:hypothesis")
+        if issue:
+            body = bodies.hypothesis_body(row, claims)
+            if body != issue.get("body"):
+                actions.append({"kind": "edit_body", "issue": issue["number"], "body": body})
+    return actions
 
 
 def sign(actions, role):
