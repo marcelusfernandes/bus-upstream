@@ -1,3 +1,7 @@
+## Review · B-02 · approved
+
+Blocking: none · Return to: none
+
 ## Review · B-03 · rejected
 
 Blocking: A afirmação sobre o conteúdo da proposta D-003 em B-02 não é sustentada por nenhuma das evidências citadas e fornecidas. · Return to: B-03
