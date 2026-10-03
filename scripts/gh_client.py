@@ -64,3 +64,11 @@ def add_assignees(repo, number, logins):
     for login in logins:
         cmd += ["--add-assignee", login]
     run(cmd)
+
+
+def create_draft_pr(repo, head, base, title, body):
+    """Draft PR from the initiative branch. Its `Closes #N` lines link the branch and the PR to
+    every issue in GitHub's Development panel; it becomes the handoff PR."""
+    out = run(["gh", "pr", "create", "--repo", repo, "--draft", "--head", head, "--base", base,
+               "--title", title, "--body", body])
+    return out.strip().splitlines()[-1]

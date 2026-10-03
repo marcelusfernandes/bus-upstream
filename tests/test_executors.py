@@ -56,6 +56,8 @@ class FakeGh:
             return json.dumps({"id": 555})
         if cmd[:3] == ["gh", "repo", "view"]:
             return json.dumps({"nameWithOwner": "o/r"})
+        if cmd[:3] == ["gh", "pr", "create"]:
+            return "https://github.com/o/r/pull/99\n"
         if cmd[:3] == ["gh", "issue", "list"]:
             return json.dumps([{"number": 8, "title": "D-001 · outcome", "labels": [{"name": "type:decision"},
                                {"name": "human:pending"}], "assignees": [{"login": "junior-pm"}]}])
@@ -85,7 +87,8 @@ class CreateInitiative(unittest.TestCase):
             milestone, numbers = create_initiative.apply(plan, "o/r")
             readme = (Path(tmp) / "initiatives/usual-basket/README.md").read_text(encoding="utf-8")
         self.assertEqual(milestone, 7)
-        self.assertEqual(set(numbers), {"B", "U", "S", "PRD"})
+        self.assertEqual(set(numbers), {"B", "U", "S", "PRD", "hypotheses"})
+        self.assertEqual(len(numbers["hypotheses"]), 3)
         self.assertIn("Milestone: #7", readme)
         creates = [c for c in fake.calls if c[:2] == ["gh", "api"] and c[2].endswith("/issues") and "POST" in c]
         self.assertEqual(len(creates), 4 + 3)
@@ -120,6 +123,19 @@ class CreateInitiative(unittest.TestCase):
         self.assertIn(["switch", "-c", "upstream/usual-basket", "origin/main"], git.calls)
         self.assertEqual(git.calls[-2:], [["commit", "-m", "chore: intake usual-basket"],
                                           ["push", "-u", "origin", "upstream/usual-basket"]])
+
+    def test_apply_opens_a_draft_pr_linking_every_issue(self):
+        fake = FakeGh()
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(gh_client, "run", fake), \
+                mock.patch.object(git_ops, "run_git", FakeGit()), mock.patch.object(create_initiative, "ROOT", Path(tmp)), \
+                redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(create_initiative.main([str(EXAMPLE), "--apply", "--repo", "o/r"]), 0)
+        pr = next(c for c in fake.calls if c[:3] == ["gh", "pr", "create"])
+        self.assertIn("--draft", pr)
+        self.assertEqual(pr[pr.index("--head") + 1], "upstream/usual-basket")
+        body = pr[pr.index("--body") + 1]
+        self.assertEqual(body.count("Closes #"), 4 + 3)
+        self.assertIn("pull/99", out.getvalue())
 
     def test_dirty_tree_stops_before_github(self):
         fake, err = FakeGh(), io.StringIO()

@@ -4,7 +4,10 @@
 
 - Each intake gets its own branch, `upstream/<slug>`, created from an **updated
   main**. `create_initiative.py --apply` creates it automatically (or resumes it if it
-  already exists), and commits and pushes the intake; PMs never create branches. The slug names the outcome or the demand in a few words, for example
+  already exists), and commits and pushes the intake; PMs never create branches.
+- Intake also opens a **draft PR** from `upstream/<slug>` into `main`, with `Closes #N` for
+  every issue it created. That links the branch and the PR to each issue in GitHub's
+  **Development** panel, and it is the PR used for the final review at handoff. The slug names the outcome or the demand in a few words, for example
   `upstream/basket-repurchase`.
 - All of the initiative's files live under `initiatives/<slug>/`, so parallel
   branches don't conflict with each other.
