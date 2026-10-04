@@ -1,3 +1,7 @@
+## Review · S-04 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão documental S-04; não verifica pesquisa, acesso a dados, viabilidade técnica/econômica ou eficácia; métodos propostos e D-007 limitado ao fechamento documental.
+
 ## Review · S-03 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão documental; não verifica viabilidade, pesquisa ou adequação empírica; canal, elegibilidade, dados e parâmetros desconhecidos; D-007 somente documental, diagnóstico/validação antes de implementação.
