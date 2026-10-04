@@ -1,3 +1,7 @@
+## Review · U-03 · rejected
+
+Blocking: O briefing do orquestrador forneceu business/evidence/E-003.md inexistente; suporte de E-003 não verificável nesse caminho. · Return to: U-03 · Limitations: Revisão documental; mecanismo explicitamente aberto com dono e falsificadores. Falha de caminho do briefing, sem conclusão de falsidade da resposta.
+
 ## Review · U-02 · approved
 
 Blocking: none · Return to: none · Limitations: Review restricted to U-02, E-001/E-016/E-017, discovery brief, D-006 and User rules; unknown magnitude consciously nonblocking in exercise. Does not demonstrate behavior, magnitude, research, causality or complete closure conditions.
