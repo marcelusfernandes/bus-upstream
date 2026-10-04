@@ -12,12 +12,13 @@ changing anything.
 | A new demand arrives | agent `intake` + skill `intake`. It creates the initiative's own branch `upstream/<slug>` automatically; the PM never creates branches. |
 | An initiative exists | agent `orchestrator` + skill `orchestrator`. It always starts with `scripts/reconcile.py <slug>`. |
 | Work on the Business layer | agent `business_lead` (dispatched by the orchestrator) |
+| Work on the User layer | agent `user_lead` (dispatched by the orchestrator) |
 | Evidence for one question | agent `collector` (dispatched by a lead) |
 | Review / scoring | `reviewer`, `scorer_luna`, `scorer_sol`, `scorer_sol56` (read-only, dispatched by the orchestrator) |
 
-**Built so far:** intake, orchestrator, Business lead, collector, scorers, reviewer.
-**Not built yet:** the User and Solution leads, the B↔U and U↔S fit reviews, and the
-PRD writer. The orchestrator stops and says so when it reaches them.
+**Built so far:** intake, orchestrator, Business lead, User lead, collector, scorers,
+reviewer (answer and fit reviews).
+**Not built yet:** the Solution lead and the PRD writer. The orchestrator stops and says so when it reaches them.
 
 ## Rules
 

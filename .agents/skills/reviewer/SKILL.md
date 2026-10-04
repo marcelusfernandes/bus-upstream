@@ -22,6 +22,17 @@ Reject when any of these holds:
 - A contradiction in the evidence is hidden instead of named.
 - The answer fills a field just to complete it.
 
+## Fit review (BU-fit, US-fit)
+
+When the orchestrator asks for a **fit review**, you judge the link between two layers,
+not one answer. For **BU-fit** you receive B's committed answers and U's draft of U3 (and
+U1); for **US-fit**, U's committed answers and S's draft of S2. Reject when:
+- the link claims a mechanism the upstream layer's outcome does not support;
+- the two layers talk about different populations or situations;
+- the link is marked `evidenced` on evidence that only shows the downstream problem
+  exists, not that solving it moves the upstream outcome;
+- a gap in the link is hidden instead of named as a bet with an owner.
+
 Return only this JSON:
 
 ```json
