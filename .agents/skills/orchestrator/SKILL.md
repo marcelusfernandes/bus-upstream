@@ -52,13 +52,13 @@ back and forth between layers.
   direction while U or B is still weak, say so explicitly and bring it to the PM as an
   accepted risk (gate 4). Do not commit it silently.
 - **Stop** when every open layer waits for the PM, or when the next step needs an agent
-  that does not exist yet (User/Solution leads, fit reviews, PRD writer).
+  that does not exist yet.
 
 ## Work cycle for a layer
 
 1. `upstream_ops <slug> route --layer <L> --state in-progress`
 2. **Dispatch the lead** with the gap you chose and why: `business_lead` for B,
-   `user_lead` for U. The Solution lead is not built yet: for S, report that and stop. The brief is
+   `user_lead` for U, `solution_lead` for S. The brief is
    self-contained: slug, layer, gap, the open questions and hypotheses from the reconcile
    report, and the paths to read. The lead drafts answers and evidence, and returns any
    decision it needs as a **spec file in /tmp**. It does not open decisions.
@@ -91,10 +91,21 @@ back and forth between layers.
    `upstream_ops <slug> review --target BU-fit --verdict <v> --blocking "<...>" --return-to <...>`.
    A rejected fit sends the work back (to U3, or to B when B1 must change). The Solution
    layer must not commit a direction before an approved BU-fit (or one accepted as risk).
+   **Before closing S, run the US-fit review** the same way (U's committed answers and S's
+   S2), recorded as `review --target US-fit`.
 8. **Close the layer** only when every key question is evidenced, a bet or knowingly
    open, no hypothesis routed to it is open, and nothing waits for the PM:
    `upstream_ops <slug> route --layer <L> --state done`. The helper refuses otherwise.
 9. Reconcile again and choose again.
+
+## When B, U and S are done: the PRD and the handoff
+
+1. Dispatch `prd_writer`. It writes `prd/README.md` from the committed layers only.
+2. Dispatch a fresh `reviewer` with the PRD and the committed answers; record it with
+   `upstream_ops <slug> review --target PRD --verdict <v> ...`. Rejected: back to the writer.
+3. `upstream_ops <slug> prd-publish`: the whole PRD goes into the PRD epic body.
+4. `upstream_ops <slug> handoff`: marks the draft PR ready for review.
+5. Stop. **The PM approves the handoff by merging the PR**; never merge it yourself.
 
 ## Before you stop (always)
 

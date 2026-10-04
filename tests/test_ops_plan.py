@@ -520,6 +520,38 @@ class CheckpointAndSummary(unittest.TestCase):
         self.assertEqual(len(again), 1, "hypothesis bodies already current: no further edits")
 
 
+class PrdPublish(unittest.TestCase):
+    def _done(self):
+        snap = snap_with_readme()
+        for n in (1, 2, 3):
+            by_number(snap, n)["labels"] = [l for l in by_number(snap, n)["labels"] if not l.startswith("state:")] + [
+                "state:done"]
+        snap["files"][f"{BASE}/prd/README.md"] = "# PRD\n\n## Business problem\n" + "Conversion below the App. " * 20
+        snap["files"][f"{BASE}/prd/review.md"] = "## Review · PRD · approved\n\nBlocking: none\n"
+        return snap
+
+    def test_publishes_the_whole_prd_into_the_prd_epic(self):
+        actions = o.plan_prd_publish(self._done(), SLUG, "o/r")
+        self.assertEqual(actions[0]["issue"], 4)
+        self.assertIn("## Business problem", actions[0]["body"])
+        self.assertIn("https://github.com/o/r/blob/upstream/usual-basket/initiatives/usual-basket/prd/README.md",
+                      actions[0]["body"])
+        self.assertEqual(actions[1]["add"], ["state:in-review"])
+
+    def test_refuses_before_layers_are_done_or_without_approved_review(self):
+        snap = self._done()
+        by_number(snap, 3)["labels"].remove("state:done")
+        with self.assertRaises(o.OpsError):
+            o.plan_prd_publish(snap, SLUG, "o/r")
+        snap = self._done()
+        snap["files"][f"{BASE}/prd/review.md"] = "## Review · PRD · rejected\n"
+        with self.assertRaises(o.OpsError):
+            o.plan_prd_publish(snap, SLUG, "o/r")
+
+    def test_handoff_marks_the_branch_pr_ready(self):
+        self.assertEqual(o.plan_handoff(SLUG), [{"kind": "pr_ready", "branch": "upstream/usual-basket"}])
+
+
 class Signing(unittest.TestCase):
     def test_every_comment_is_signed_except_relays(self):
         actions = o.sign([{"kind": "comment", "issue": 1, "body": "x"},
