@@ -1,5 +1,15 @@
 # [codex test] Usual basket
 
+## Checkpoint · Solution aguarda D-007
+
+Nesta rodada a direção explícita do PM determinou Solution, H-01 e S1 primeiro, depois PRD/handoff. B e U permaneceram done; nenhuma contradição nova exigiu reabertura. O Solution lead delegou a auditoria documental E-018 ao collector, exclusivamente no corpus autorizado, sem pesquisa externa. H-01 foi estacionada via helper, sem validação/invalidação empírica, com condições de reabertura preservadas.
+
+S1–S4 receberam quatro revisores novos, isolados e somente leitura; todos aprovaram os drafts com limites documentais. S1 foi registrada como evidenced exclusivamente sobre comparação das quatro opções. S2–S4 continuam open e dependem da escolha do PM. D-007 foi publicada no epic S #21 após revisão: escolher S-A (reutilização ajustável), S-B (preparação humana), ambas com aceitação dos riscos herdados e exceção explícita a D-003 limitada ao fechamento documental deste teste, ou C (manter diagnóstico antes de escolher solução). Recomendação A, baixa confiança; nenhuma implementação autorizada. Pedido completo: https://github.com/marcelusfernandes/bus-upstream/issues/21#issuecomment-5975670205
+
+Painel isolado e paralelo: luna 5/2, sol 7/1, sol56 6/1; mediana Definition 6 / Grounding 1, Spread 2, mostly_bets=false. A mudança de S1 motivou o painel, sem converter os drafts em decisões. S permanece in-progress, D-007 pendente, sem hipóteses abertas em S, drift ou obrigações mecânicas. US-fit, fechamento S, PRD writer/review/publish e handoff aguardam decisão; PR não foi mesclada.
+
+Validação: 263 testes passaram. A atualização da branch falhou inicialmente por restrição de escrita em .git/index.lock; reexecução escalonada funcionou, sem rejeição automática. O Solution lead relatou projeto ausente no grafo: indexação resolveu, mas excluiu scripts. Nenhuma skill ou script foi alterado; todas as chamadas upstream_ops desta rodada incluíram --repo marcelusfernandes/bus-upstream e assinatura do papel. Encerramento em D-007 pendente, com summary e checkpoint pelo helper autorizado.
+
 ## Checkpoint · User concluída nesta retomada
 
 A direção do PM determinou U, H-02 primeiro. D-006 B já respondida no GitHub foi registrada; nenhuma decisão nova foi solicitada. O User lead e seu collector produziram E-017, atualizaram o discovery brief e redigiram U1–U4 usando somente o corpus autorizado, sem pesquisa externa ou pesquisa de usuários inventada.
