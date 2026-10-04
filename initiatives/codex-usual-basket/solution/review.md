@@ -1,3 +1,7 @@
+## Review · S-01 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão documental de S-01 e fontes citadas; não verifica pesquisa executada, viabilidade, redução de esforço/tempo, conversão, US-fit ou autenticidade externa das decisões; D-007 não é evidência empírica.
+
 ## Review · S-04 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão documental: abordagem e quatro hipóteses derivadas com testes propostos, sem resultados, fluxos ou telas inventados. Não verifica execução, viabilidade ou fontes externas. S-A, riscos e exceção D-003 pendentes do PM; não autoriza fechamento ou implementação.
