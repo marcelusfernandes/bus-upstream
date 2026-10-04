@@ -30,9 +30,10 @@ business problem and its decisions are your frame), `user/` and the orchestrator
    evidence resolves it or discovery is needed. Close it explicitly with
    `upstream_ops <slug> --agent user_lead hypothesis-close --id H-nn --status <...> --why "<...>" [--evidence ...] [--into H-nn]`.
    A business claim about users (for example "if it is faster, users convert more") is
-   usually **reframed** into a user-problem hypothesis: register the new one in
-   `hypotheses.md` (origin `agent`, with a basis and a test, routed to U) and close the
-   old one as `reframed → H-nn`. A business hypothesis is never silently dropped.
+   usually **reframed** into a user-problem hypothesis: register the new one with
+   `upstream_ops <slug> --agent user_lead hypothesis-add --statement "<...>" --kind user-problem --origin "agent, reframing H-nn" --basis "<E-ids or guess>" --raised-at U --routed-to U --test "<...>"`
+   (it writes the register and opens the issue), then close the old one as
+   `reframed` with `--into <new H-id>`. A business hypothesis is never silently dropped.
 2. **Gather the evidence that exists** with `collector`, one bounded question each, writing
    `initiatives/<slug>/user/evidence/E-nnn.md` with the next free E number. If you cannot
    dispatch subagents, return the bounded questions to the orchestrator.
