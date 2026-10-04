@@ -66,6 +66,16 @@ def add_assignees(repo, number, logins):
     run(cmd)
 
 
+def pr_ready(repo, branch):
+    """Mark the PR whose head is `branch` ready for review."""
+    number = json.loads(run(["gh", "pr", "list", "--repo", repo, "--head", branch, "--state", "open",
+                             "--json", "number"]))
+    if not number:
+        raise GhError(f"no open PR from {branch}")
+    run(["gh", "pr", "ready", str(number[0]["number"]), "--repo", repo])
+    return number[0]["number"]
+
+
 def create_draft_pr(repo, head, base, title, body):
     """Draft PR from the initiative branch. Its `Closes #N` lines link the branch and the PR to
     every issue in GitHub's Development panel; it becomes the handoff PR."""
