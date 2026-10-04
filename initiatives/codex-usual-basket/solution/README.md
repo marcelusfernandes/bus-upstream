@@ -1,25 +1,27 @@
 # Solution
 
-**Statement:** Propomos como aposta S-A reutilizar a composição de uma compra anterior como base ajustável da recompra, para evitar reconstrução manual quando a intenção do cliente for repetir os mesmos itens.
+**Statement:** A aposta S-A de @marcelusfernandes é reutilizar a composição de uma compra anterior como base ajustável da recompra, para evitar reconstrução manual quando a intenção do cliente for repetir os mesmos itens.
 
-**Estado:** in-progress; proposta ainda não escolhida. D-003 permanece integralmente vigente; nenhuma exceção ou risco de S foi aceito. S1 compara documentalmente as opções; S2–S4 são drafts abertos para revisão e decisão do PM.
+**Estado:** in-progress; D-007 A escolheu a aposta e aceitou o risco herdado. S1–S4 foram atualizadas para revisão independente; registro, US-fit, re-score e conclusão pertencem ao orquestrador. Este README não declara esses passos executados.
 
-| Questão | Estado do draft | O que falta |
+| Questão | Estado do draft | Base e limite |
 | --- | --- | --- |
-| S1 — opções | evidenced somente sobre comparação documental | revisão independente e registro pelo orquestrador |
-| S2 — aposta/U→S | open | gates 3/4: escolha, risco herdado e eventual exceção explícita a D-003 |
-| S3 — escopo/non-goals | open | depende da escolha; se S-B vencer, reescrever/rever |
-| S4 — abordagem/hipóteses derivadas | open | depende da escolha; testes posteriores não executados |
+| S1 — opções | evidenced | comparação e disposição documentais; mecanismos sem validação empírica |
+| S2 — aposta/U→S | bet | S-A escolhida por @marcelusfernandes em D-007 A, baixa confiança |
+| S3 — escopo/non-goals | bet | delimitação do mecanismo escolhido, para revisão; sem autorização de entrega |
+| S4 — abordagem/hipóteses derivadas | bet | valor, usabilidade, viabilidade técnica/econômica a validar antes de implementação |
 
-## Opções
+## Opções e hipótese herdada
 
-- S-A: reutilização ajustável da composição anterior, proposta recomendada; parked até decisão.
-- S-B: preparação humana da recompra, alternativa operacional; parked até decisão.
-- S-C: H-01, aspiração de fluxo mais rápido sem mecanismo; parked sem veredicto empírico.
-- S-D: não intervir agora, preservando diagnóstico anterior à solução; parked como alternativa de decisão.
+- S-A: reutilização ajustável da composição anterior, chosen em D-007 A.
+- S-B: preparação humana da recompra, parked; alternativa operacional não escolhida, sem invalidação empírica.
+- S-C: H-01, aspiração de fluxo mais rápido sem mecanismo próprio, parked sem veredicto empírico.
+- S-D: não intervir agora, parked neste teste; mantém a alternativa de diagnóstico antes de escolher solução.
 
-A auditoria E-018 foi produzida por collector usando somente as fontes permitidas. H-01 foi estacionada via helper, preservando hipótese, teste e reabertura ao definir intervenção/comparador, antes de alegar redução de tempo ou se diagnóstico contrariar a direção. Nenhuma hipótese foi validada ou invalidada.
+E-018 é uma auditoria documental anterior a D-007, usando exclusivamente o corpus autorizado. Sua indicação de escolha ausente foi superada pela decisão; a falta de evidência empírica permanece. H-01 conserva teste e condições de reabertura ao definir intervenção/comparador, antes de alegar redução de tempo ou se diagnóstico contrariar a direção. A decisão não define comparação nem valida rapidez. Nenhuma hipótese foi validada ou invalidada; não houve novo encerramento nesta atualização.
 
-A recomendação tem confiança baixa, não quantificada: U1 bet, U2/U3 abertas e B1–B4 conscientemente abertas. Comparação de opções não demonstra viabilidade ou oportunidade; D-006 não autoriza S. A decisão proposta pede ao PM aceitar nominalmente os riscos e uma exceção restrita ao fechamento documental S/PRD/handoff neste teste; diagnóstico continua obrigatório antes de implementação/meta/sucesso e não há autorização de implementação. Manter D-003 integralmente é opção explícita.
+## Risco aceito e próximo passo
 
-US-fit, scores novos, fechamento de S, PRD e handoff ainda não executados. O orquestrador recebe o spec /tmp/codex-usual-basket-D-007-solution.json para revisão antes de abrir decisão no epic S. Nenhuma resposta foi registrada por este lead.
+D-007 A aceita S-A como aposta de @marcelusfernandes, herdando U1 bet, U2/U3 abertas e B1–B4 conscientemente abertas: dificuldade pode não existir, não mover conversão, não ser viável ou não justificar investimento. Confiança baixa, não quantificada. A exceção a D-003 vale apenas para fechamento documental de S, PRD e handoff neste teste; diagnóstico e validação permanecem obrigatórios em paralelo e antes de qualquer implementação. Diagnóstico continua exigido antes de meta/sucesso; não há autorização de implementação.
+
+Discovery de D-006 mantém prazo 2026-10-10 e dono @marcelusfernandes, sem execução demonstrada; o teste não permite pesquisa real. Parâmetros de B3, comparador, população/canal, executores, orçamento e demais prazos seguem abertos. S2 registra sinais de parada; S4 leva hipóteses derivadas e métodos propostos ao PRD. Nenhuma nova decisão é necessária para submeter estes drafts à revisão; expansão de escopo ou alteração da aposta exige nova decisão.
