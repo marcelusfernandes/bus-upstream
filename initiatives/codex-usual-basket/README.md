@@ -81,4 +81,4 @@ Reconciliação após abrir D-006: U `in-progress`, D-006 pendente, H-02 aberta,
 - A ferramenta recusou um segundo reviewer com `agent thread limit reached`, apesar de collector concluído. O mesmo reviewer foi reutilizado em quatro tarefas de alvo único, em sequência: isso preserva separação autor/revisor, mas não proporciona contexto limpo entre respostas.
 - O User lead tentou ler `templates/decision-request.json`, inexistente; corrigiu para o template `.md`, sem efeito no contrato.
 - Uma chamada inicial de ajuda de `upstream_ops` omitiu `--repo`; somente leitura. Todas as operações de contrato usaram o repo solicitado e a assinatura do papel.
-- Reviews são documentais e não atestam pesquisa, recrutamento, prazo nem execução externa. O resumo mantém Statement `not yet writable` enquanto U1 está `open`.
+- Reviews são documentais e não atestam pesquisa, recrutamento, prazo nem execução externa. O resumo atual apresenta Statement `not yet written — U-01 is open`, com a candidata e seu estado explícitos.
