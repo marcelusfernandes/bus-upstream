@@ -1,3 +1,7 @@
+## Review · S-03 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão documental; não verifica viabilidade, pesquisa ou adequação empírica; canal, elegibilidade, dados e parâmetros desconhecidos; D-007 somente documental, diagnóstico/validação antes de implementação.
+
 ## Review · S-02 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão documental de S-02 e fontes fornecidas; não verifica pesquisa, viabilidade, conversão, autenticidade GitHub, S3/S4 ou US-fit; não valida aposta nem autoriza implementação.
