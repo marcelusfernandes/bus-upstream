@@ -1,3 +1,7 @@
+## Review · US-fit · approved
+
+Blocking: none · Return to: none · Limitations: U→S condicional corresponde à população/situação de U1, baixa confiança, lacunas e dono explícitos; não verifica eficácia, magnitude, conversão, viabilidade, pesquisa ou autenticidade das decisões.
+
 ## Review · S-04 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão documental S-04; não verifica pesquisa, acesso a dados, viabilidade técnica/econômica ou eficácia; métodos propostos e D-007 limitado ao fechamento documental.
