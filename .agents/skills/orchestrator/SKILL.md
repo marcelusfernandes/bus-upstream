@@ -63,6 +63,9 @@ back and forth between layers.
    report, and the paths to read. The lead drafts answers and evidence, and returns any
    decision it needs as a **spec file in /tmp**. It does not open decisions.
 3. **Review every draft before anything reaches the PM.** For each drafted answer:
+   - Use a **fresh** `reviewer` for each draft, so no review sees another draft's context.
+     With the 4-agent limit, close the previous reviewer before spawning the next; never
+     reuse one reviewer across drafts.
    - Dispatch `reviewer` with only the answer file, the evidence files it cites, the
      decision spec if there is one, and the layer's section of
      `spec/v1/12-key-questions.md`. Do not pass the lead's reasoning.

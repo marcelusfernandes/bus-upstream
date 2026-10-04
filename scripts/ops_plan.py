@@ -626,3 +626,53 @@ def plan_hypothesis_update(snap, slug, hid, fields):
     return [{"kind": "write_file", "path": path, "text": text},
             {"kind": "edit_body", "issue": issue["number"], "body": bodies.hypothesis_body(row, _evidence_claims(snap, slug))},
             _commit(f"chore({slug}): update {hid} " + ", ".join(sorted(fields)).lower(), [path])]
+
+
+HYP_KINDS = ("user-problem", "solution", "causal")
+
+
+def _next_hypothesis_id(snap, slug):
+    ids = [int(r["ID"][2:]) for r in _register_rows(snap, slug)]
+    ids += [int(m.group(1)) for i in snap["issues"] if (m := re.match(r"^H-(\d{2})\b", i.get("title", "")))]
+    return f"H-{max(ids, default=0) + 1:02d}"
+
+
+def plan_hypothesis_add(snap, slug, statement, kind, origin, basis, raised_at, routed_to, test):
+    """Register a new hypothesis (for example a reframed one) and open its issue, together.
+    The issue is self-contained and sits under the epic of the layer that tests it."""
+    import bodies
+    if kind not in HYP_KINDS:
+        raise OpsError(f"kind must be one of {HYP_KINDS}")
+    for name, value in (("statement", statement), ("origin", origin), ("basis", basis), ("test", test)):
+        _one_line(value, name)
+    if re.search(r"\S+/\S+\.(md|json|txt)\b", origin):
+        raise OpsError("origin must say who and where in words, never a file path")
+    if origin.startswith("agent") and not basis:
+        raise OpsError("an agent hypothesis needs a basis (evidence IDs or 'guess')")
+    for layer in (raised_at, routed_to):
+        if layer not in ("B", "U", "S"):
+            raise OpsError("raised_at and routed_to must be B, U or S")
+    _require_evidence(snap, slug, re.findall(c.EVIDENCE_ID, basis))
+    hid = _next_hypothesis_id(snap, slug)
+    path = f"{_base(slug)}/hypotheses.md"
+    text = snap["files"].get(path, "")
+    header = next((l for l in text.splitlines() if "| ID |" in l and "Status" in l), None)
+    if header is None:
+        raise OpsError("hypotheses.md has no header row")
+    names = [x.strip() for x in header.strip().strip("|").split("|")]
+    values = {"ID": hid, "Statement": statement, "Kind": kind, "Origin": origin, "Basis": basis,
+              "Raised at": raised_at, "Routed to": routed_to, "Test": test, "Status": "open", "Resolution": "—"}
+    row = "| " + " | ".join(_cell(values.get(n, "—")) for n in names) + " |"
+    if "Test" not in names:  # older register: add the column first, then the row
+        text = _set_register_fields(text, _register_rows(snap, slug)[0]["ID"], {"Test": "—"}) \
+            if _register_rows(snap, slug) else text
+        names = [x.strip() for x in next(l for l in text.splitlines() if "| ID |" in l).strip().strip("|").split("|")]
+        row = "| " + " | ".join(_cell(values.get(n, "—")) for n in names) + " |"
+    text = text.rstrip("\n") + "\n" + row + "\n"
+    fields = dict(values)
+    return [{"kind": "write_file", "path": path, "text": text},
+            _commit(f"chore({slug}): register {hid}", [path]),
+            {"kind": "create_issue", "title": f"{hid} · {statement}",
+             "body": bodies.hypothesis_body(fields, _evidence_claims(snap, slug)),
+             "labels": ["type:hypothesis", "hyp:open", LAYER[routed_to][0]], "assignees": [],
+             "parent": _epic(snap, routed_to)["number"]}]

@@ -8,6 +8,7 @@
     upstream_ops.py <slug> decision-open --spec decision.json
     upstream_ops.py <slug> decision-record --id D-001 [--agent-choice B --agent-why ..]
     upstream_ops.py <slug> hypothesis-close --id H-01 --status invalidated --why .. [--evidence E-007 ..] [--into H-04]
+    upstream_ops.py <slug> hypothesis-add --statement .. --kind user-problem --origin .. --basis .. --raised-at U --routed-to U --test ..
     upstream_ops.py <slug> hypothesis-update --id H-01 [--test ..] [--origin ..] [--basis ..]
     upstream_ops.py <slug> fix-labels
     upstream_ops.py <slug> reply --decision D-001 --text "<options and a recommendation>"
@@ -62,6 +63,9 @@ def _parser():
     s.add_argument("--decision", required=True)
     s.add_argument("--choice", required=True)
     s.add_argument("--why")
+    s = sub.add_parser("hypothesis-add")
+    for name in ("--statement", "--kind", "--origin", "--basis", "--raised-at", "--routed-to", "--test"):
+        s.add_argument(name, required=True)
     s = sub.add_parser("hypothesis-update")
     s.add_argument("--id", required=True)
     s.add_argument("--test")
@@ -113,6 +117,9 @@ def plan(args, snap, repo=None):
         return o.plan_reply(snap, args.decision, args.text)
     if args.command == "relay-decide":
         return o.plan_relay_decide(snap, args.slug, args.decision, args.choice, args.why)
+    if args.command == "hypothesis-add":
+        return o.plan_hypothesis_add(snap, args.slug, args.statement, args.kind, args.origin, args.basis,
+                                     args.raised_at, args.routed_to, args.test)
     if args.command == "hypothesis-update":
         fields = {k: v for k, v in (("Test", args.test), ("Origin", args.origin), ("Basis", args.basis)) if v}
         return o.plan_hypothesis_update(snap, args.slug, args.id, fields)
