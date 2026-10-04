@@ -1,6 +1,6 @@
 # S-B · Preparação assistida da recompra por uma pessoa
 
-**Disposition:** parked como alternativa operacional plausível, ainda não escolhida.
+**Disposition:** parked como alternativa operacional: D-007 A escolhe S-A; S-B não integra a aposta ativa e não foi invalidada por evidência.
 
 **Mechanism:** propor que uma pessoa responsável pelo atendimento prepare os itens desejados a partir da compra anterior e da intenção atual do cliente, com confirmação dele. Transfere a reconstrução para uma operação humana; não depende da mesma capacidade de reutilização direta pelo comprador de S-A. A existência desse atendimento, acesso ou capacidade não foi demonstrada.
 
@@ -12,6 +12,6 @@
 
 **Reversibility:** proposta de piloto operacional seria interrompível; transição, esforço e compromissos não foram estimados nem autorizados.
 
-**Decision dependency:** mesma aceitação de risco e restrição D-003 que S-A; requer escolha explícita e nova redação de S2–S4 se selecionada. Não há contratação nem execução autorizada.
+**Decision dependency:** D-007 A aceita apenas S-A para fechamento documental neste teste; S-B exige nova escolha explícita e revisão de S2–S4 se retomada. Não há contratação nem execução autorizada; custo total e capacidade operacional desconhecidos motivam preservar esta alternativa sem presumir vantagem sobre S-A.
 
-**Evidence/frame:** E-001 (../../../user/evidence/E-001.md), E-002 (../../../business/evidence/E-002.md), E-018 (../../evidence/E-018.md); U-01/U-03 (../../../user/answers/); D-002/D-003/D-006 (../../../decisions/).
+**Evidence/frame:** E-001 (../../../user/evidence/E-001.md), E-002 (../../../business/evidence/E-002.md), E-018 (../../evidence/E-018.md); U-01/U-03 (../../../user/answers/); D-002/D-003/D-006/D-007 (../../../decisions/).

@@ -8,8 +8,8 @@
 
 **Trade-offs:** manter a aspiração preserva a demanda; promovê-la a direção concreta agora ocultaria intervenção e efeito desconhecidos. Uma promessa de velocidade não pode orientar escopo verificável.
 
-**Assumptions/reversibility:** U1, redução de tempo e conversão são desconhecidos; estacionamento é reversível e não rejeita a aspiração. H-01 foi estacionada documentalmente pelo helper, sem escolha do PM nem exceção a D-003.
+**Assumptions/reversibility:** U1, redução de tempo e conversão são desconhecidos; estacionamento é reversível e não rejeita a aspiração. H-01 foi estacionada documentalmente antes da escolha de solução. D-007 A posteriormente escolhe S-A e concede exceção restrita ao fechamento documental de S/PRD/handoff neste teste; não valida H-01 nem define seu comparador. Diagnóstico e validação continuam obrigatórios em paralelo e antes de implementação.
 
 **Reopen/test:** reabrir ao definir intervenção e comparador, antes de alegar redução de tempo, ou se diagnóstico contrariar a direção. Seguir Test de H-01: mesmos eventos, população e janela comparáveis, abandonos tratados previamente e relevância/precisão predefinidas. Tempo não comprova H-02.
 
-**Evidence/frame:** E-003 (../../evidence/E-003.md), E-018 (../../evidence/E-018.md); H-01 (../../../hypotheses.md); D-003 (../../../decisions/D-003.md).
+**Evidence/frame:** E-003 (../../evidence/E-003.md), E-018 (../../evidence/E-018.md); H-01 (../../../hypotheses.md); D-003 (../../../decisions/D-003.md), D-007 (../../../decisions/D-007.md).
