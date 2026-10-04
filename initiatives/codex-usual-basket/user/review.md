@@ -1,3 +1,7 @@
+## Review · BU-fit · approved
+
+Blocking: none · Return to: none · Limitations: Documentary B-U compatibility only: comparable conversion outcome, conditional mechanism, low confidence, falsifiers and owner explicit. Population equivalence remains unproved and subject to diagnosis; no evidence, decisions, register, baseline, causality or research execution verification.
+
 ## Review · U-04 · approved
 
 Blocking: none · Return to: none · Limitations: Documentary disposition only: register and D-006 support parked H-02/H-05 without empirical verdict. No external authenticity, discovery execution, behavior, magnitude, causality, BU-fit, scoring or closure check. Snapshot differences explicit.
