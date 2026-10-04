@@ -1,3 +1,7 @@
+## Review · U-02 · approved
+
+Blocking: none · Return to: none · Limitations: Review restricted to U-02, E-001/E-016/E-017, discovery brief, D-006 and User rules; unknown magnitude consciously nonblocking in exercise. Does not demonstrate behavior, magnitude, research, causality or complete closure conditions.
+
 ## Review · U-01 · approved
 
 Blocking: none · Return to: none · Limitations: Reviewed only U-01, E-001/E-016/E-017, D-006 and User rules. Explicitly owned authorized bet; behavior, root cause and magnitude remain unobserved. Did not verify register, discovery execution, BU-fit or closure.
