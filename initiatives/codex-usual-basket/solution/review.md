@@ -1,3 +1,7 @@
+## Review · S-02 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão documental de S-02 e fontes fornecidas; não verifica pesquisa, viabilidade, conversão, autenticidade GitHub, S3/S4 ou US-fit; não valida aposta nem autoriza implementação.
+
 ## Review · S-01 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão documental de S-01 e fontes citadas; não verifica pesquisa executada, viabilidade, redução de esforço/tempo, conversão, US-fit ou autenticidade externa das decisões; D-007 não é evidência empírica.
