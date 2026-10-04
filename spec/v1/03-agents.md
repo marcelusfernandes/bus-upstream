@@ -26,7 +26,9 @@
   `<!-- enceladus:<role> -->` marker (`upstream_ops --agent <role>`), because agents
   comment with the PM's account; that is how a comment is known not to be the PM's.
 - **Leads** write answer drafts and READMEs in their layer folder, prepare decision specs
-  in /tmp (they do not open them), and run `hypothesis-close`.
+  in /tmp (they do not open them), and run `hypothesis-close` and `hypothesis-update`.
+  The User lead also writes `user/discovery-brief.md` when user evidence is missing, and
+  never invents user research.
 - **The orchestrator reviews drafts before the PM sees them**, then opens the decisions
   (`decision-open`), and also runs `fix-labels`, `reply`, `relay-decide` (only for an
   answer the PM typed in Codex), `summary` and `checkpoint`.
