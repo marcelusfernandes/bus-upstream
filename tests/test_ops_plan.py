@@ -501,8 +501,9 @@ class CheckpointAndSummary(unittest.TestCase):
         snap = apply_to_snapshot(snap, open_d001(snap), now=T0)
         body = o.plan_summary(snap, SLUG, "B", "o/r")[0]["body"]
         self.assertTrue(body.startswith("> **Definition:**"))
-        self.assertIn("**Statement:** The repurchase flow converts below the App.", body)
-        self.assertIn("| B-01 | What is the business problem? | bet | The repurchase flow converts below the App. |", body)
+        self.assertIn("**Statement:** Support cost per account has grown since the new pricing, driven by invoice questions.", body)
+        self.assertIn("| B-01 | What is the business problem? | bet | Support cost per account has grown since the new "
+                      "pricing, driven by invoice questions. |", body)
         self.assertIn("**Files:** [initiatives/usual-basket/business](https://github.com/o/r/tree/upstream/usual-basket/"
                       "initiatives/usual-basket/business)", body)
         self.assertLess(body.index("### Key questions"), body.index("### Decisions"))

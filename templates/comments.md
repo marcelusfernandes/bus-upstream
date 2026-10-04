@@ -10,7 +10,7 @@ why, the IDs, and a link to the file holding the detail.
 
 removed `human:decided`: a decision is waiting for the PM.
 
-## Answer U-02 · Recurring buyers rebuild the same basket manually each week
+## Answer U-02 · Account admins call support every month to find which invoice line items changed
 
 Why: <one line> · Evidence: E-005, E-007 · Detail: <link>
 
@@ -38,9 +38,9 @@ What changed: <one line>
 
 Options, recommendation and how to decide: see [decision-request.md](decision-request.md).
 
-## Decision D-004 · U-02 · Bet on basket rebuilding as the user problem
+## Decision D-004 · U-02 · Bet on invoice changes being unexplained as the user problem
 
-Decision (@<pm>, 2026-10-03, recorded by Enceladus) — **D-004 → A: Bet on basket rebuilding as the user problem.** <the PM's reason, in their words>. Unlocks: <what the request said it blocks>
+Decision (@<pm>, 2026-10-03, recorded by Enceladus) — **D-004 → A: Bet on invoice changes being unexplained as the user problem.** <the PM's reason, in their words>. Unlocks: <what the request said it blocks>
 
 ## Reply · D-004
 

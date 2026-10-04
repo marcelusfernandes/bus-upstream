@@ -8,7 +8,7 @@
 - Intake also opens a **draft PR** from `upstream/<slug>` into `main`, with `Closes #N` for
   every issue it created. That links the branch and the PR to each issue in GitHub's
   **Development** panel, and it is the PR used for the final review at handoff. The slug names the outcome or the demand in a few words, for example
-  `upstream/basket-repurchase`.
+  `upstream/invoice-clarity`.
 - All of the initiative's files live under `initiatives/<slug>/`, so parallel
   branches don't conflict with each other.
 
