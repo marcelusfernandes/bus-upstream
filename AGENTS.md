@@ -13,12 +13,14 @@ changing anything.
 | An initiative exists | agent `orchestrator` + skill `orchestrator`. It always starts with `scripts/reconcile.py <slug>`. |
 | Work on the Business layer | agent `business_lead` (dispatched by the orchestrator) |
 | Work on the User layer | agent `user_lead` (dispatched by the orchestrator) |
+| Work on the Solution layer | agent `solution_lead` (dispatched by the orchestrator) |
+| Compile the PRD | agent `prd_writer` (dispatched by the orchestrator when B, U and S are done) |
 | Evidence for one question | agent `collector` (dispatched by a lead) |
 | Review / scoring | `reviewer`, `scorer_luna`, `scorer_sol`, `scorer_sol56` (read-only, dispatched by the orchestrator) |
 
-**Built so far:** intake, orchestrator, Business lead, User lead, collector, scorers,
-reviewer (answer and fit reviews).
-**Not built yet:** the Solution lead and the PRD writer. The orchestrator stops and says so when it reaches them.
+**Built:** intake, orchestrator, Business, User and Solution leads, collector, scorers,
+reviewer (answer, fit and PRD reviews), PRD writer. The PM approves the handoff by merging
+the initiative's PR; agents never merge it. The orchestrator stops and says so when it reaches them.
 
 ## Rules
 

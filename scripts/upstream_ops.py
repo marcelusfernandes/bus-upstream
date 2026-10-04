@@ -10,6 +10,8 @@
     upstream_ops.py <slug> hypothesis-close --id H-01 --status invalidated --why .. [--evidence E-007 ..] [--into H-04]
     upstream_ops.py <slug> hypothesis-add --statement .. --kind user-problem --origin .. --basis .. --raised-at U --routed-to U --test ..
     upstream_ops.py <slug> hypothesis-update --id H-01 [--test ..] [--origin ..] [--basis ..]
+    upstream_ops.py <slug> prd-publish      (after B, U, S done and an approved PRD review)
+    upstream_ops.py <slug> handoff          (marks the draft PR ready; merging it is the PM's approval)
     upstream_ops.py <slug> fix-labels
     upstream_ops.py <slug> reply --decision D-001 --text "<options and a recommendation>"
     upstream_ops.py <slug> relay-decide --decision D-001 --choice B --why "<the PM's words, typed in Codex>"
@@ -71,6 +73,8 @@ def _parser():
     s.add_argument("--test")
     s.add_argument("--origin")
     s.add_argument("--basis")
+    sub.add_parser("prd-publish")
+    sub.add_parser("handoff")
     s = sub.add_parser("checkpoint")
     s.add_argument("--reason", required=True)
     s = sub.add_parser("summary")
@@ -123,6 +127,10 @@ def plan(args, snap, repo=None):
     if args.command == "hypothesis-update":
         fields = {k: v for k, v in (("Test", args.test), ("Origin", args.origin), ("Basis", args.basis)) if v}
         return o.plan_hypothesis_update(snap, args.slug, args.id, fields)
+    if args.command == "prd-publish":
+        return o.plan_prd_publish(snap, args.slug, repo)
+    if args.command == "handoff":
+        return o.plan_handoff(args.slug)
     if args.command == "checkpoint":
         return o.plan_checkpoint(args.slug, args.reason)
     if args.command == "summary":
@@ -172,6 +180,8 @@ def execute(actions, repo, slug, milestone, git=None):
             gh.edit_body(repo, a["issue"], a["body"])
         elif kind == "labels":
             gh.edit_labels(repo, a["issue"], a["add"], a["remove"])
+        elif kind == "pr_ready":
+            gh.pr_ready(repo, a["branch"])
         elif kind == "assign":
             gh.add_assignees(repo, a["issue"], a["assignees"])
         elif kind == "close":

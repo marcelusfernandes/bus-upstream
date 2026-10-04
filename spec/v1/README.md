@@ -78,6 +78,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 | R-41 | The issue is self-contained: drafts are reviewed before the PM decides; requests carry a Context and short options; `summary` keeps the epic body current; `checkpoint` pushes work before stopping. | agreed |
 | R-42 | Decision records follow Apollo's pattern: `Decision (@pm, date, recorded by Enceladus) — D-nnn → option: text. why. Unlocks: …`; one PM comment may decide several (`/decide D-nnn <option>` per line). | agreed |
 | R-43 | User lead built: hypotheses routed to U first (reframe, never drop), a discovery brief and a PM decision when user evidence is missing, no invented research; reviewer gains the BU-fit mode, run before U closes. | agreed |
+| R-44 | Solution lead (options incl. inherited solution hypotheses and "don't do it", S2 with U→S link and inherited risk, no flows/screens) and PRD writer built; US-fit before S closes; `prd-publish` puts the whole PRD in the PRD epic; `handoff` marks the PR ready; the PM approves by merging. | agreed |
 | R-28 | Grounding is capped at 5 when a layer rests mostly on bets. | agreed |
 
 ## Out of scope for v1

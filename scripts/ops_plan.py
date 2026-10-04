@@ -676,3 +676,32 @@ def plan_hypothesis_add(snap, slug, statement, kind, origin, basis, raised_at, r
              "body": bodies.hypothesis_body(fields, _evidence_claims(snap, slug)),
              "labels": ["type:hypothesis", "hyp:open", LAYER[routed_to][0]], "assignees": [],
              "parent": _epic(snap, routed_to)["number"]}]
+
+
+# ---------- PRD and handoff ----------
+
+def plan_prd_publish(snap, slug, repo):
+    """Put the whole PRD in the PRD epic's body (self-contained on GitHub) and mark it in review.
+    Requires B, U and S done and an approved PRD review."""
+    for layer in ("B", "U", "S"):
+        if "state:done" not in _epic(snap, layer)["labels"]:
+            raise OpsError(f"{layer} is not done yet; the PRD compiles committed layers only")
+    path = f"{_base(slug)}/prd/README.md"
+    prd = snap["files"].get(path, "")
+    if len(prd.strip()) < 200:
+        raise OpsError(f"write {path} first (prd_writer)")
+    review = re.search(c.REVIEW_TITLE, snap["files"].get(f"{_base(slug)}/prd/review.md", ""),
+                       re.MULTILINE)
+    if not review or review["id"] != "PRD" or review["verdict"] != "approved":
+        raise OpsError("the PRD needs an approved review (review --target PRD) before it is published")
+    epic = _epic(snap, "PRD")
+    link = f"https://github.com/{repo}/blob/upstream/{slug}/{path}"
+    body = f"**Files:** [{path}]({link})\n\n" + prd.strip() + "\n"
+    remove = [l for l in epic["labels"] if l.startswith("state:") and l != "state:in-review"]
+    return [{"kind": "edit_body", "issue": epic["number"], "body": body},
+            {"kind": "labels", "issue": epic["number"], "add": ["state:in-review"], "remove": remove}]
+
+
+def plan_handoff(slug):
+    """Mark the initiative's draft PR ready for review. Merging it is the PM's handoff approval."""
+    return [{"kind": "pr_ready", "branch": f"upstream/{slug}"}]
