@@ -1,3 +1,7 @@
+## Review · U-04 · approved
+
+Blocking: none · Return to: none · Limitations: Documentary disposition only: register and D-006 support parked H-02/H-05 without empirical verdict. No external authenticity, discovery execution, behavior, magnitude, causality, BU-fit, scoring or closure check. Snapshot differences explicit.
+
 ## Review · U-03 · approved
 
 Blocking: none · Return to: none · Limitations: Review of U-03 and cited authorized sources only; no BU-fit, research execution, original source validation or operational hypothesis check. Conditional mechanism has low confidence, owner and falsifiers; no causal validation.
