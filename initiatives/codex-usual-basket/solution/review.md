@@ -1,3 +1,7 @@
+## Review · S-03 · approved
+
+Blocking: none · Return to: none · Limitations: Aprovação provisória para S-A: escopo e exclusões propostas, riscos herdados explícitos e D-003 vigente. Não confirma escolha, exceção, fechamento S, viabilidade ou implementação; canal, elegibilidade e comparador sem delimitação.
+
 ## Review · S-02 · approved
 
 Blocking: none · Return to: none · Limitations: Aprovação restrita ao draft proposto: U→S inferência de baixa confiança, dono e parada nomeados; D-007 solicita riscos e exceção documental explícita. Não verifica decisão do PM, S3/S4, registro de hipóteses, pesquisa, viabilidade ou implementação.
