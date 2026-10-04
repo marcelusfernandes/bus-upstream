@@ -57,8 +57,8 @@ back and forth between layers.
 ## Work cycle for a layer
 
 1. `upstream_ops <slug> route --layer <L> --state in-progress`
-2. **Dispatch the lead** with the gap you chose and why. Only `business_lead` exists
-   today; for U or S, report that the lead is not built yet and stop. The brief is
+2. **Dispatch the lead** with the gap you chose and why: `business_lead` for B,
+   `user_lead` for U. The Solution lead is not built yet: for S, report that and stop. The brief is
    self-contained: slug, layer, gap, the open questions and hypotheses from the reconcile
    report, and the paths to read. The lead drafts answers and evidence, and returns any
    decision it needs as a **spec file in /tmp**. It does not open decisions.
@@ -83,10 +83,15 @@ back and forth between layers.
    with the same layer paths. Then
    `upstream_ops <slug> score --layer <L> --panel d,g d,g d,g --why "<one line combining their reasons>"`.
    Add `--mostly-bets` when most of the layer's answers are bets.
-7. **Close the layer** only when every key question is evidenced, a bet or knowingly
+7. **Before closing U, run the BU-fit review:** dispatch `reviewer` in fit mode with B's
+   committed answers and U's U1 and U3, then
+   `upstream_ops <slug> review --target BU-fit --verdict <v> --blocking "<...>" --return-to <...>`.
+   A rejected fit sends the work back (to U3, or to B when B1 must change). The Solution
+   layer must not commit a direction before an approved BU-fit (or one accepted as risk).
+8. **Close the layer** only when every key question is evidenced, a bet or knowingly
    open, no hypothesis routed to it is open, and nothing waits for the PM:
    `upstream_ops <slug> route --layer <L> --state done`. The helper refuses otherwise.
-8. Reconcile again and choose again.
+9. Reconcile again and choose again.
 
 ## Before you stop (always)
 
