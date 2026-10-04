@@ -1,5 +1,17 @@
 # [codex test] Usual basket
 
+## Checkpoint · User concluída nesta retomada
+
+A direção do PM determinou U, H-02 primeiro. D-006 B já respondida no GitHub foi registrada; nenhuma decisão nova foi solicitada. O User lead e seu collector produziram E-017, atualizaram o discovery brief e redigiram U1–U4 usando somente o corpus autorizado, sem pesquisa externa ou pesquisa de usuários inventada.
+
+H-02 foi estacionada explicitamente, sem veredicto causal. H-05 foi registrada como reenquadramento comportamental vinculado a H-02, basis guess, e estacionada quanto ao teste empírico da aposta ativa do PM. Ambas preservam condições de reabertura. U1 é bet de @marcelusfernandes; U2/U3 ficam conscientemente open quanto a existência/magnitude e causalidade; U4 é evidenced exclusivamente sobre disposição documental.
+
+As quatro respostas receberam revisões independentes em contextos novos e foram registradas com D-006. BU-fit foi aprovado como compatibilidade documental, sem demonstração de equivalência de populações ou causalidade; nenhuma contradição nova exigiu reabrir Business. O Business lead não foi acionado porque essa condição não ocorreu. Painel isolado: luna 8/2, sol 8/1, sol56 8/2; mediana Definition 8 / Grounding 2, Spread 1, mostly_bets=false. U foi movida a done após reconciliação sem drift, decisões pendentes ou hipóteses abertas em U. Isso fecha o trabalho documental sob risco aceito, não o teste empírico. D-003 continua exigindo diagnóstico comparável antes de solução, meta ou sucesso.
+
+Problemas desta retomada: git switch/pull e a primeira gravação de review falharam por restrição de escrita em .git; reexecução escalonada funcionou, sem rejeição automática. A falha de review ocorreu antes de escrita remota pelo helper local-first. O orquestrador forneceu inicialmente caminho errado para E-003 em U3, gerando rejeição registrada; corrigiu para solution/evidence/E-003.md e uma nova revisão isolada aprovou. O terceiro scorer não pôde ser criado junto dos outros dois (agent thread limit reached, apesar de só três agentes ativos); foi criado após luna concluir, mantendo isolamento, mas sem simultaneidade dos três. A chamada inicial de ajuda omitiu --repo; todas as operações de contrato usaram --repo marcelusfernandes/bus-upstream e assinatura do papel. Limitações antigas sobre ausência de hypothesis-add ou --limitations não se reproduziram: ambos funcionaram. Nenhuma skill ou script foi alterado. Os 260 testes unitários passaram.
+
+O discovery brief existe, com seis sessões futuras propostas e prazo do exercício 2026-10-10; nenhuma sessão foi executada. Encerramento neste ponto por U done, com summary e checkpoint publicados pelo caminho autorizado.
+
 Milestone: #3
 PM: @marcelusfernandes
 Mode: piloted
