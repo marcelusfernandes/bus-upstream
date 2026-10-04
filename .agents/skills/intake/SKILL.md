@@ -6,7 +6,8 @@ description: Use when a new stakeholder demand arrives, to turn it into a BUS in
 # Intake
 
 References: `spec/v1/01-process.md` (Intake), `spec/v1/02-scoring.md`,
-`spec/v1/12-key-questions.md`, and `templates/intake.example.json` for the exact shape.
+`spec/v1/12-key-questions.md`, and `templates/intake.example.json` for the exact shape (its content is only an illustration;
+never borrow its domain).
 The JSON needs the PM's GitHub login (`pm`): every decision is assigned to it.
 
 ## Steps

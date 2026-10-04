@@ -1,77 +1,67 @@
 {
-  "slug": "usual-basket",
-  "title": "Faster repurchase flow",
-  "demand": "Se o fluxo for mais rápido ele pode converter mais que o App, e o custo de interação é menor. Objetivo: agilizar a compra e reduzir custo. Também queremos entender se ajuda na recorrência ou mexe no AOV.",
-  "context": "App, compared with another channel (comparison unclear)",
+  "slug": "invoice-clarity",
+  "title": "Fewer billing support calls",
+  "demand": "Support is drowning in billing calls since the new pricing. Let's add a chatbot so customers can answer their own invoice questions. We want lower support cost and we suspect confused customers churn more.",
+  "context": "B2B web app, billing area; account admins are the ones who call",
   "mode": "piloted",
-  "pm": "marcelusfernandes",
+  "pm": "example-pm",
   "fragments": [
     {
       "layer": "S",
-      "text": "fluxo mais rápido",
+      "text": "add a chatbot",
       "kind": "solution suggested by the stakeholder"
     },
     {
       "layer": "B",
-      "text": "converter mais que o App, reduzir custo",
-      "kind": "desired outcomes (E-002)"
+      "text": "lower support cost",
+      "kind": "desired outcome (E-002)"
     },
     {
       "layer": "B",
-      "text": "recorrência ou AOV",
-      "kind": "open outcome question"
+      "text": "confused customers churn more",
+      "kind": "causal hypothesis"
     }
   ],
   "layers": {
     "B": {
       "statement": null,
       "definition": 5,
-      "grounding": 3,
-      "why": "Outcomes are named but there is no baseline or target; not lower because E-002 names them."
+      "grounding": 4,
+      "why": "Outcome named (E-002) and support cost has a baseline (E-001); not higher because churn is only suspected."
     },
     "U": {
       "statement": null,
-      "definition": 1,
+      "definition": 2,
       "grounding": 2,
-      "why": "No user or situation stated; not 0 because E-001 shows recurrent repurchase exists."
+      "why": "Who calls is known, but not what they struggle with; not 0 because E-001 shows billing is the top call reason."
     },
     "S": {
-      "statement": "A faster flow.",
-      "definition": 5,
+      "statement": "Add a chatbot for billing questions.",
+      "definition": 6,
       "grounding": 0,
-      "why": "Articulated as a concept but undefined (E-003); no evidence links speed to conversion."
+      "why": "Articulated, but nothing links a chatbot to the reason customers call."
     }
   },
   "hypotheses": [
     {
       "id": "H-01",
-      "statement": "a faster flow",
+      "statement": "add a chatbot to answer billing questions",
       "kind": "solution",
-      "origin": "business stakeholder, in the intake demand",
+      "origin": "head of support, in the intake demand",
       "basis": "intake",
       "raised_at": "B",
       "routed_to": "S",
-      "test": "users given a faster flow complete more repurchases than with the current flow"
+      "test": "share of billing questions resolved without an agent"
     },
     {
       "id": "H-02",
-      "statement": "if it is faster, it converts more than the App",
+      "statement": "confused customers churn more",
       "kind": "causal",
-      "origin": "business stakeholder, in the intake demand",
+      "origin": "head of support, in the intake demand",
       "basis": "intake",
       "raised_at": "B",
       "routed_to": "U",
-      "test": "comparable conversion of this flow vs the App, split by time to order"
-    },
-    {
-      "id": "H-03",
-      "statement": "it helps recurrence or changes AOV",
-      "kind": "causal",
-      "origin": "business stakeholder, in the intake demand",
-      "basis": "intake",
-      "raised_at": "B",
-      "routed_to": "B",
-      "test": "recurrence and average order value before vs after, in the same population"
+      "test": "churn of accounts that called about billing vs those that did not"
     }
   ],
   "evidence": [
@@ -79,26 +69,20 @@
       "id": "E-001",
       "layer": "U",
       "kind": "fact",
-      "claim": "Recurrent repurchase exists enough to investigate a repurchase journey.",
-      "source": "prior analytical discovery",
-      "population": "recurrent customers of the analyzed flow",
-      "freshness": "current for the exercise",
-      "limitations": "does not show the current flow is slow, nor that speed increases conversion"
+      "claim": "Billing questions are the largest category of support calls in the last quarter.",
+      "source": "support ticket export",
+      "population": "all paying accounts",
+      "time_window": "last quarter",
+      "freshness": "current",
+      "limitations": "call reasons are tagged by agents, not by customers"
     },
     {
       "id": "E-002",
       "layer": "B",
       "kind": "decision",
-      "claim": "Reducing time to order and interaction cost are desired outcomes.",
-      "source": "PM intake",
-      "limitations": "a desired outcome is not causality"
-    },
-    {
-      "id": "E-003",
-      "layer": "S",
-      "kind": "fact",
-      "claim": "No product or flow rule was specified at the start.",
-      "source": "intake"
+      "claim": "Lowering support cost is the desired outcome.",
+      "source": "intake with the head of support",
+      "limitations": "a desired outcome is not evidence of a problem"
     }
   ]
 }

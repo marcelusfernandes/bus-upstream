@@ -19,7 +19,7 @@ import git_ops  # noqa: E402
 import github_snapshot  # noqa: E402
 import initiative_plan  # noqa: E402
 
-EXAMPLE = ROOT / "templates" / "intake.example.json"
+EXAMPLE = ROOT / "evals" / "usual-basket" / "intake.json"  # the golden case
 
 
 class FakeGit:

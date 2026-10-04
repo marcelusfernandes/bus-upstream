@@ -54,7 +54,7 @@ orchestrator's brief (gap: `define` or `ground`).
    When evidence is missing, include a **bet** option: "commit to X as a bet, owned by
    the PM, validated by <how> in parallel". Accepting it is gate 4 (accepted risk); say so
    in its trade-offs. Do not only offer "wait for a diagnosis".
-5. **Resolve hypotheses routed to B** (for example "is recurrence or AOV in scope?") when
+5. **Resolve hypotheses routed to B** (for example "is churn in scope, or only support cost?") when
    evidence or a decision settles them:
    `upstream_ops <slug> --agent business_lead hypothesis-close --id H-nn --status <...> --why "<...>" [--evidence ...] [--into H-nn]`.
 6. **Complete hypotheses that miss a test or a readable origin:**

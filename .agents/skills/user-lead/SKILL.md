@@ -19,7 +19,7 @@ business problem and its decisions are your frame), `user/` and the orchestrator
 
 | ID | Question | You produce |
 |---|---|---|
-| U1 | What is the user problem? | One sentence: who struggles with what, in what situation, as **behavior** ("rebuilds the same basket by hand every week"), never an opinion ("the app is bad") and never a solution ("users need a faster flow"). **Gate 2**: prepare a decision spec with the candidate problems and your recommendation. |
+| U1 | What is the user problem? | One sentence: who struggles with what, in what situation, as **behavior** ("calls support every month to find what changed on the invoice"), never an opinion ("the product is confusing") and never a solution ("users need a dashboard"). **Gate 2**: prepare a decision spec with the candidate problems and your recommendation. |
 | U2 | How do we know it is real? | Evidence that fits the affected population, with magnitude (how many people, how often), or the discovery brief that would produce it |
 | U3 | **B→U:** if we solve it, how does the business problem move? | The mechanism, a confidence level, and what would prove it wrong. Evidence that the user problem exists is **not** evidence that solving it moves the business outcome; say which one you have |
 | U4 | What happened to the hypotheses? | Every hypothesis routed to U resolved; new solution hypotheses raised by users registered and routed to S |
@@ -29,7 +29,7 @@ business problem and its decisions are your frame), `user/` and the orchestrator
 1. **Start with the hypotheses routed to U (U4).** For each one, decide whether the
    evidence resolves it or discovery is needed. Close it explicitly with
    `upstream_ops <slug> --agent user_lead hypothesis-close --id H-nn --status <...> --why "<...>" [--evidence ...] [--into H-nn]`.
-   A business claim about users (for example "if it is faster, users convert more") is
+   A business claim about users (for example "customers churn because billing is confusing") is
    usually **reframed** into a user-problem hypothesis: register the new one with
    `upstream_ops <slug> --agent user_lead hypothesis-add --statement "<...>" --kind user-problem --origin "agent, reframing H-nn" --basis "<E-ids or guess>" --raised-at U --routed-to U --test "<...>"`
    (it writes the register and opens the issue), then close the old one as

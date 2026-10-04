@@ -27,7 +27,7 @@ takes a demand from stakeholders to a clear **Business problem**, **User problem
 6. [06-commit-contract.md](06-commit-contract.md) — commits as answer checkpoints.
 7. [07-branching-and-handoff.md](07-branching-and-handoff.md) — branches, PR, PRD handoff.
 8. [08-validator-and-hooks.md](08-validator-and-hooks.md) — how drift is detected.
-9. [09-worked-example.md](09-worked-example.md) — `usual-basket` through the new model.
+9. [09-worked-example.md](09-worked-example.md) — the golden case through the new model.
 10. [10-open-questions.md](10-open-questions.md) — not decided yet.
 11. [11-legacy-mapping.md](11-legacy-mapping.md) — what is kept, dropped or reversed.
 12. [12-key-questions.md](12-key-questions.md) — key questions per layer and the hypothesis register.

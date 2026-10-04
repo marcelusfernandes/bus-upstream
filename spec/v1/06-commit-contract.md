@@ -13,11 +13,11 @@ from that point.
   the history with `git log`.
 
 ```
-U-02: Recurring buyers rebuild the same basket manually each week
+U-02: Account admins call support every month to find what changed on the invoice
 
-Reasoning: three interview patterns plus reorder data; discarded "the app is
-slow" (no latency evidence, E-007 contradicts it).
-Learning: the initial framing assumed speed causes conversion; unsupported.
+Reasoning: three interview patterns plus call-reason tags; discarded "prices are
+too high" (no price complaints in the tags, E-007 contradicts it).
+Learning: the initial framing assumed billing calls cause churn; unsupported.
 
 Layer: user
 Definition: 4 -> 7

@@ -26,7 +26,7 @@ brief. Note which B and U answers are `bet` or `open`: the solution inherits tha
 ## Steps
 
 1. **Resolve inherited solution hypotheses** routed to S (for example a stakeholder's
-   "faster flow"). Include each one in S1 as an option. Then close it with
+   "add a chatbot"). Include each one in S1 as an option. Then close it with
    `upstream_ops <slug> --agent solution_lead hypothesis-close --id H-nn --status <...> --why "<...>"`:
    `parked` when it became the chosen bet (it is validated downstream, not here) or was
    set aside, `invalidated` only with evidence against it.

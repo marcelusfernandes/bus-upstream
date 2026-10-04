@@ -4,7 +4,7 @@ The **Answer:** line must stand on its own for a PM reading only GitHub: write t
 never just a pointer to a file ("see hypotheses.md"). A reference for detail is fine after it. -->
 # B-01 · What is the business problem?
 
-**Answer:** The repurchase flow converts below the App.
+**Answer:** Support cost per account has grown since the new pricing, driven by invoice questions.
 
 **State:** bet
 
