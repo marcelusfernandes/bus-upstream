@@ -1,5 +1,15 @@
 # [codex test] Usual basket
 
+## Checkpoint · Solution e PRD entregues para revisão do PM
+
+A direção explícita do PM determinou S, depois PRD/handoff. Reconciliação encontrou D-007 A já respondida no GitHub; o orquestrador registrou a decisão sem decidir ou retransmitir por conta própria. Solution lead atualizou S1–S4 e as quatro opções; cada resposta recebeu um reviewer novo, aprovação documental e registro pelo helper. US-fit aprovado como mecanismo condicional de baixa confiança. B/U não foram reabertas.
+
+S está done documentalmente: Definition 8, Grounding 1, Spread 2; painel luna 8/2, sol 8/1, sol56 8/0, mostly_bets=true. S1 evidenced apenas sobre comparação documental; S2–S4 bet do PM. H-01 já estava parked: nenhuma hipótese nova foi encerrada nesta retomada; H-01–H-05 permanecem sem veredicto empírico. Evidência existente bastou, sem novo collector ou pesquisa externa.
+
+PRD writer compilou nove seções com fontes; um reviewer novo aprovou o PRD. prd-publish publicou o documento no epic PRD e handoff marcou PR #31 ready for review: https://github.com/marcelusfernandes/bus-upstream/pull/31 . Não houve merge. D-007 aceita apenas a exceção documental deste teste; diagnóstico e validação seguem obrigatórios em paralelo e antes de implementação. Não há decisão pendente, drift ou obrigação mecânica na reconciliação final.
+
+Problemas desta retomada: git switch/pull falhou inicialmente por .git/index.lock sem permissão; reexecução escalonada funcionou, sem rejeição automática. Uma chamada inicial de ajuda de upstream_ops omitiu --repo; todas as demais chamadas incluíram o repo, e todo contrato incluiu assinatura do papel. O grafo retornou zero para uma busca estreita (busca ampliada e snippet funcionaram); depois uma consulta opcional falhou com Transport closed, sem bloquear os helpers. Solution README ainda descrevia drafts após fechamento; o lead corrigiu o estado. Nenhuma alteração de skills/scripts foi necessária; 263 testes passaram. Checkpoints anteriores abaixo são históricos.
+
 ## Checkpoint · Solution aguarda D-007
 
 Nesta rodada a direção explícita do PM determinou Solution, H-01 e S1 primeiro, depois PRD/handoff. B e U permaneceram done; nenhuma contradição nova exigiu reabertura. O Solution lead delegou a auditoria documental E-018 ao collector, exclusivamente no corpus autorizado, sem pesquisa externa. H-01 foi estacionada via helper, sem validação/invalidação empírica, com condições de reabertura preservadas.
