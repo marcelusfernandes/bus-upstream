@@ -1,3 +1,7 @@
+## Review · U-03 · approved
+
+Blocking: none · Return to: none · Limitations: Review of U-03 and cited authorized sources only; no BU-fit, research execution, original source validation or operational hypothesis check. Conditional mechanism has low confidence, owner and falsifiers; no causal validation.
+
 ## Review · U-03 · rejected
 
 Blocking: O briefing do orquestrador forneceu business/evidence/E-003.md inexistente; suporte de E-003 não verificável nesse caminho. · Return to: U-03 · Limitations: Revisão documental; mecanismo explicitamente aberto com dono e falsificadores. Falha de caminho do briefing, sem conclusão de falsidade da resposta.
