@@ -1,3 +1,7 @@
+## Review · U-04 · approved
+
+Blocking: none · Return to: none · Limitations: Aprovação documental U-04/D-006, sem resolução ou fechamento alegados; corpus não atesta transcrição/estados do registro, H-01/H-03/H-04, D-004, capacidade do helper ou encaminhamento ao orquestrador.
+
 ## Review · U-03 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão de U-03/D-006 com E-001/E-002/E-003/E-016 e regras User; mecanismo condicional de baixa confiança, sem demonstração causal; não verifica D-002/D-003/D-004, H-02 ou Business e não constitui BU-fit.
