@@ -433,6 +433,27 @@ class RelayDecide(unittest.TestCase):
             o.plan_relay_decide(DecisionRecord()._opened(), SLUG, "D-001", "Z", "x")
 
 
+class HypothesisAdd(unittest.TestCase):
+    def test_registers_and_opens_a_self_contained_issue_under_the_testing_layer(self):
+        snap = usual_basket()
+        actions = o.plan_hypothesis_add(snap, SLUG, "recurrent buyers rebuild the same basket by hand", "user-problem",
+                                        "agent, reframing H-02", "guess", "U", "U", "observed repeat purchases")
+        self.assertEqual([a["kind"] for a in actions], ["write_file", "commit", "create_issue"])
+        self.assertIn("| H-04 | recurrent buyers rebuild the same basket by hand |", actions[0]["text"])
+        issue = actions[2]
+        self.assertEqual((issue["title"][:4], issue["parent"]), ("H-04", 2))
+        self.assertIn("layer:user", issue["labels"])
+        self.assertIn("**How it gets tested:** observed repeat purchases", issue["body"])
+        after = apply_to_snapshot(snap, actions)
+        self.assertEqual(v.validate_snapshot(after) + v.validate_files_and_comments(after), [])
+
+    def test_refuses_agent_without_basis_and_file_paths(self):
+        with self.assertRaises(o.OpsError):
+            o.plan_hypothesis_add(usual_basket(), SLUG, "s", "user-problem", "agent", "", "U", "U", "t")
+        with self.assertRaises(o.OpsError):
+            o.plan_hypothesis_add(usual_basket(), SLUG, "s", "user-problem", "see x/input.md", "guess", "U", "U", "t")
+
+
 class HypothesisUpdate(unittest.TestCase):
     def test_adds_a_missing_test_column_and_refreshes_the_issue(self):
         snap = usual_basket()  # its register predates the Test column
