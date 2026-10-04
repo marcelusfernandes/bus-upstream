@@ -44,3 +44,41 @@ Fontes de evidência exclusivas: `evals/usual-basket/evidence.md` e arquivos da 
 - Uma chamada inicial de `upstream_ops.py --help` omitiu `--repo`; foi somente leitura de ajuda. Todas as operações de contrato usaram `--repo marcelusfernandes/bus-upstream` e a assinatura do papel responsável.
 
 As limitações de helper/skill relatadas no checkpoint anterior sobre ausência de `hypothesis-update` e limites de specs não representam as capacidades verificadas nesta execução: o reparo autorizado funcionou sem alteração dos scripts ou skills.
+
+
+## Checkpoint · 2026-10-03 · User aguarda D-006
+
+A direção explícita do PM determinou o trabalho em U, H-02 primeiro. O User lead examinou H-02 antes das respostas e delegou a auditoria documental E-016 ao collector, limitada a `evals/usual-basket/evidence.md` e aos arquivos existentes da iniciativa. Não houve pesquisa web nem pesquisa com usuários. E-016 sustenta recorrência como contexto, sem comprovar retrabalho, magnitude ou causalidade.
+
+U-01–U-04 foram redigidas como `open` e receberam quatro revisões documentais aprovadas, registradas com suas limitações. Nenhuma resposta foi registrada como decidida: todas dependem da disposição do PM sobre discovery, aposta ou adiamento. Existe `user/discovery-brief.md`; seis sessões e prazo são propostas futuras, não resultados nem compromissos vigentes. H-02 continua aberta e preservada; nenhuma hipótese foi registrada ou encerrada. A candidata comportamental é explicitamente guess, sem H-id fictício.
+
+### Decisão pendente no epic U #20
+
+**D-006 · Investigar o retrabalho na recompra antes de escolher U1, assumir essa candidata como aposta com discovery em paralelo ou adiar User, explicitando o destino de H-02?**
+
+E-001 registra recompra recorrente no fluxo analisado, sem contagens, frequência ou dificuldade observada. E-002 registra tempo/custo como outcomes desejados; E-003 diz que nenhuma intervenção foi definida. A auditoria E-016 não encontrou fricção, magnitude nem causalidade velocidade→conversão/App nas fontes permitidas.
+
+A candidata do agente é: clientes recorrentes refazem manualmente a seleção dos mesmos itens ao tentar repetir uma compra no fluxo analisado. É um guess, não um achado: até a repetição dos mesmos itens e seu caráter problemático são desconhecidos. H-02 preserva a alegação causal do stakeholder e continua aberta. U1–U4 estão abertas; decisões B anteriores não aceitam risco em U.
+
+O brief propõe seis sessões observadas como contraste qualitativo, levantamento de magnitude e planejamento causal separado. Dono proposto: PM @marcelusfernandes, responsável por designar pesquisador e obter relatório inicial até 2026-10-10; não é compromisso vigente. D-003 mantém diagnóstico comparável antes de solução, meta ou sucesso. Aceitar aposta não fecha U automaticamente: registro da candidata, revisão BU-fit e demais pendências continuam necessários.
+
+- **A** — Executar o discovery proposto, sob responsabilidade de @marcelusfernandes, com relatório inicial até 2026-10-10; manter U1–U4 e H-02 abertas até evidência ou nova decisão. Trade-offs: Recomendado: investiga a candidata sem assumir retrabalho nem efeito na conversão; exige recrutamento e mantém o fechamento de U pendente. O relatório inicial não é prova causal. Reversibilidade: Alta: mudar ou descartar a candidata à luz das observações.
+- **B** — Escolher a candidata de retrabalho como aposta de @marcelusfernandes, executar discovery em paralelo até 2026-10-10 e estacionar H-02 sem veredicto causal. Trade-offs: Gates 2/4: aceita risco de retrabalho inexistente ou sem efeito em conversão e mantém magnitude/causalidade abertas. Reabrir H-02 antes de alegar causalidade/superioridade ou se o diagnóstico contrariar a direção; não autoriza solução nem fechamento automático de U. Reversibilidade: Reversível com retrabalho: revisar a aposta quando houver evidência; registro da candidata segue pendente.
+- **C** — Adiar User sem escolher problema e estacionar H-02 sem veredicto até retomada explícita do PM. Trade-offs: Evita esforço de pesquisa agora, mas mantém U inconclusa e sem base para solução; reabrir H-02 na retomada ou antes de alegar causalidade/superioridade. Reversibilidade: Alta: PM retoma a camada com o mesmo registro e as lacunas preservadas.
+
+**Recomendação:** A — O corpus só sustenta recorrência; observar a tarefa pode separar retrabalho evitável de seleção deliberada, sem converter desejo de velocidade em problema comprovado.
+
+**Mudaria a recomendação:** Evidência observável de uma dificuldade recorrente no mesmo recorte e magnitude conhecida, ou decisão explícita do PM de aceitar a candidata e suas lacunas como risco.
+
+### Estado, validação e limites
+
+Reconciliação após abrir D-006: U `in-progress`, D-006 pendente, H-02 aberta, Definition 0 / Grounding 5 (baseline anterior, sem novo painel); B permanece `done` 5/2, sem nova contradição que exija reabertura. Não houve BU-fit nem re-score: o ciclo parou na decisão do PM antes de respostas decididas ou fechamento. Business lead e painel de scorers não foram acionados porque suas condições de despacho não foram alcançadas. Os 258 testes unitários passaram.
+
+### Problemas observados
+
+- A skill User exige registrar a hipótese reenquadrada, mas `upstream_ops` não tem comando de criação; `hypothesis-update` só altera Test/Origin/Basis. O código/CLI confirmam o limite. Nenhuma escrita manual contornou o contrato. O reenquadramento ficou proposto, não executado, e impede fechamento.
+- `git switch` falhou em `.git/index.lock` por permissão; escalonamento permitiu switch/pull e registros das revisões. Não houve rejeição de aprovação automática.
+- A ferramenta recusou um segundo reviewer com `agent thread limit reached`, apesar de collector concluído. O mesmo reviewer foi reutilizado em quatro tarefas de alvo único, em sequência: isso preserva separação autor/revisor, mas não proporciona contexto limpo entre respostas.
+- O User lead tentou ler `templates/decision-request.json`, inexistente; corrigiu para o template `.md`, sem efeito no contrato.
+- Uma chamada inicial de ajuda de `upstream_ops` omitiu `--repo`; somente leitura. Todas as operações de contrato usaram o repo solicitado e a assinatura do papel.
+- Reviews são documentais e não atestam pesquisa, recrutamento, prazo nem execução externa. O resumo mantém Statement `not yet writable` enquanto U1 está `open`.
