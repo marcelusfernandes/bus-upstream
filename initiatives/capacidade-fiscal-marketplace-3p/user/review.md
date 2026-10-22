@@ -1,3 +1,7 @@
+## Review · BU-fit · approved
+
+Blocking: none · Return to: none · Limitations: Revisão restrita ao vínculo B→U e às fontes permitidas. A confirmação declaratória do PM sustenta o mecanismo qualitativo, sem demonstrar ganho medido, viabilidade de250 emissões/dia ou aceleração de ativações. Prazo, carga sustentável e critérios fiscais de B-03 permanecem abertos; nenhuma solução foi avaliada.
+
 ## Review · U-04 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão restrita aos arquivos autorizados. H-01 tem confirmação declaratória do PM, sem comprovação operacional independente da causalidade ou do limite de capacidade. H-04 permanece explicitamente estacionada, com motivo e condição de retomada. H-02/H-03 preservam encaminhamento a S, cujo estacionamento não foi avaliado nesta revisão.
