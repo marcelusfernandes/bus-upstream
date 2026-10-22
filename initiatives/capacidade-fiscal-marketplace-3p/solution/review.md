@@ -1,3 +1,7 @@
+## Review · US-fit · approved
+
+Blocking: none · Return to: none · Limitations: Revisão restrita ao US-fit nos arquivos autorizados. Mecanismo é aposta do PM com baixa confiança e parada coerente com U. Não comprova viabilidade,ganho,250/dia ou regras fiscais. Pedido completo D-004 não fornecido; aceite detalhado não verificado independentemente.
+
 ## Review · S-04 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão restrita aos arquivos fornecidos e aos critérios gerais/Solution. Não verificou registro H-02/H-03 nem sinal de parada S-02. Documentação genérica e decisões não comprovam compatibilidade local,ganho líquido,correção fiscal ou250/dia; S-04 preserva limites e testes downstream.
