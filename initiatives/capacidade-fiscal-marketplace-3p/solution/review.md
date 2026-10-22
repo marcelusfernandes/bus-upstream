@@ -1,3 +1,7 @@
+## Review · S-04 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão restrita a S-04, fontes citadas fornecidas e critérios de S4. Não verifica o registro de H-02/H-03, a seleção de alternativas, viabilidade local, correção fiscal ou alcance sustentável de250 emissões/dia; esses resultados permanecem hipóteses explícitas.
+
 ## Review · S-03 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão limitada ao escopo e não objetivos, confrontados com as fontes fornecidas. Não valida viabilidade, regras fiscais, capacidade sustentável de250 emissões/dia nem as referências E-002,B-03/B-04 e U-01, não incluídas nesta revisão.
