@@ -1,3 +1,7 @@
+## Review · B-02 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão restrita à B-02 e às evidências fornecidas. Os relatos sustentam a observação declaratória; não comprovam baseline medido, déficit de capacidade ou restrição efetiva à expansão, limites explicitados na resposta. Não foram verificadas fontes originais nem dados operacionais.
+
 ## Review · B-01 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão limitada à resposta e às fontes autorizadas. A evidência sustenta a prioridade decidida e a condição operacional declarada; não comprova insuficiência de capacidade, impacto nas ativações ou medição do teto de 80 notas/dia. O registro H-04 não foi verificado.
