@@ -1,3 +1,7 @@
+## Review · B-03 · rejected
+
+Blocking: B3 exige timeframe e guardrails definidos; o prazo de alcance permanece desconhecido e os critérios de correção fiscal e esforço sustentável seguem sem definição operacional, embora essas lacunas estejam explícitas. · Return to: B-03 · Limitations: A meta de 250 emissões/dia está sustentada por D-002 como escolha própria do PM; a resposta não afirma alcance ou suficiência. Revisão restrita aos arquivos fornecidos, sem verificar dados operacionais ou fontes originais.
+
 ## Review · B-02 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão limitada a B-02, às cinco evidências fornecidas e às regras Business/gerais. Não verificou D-002 diretamente nem dados operacionais independentes; os números e a insuficiência permanecem declaratórios, como explicitado na resposta.
