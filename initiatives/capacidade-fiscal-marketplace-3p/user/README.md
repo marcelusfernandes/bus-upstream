@@ -1,14 +1,14 @@
 # User problem
 
-**Statement:** A pessoa responsável pela emissão 3P precisa dedicar oito horas contínuas de cliques para concluir 80 notas no processo atual, segundo o relato do PM.
+**Statement:** A pessoa responsável pela emissão 3P executa manualmente o fluxo completo de extração na 99 e emissão no Mainô, com dedicação contínua que limita quantas notas consegue concluir.
 
-**State:** candidato em revisão; causa raiz e etapa dominante abertas. A próxima decisão escolhe observar o próximo lote antes de priorizar o gargalo ou assumir esforço manual como aposta com descoberta paralela; não reabre a meta de 250/dia decidida em D-002.
+**State:** problema escolhido pelo PM em D-003 (opção própria, gate 2), com confirmação declaratória da validação de trabalho manual, dois sistemas e limitação de capacidade. Rascunhos atualizados para revisão independente.
 
-| Pergunta | Estado do rascunho |
+| Pergunta | Resposta e limite |
 |---|---|
-| [U-01](answers/U-01.md) | open — comportamento relatado; esforço ativo e concentração de segunda como recortes a discriminar. |
-| U-02 | open — próximo trabalho: caracterizar esforço por etapa e magnitude com a observação proposta. |
-| U-03 | open — próximo trabalho: testar o elo entre redução de esforço e capacidade correta sustentável. |
-| U-04 | open — próximo trabalho: resolver H-01/H-04 com evidência ou decisão explícita de risco; ambas continuam abertas. |
+| [U-01](answers/U-01.md) | evidenced — fluxo manual completo 99→Mainô escolhido pelo PM; etapa dominante não informada. |
+| [U-02](answers/U-02.md) | evidenced — confirmação PM e magnitude declarada: uma pessoa, 80/dia com 8h contínuas, concentração de 200+ na segunda; sem série observada pelos agentes. |
+| [U-03](answers/U-03.md) | evidenced — restrição qualitativa confirmada; confiança moderada no mecanismo de liberar capacidade e baixa no ganho quantitativo de solução futura. |
+| [U-04](answers/U-04.md) | evidenced — H-01 validated pela confirmação PM; H-04 parked sem comprovação e com condição explícita de retomada. |
 
-[Descoberta mínima](discovery-brief.md): um lote real de ponta a ponta, ampliando somente se faltar o comportamento necessário. [E-008](evidence/E-008.md) sintetiza as fontes declaradas, sem observação nova. B3 permanece aberto para prazo e guardrails; 8h não é orçamento futuro aprovado e 250/dia não comprova suficiência para todo pico. APIs permanecem fora do escopo.
+[E-009](evidence/E-009.md) registra a confirmação que supera a proposta anterior de descoberta como pré-condição. [Discovery brief](discovery-brief.md) conserva contexto histórico e medição útil à avaliação futura. A meta de 250/dia já foi decidida em D-002; a solução permanece a escolher. B3 mantém prazo, janela e carga sustentável abertos; 8h não é orçamento futuro, D-1 é rotina relatada e 250/dia não comprova suficiência para todo pico. APIs permanecem fora desta iniciativa.
