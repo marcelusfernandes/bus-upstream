@@ -1,3 +1,7 @@
+## Review · U-03 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão restrita a U-03, às evidências e decisões fornecidas e às regras gerais/User. A confirmação do PM sustenta o elo qualitativo declarado; não comprova efeito de solução, ganho medido ou viabilidade de250 emissões/dia. Não verificou BU-fit com respostas Business, registro de hipóteses ou dados operacionais independentes.
+
 ## Review · U-02 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão limitada aos arquivos fornecidos. A validação,1 pessoa,80 notas/dia,8h,200+ na segunda-feira e15 lojas têm suporte declaratório; não foram comprovados por observação independente. As8h caracterizam o esforço considerado inviável, não uma jornada medida. A correspondência com U-01 não foi verificada diretamente, pois esse arquivo não integra o escopo.
