@@ -1,3 +1,7 @@
+## Review · B-05 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão limitada ao B-05, evidências citadas, registro de hipóteses e regras fornecidas; não verificou fontes originais, completude perante a demanda integral nem validade operacional das hipóteses.
+
 ## Review · B-04 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão restrita ao rascunho e às fontes fornecidas. Não verificou o registro de H-04, capacidade operacional, impacto real da espera ou cronograma de entrega da integração. O papel provisório permanece uma inferência sem validação independente.
