@@ -1,3 +1,7 @@
+## Review · B-05 · rejected
+
+Blocking: B-05 apresenta H-02 como teste downstream de S-B escolhida em D-004, mas sua resolução em hypotheses.md ainda declara gate3 pendente e S-A não decidida; essa contradição permanece sem ser nomeada. · Return to: B-05 · Limitations: Revisão limitada ao B-05,às evidências e decisões fornecidas,ao registro de hipóteses e aos critérios Business/gerais; não verificou operação real nem eficácia da IA.
+
 ## Review · B-03 · approved
 
 Blocking: none · Return to: none · Limitations: Aprovação do registro parcial com estado open, não da completude de B3: prazo, janela de comprovação e guardrails operacionais permanecem indefinidos e explicitados no contexto aceito em D-004. A revisão não comprova capacidade de250/dia, correção fiscal ou carga sustentável; examinou somente os materiais fornecidos.
