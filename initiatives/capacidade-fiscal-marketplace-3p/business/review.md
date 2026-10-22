@@ -1,3 +1,7 @@
+## Review · B-03 · approved
+
+Blocking: none · Return to: none · Limitations: Reviewed only the supplied B-03 draft, cited evidence, D-002 and Business/general rules. Approval covers honest recording of an open partial answer; it does not establish B3 completion, operational capacity, target sufficiency, fiscal correctness or sustainable effort.
+
 ## Review · B-04 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão limitada aos arquivos fornecidos. Não verificou medições operacionais independentes nem o registro de H-04. Insuficiência atual, 15 lojas e 200+ notas às segundas-feiras têm suporte declaratório; nenhum prazo legal ou go-live foi estabelecido.
