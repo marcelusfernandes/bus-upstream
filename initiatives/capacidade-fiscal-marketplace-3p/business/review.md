@@ -1,3 +1,7 @@
+## Review · B-01 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão limitada a B-01, às evidências e decisões citadas e às regras de Business. Não verifica dados operacionais independentes nem o estado de H-01/H-04; não comprova causa raiz, exigência legal de D-1 ou suficiência de 250 emissões/dia para picos e expansão.
+
 ## Review · B-05 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão limitada ao B-05, evidências citadas, registro de hipóteses e regras fornecidas; não verificou fontes originais, completude perante a demanda integral nem validade operacional das hipóteses.
