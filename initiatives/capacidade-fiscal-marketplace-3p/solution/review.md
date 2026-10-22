@@ -1,3 +1,7 @@
+## Review · S-01 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão restrita a S-01,às cinco opções e aos registros autorizados. Não verificou viabilidade técnica,desempenho,correção fiscal ou demais respostas Solution. A resolução histórica de H-02 conserva a recomendaçãoA,mas S-01explicita sua superação porD-004 e os testes registramBcomo escolhida.
+
 ## Review · S-02 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão limitada aos arquivos fornecidos; não verificou o pedido completo de D-004 na issue48,viabilidade local,redução efetiva de esforço,correção fiscal ou capacidade de250 emissões/dia.
