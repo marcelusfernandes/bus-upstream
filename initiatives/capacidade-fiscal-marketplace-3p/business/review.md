@@ -1,3 +1,7 @@
+## Review · B-04 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão restrita ao rascunho e às fontes fornecidas. Não verificou o registro de H-04, capacidade operacional, impacto real da espera ou cronograma de entrega da integração. O papel provisório permanece uma inferência sem validação independente.
+
 ## Review · B-03 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão restrita a B-03, à proposta D-002, às evidências citadas disponíveis e às regras Business. Não verifica capacidade operacional, demanda elegível, critérios fiscais, baseline ou data da próxima etapa; esses dados permanecem explicitamente desconhecidos e a escolha do critério aguarda o PM.
