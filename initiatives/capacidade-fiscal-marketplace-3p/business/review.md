@@ -1,5 +1,9 @@
 ## Review · B-03 · approved
 
+Blocking: none · Return to: none · Limitations: Aprovação do registro parcial com estado open, não da completude de B3: prazo, janela de comprovação e guardrails operacionais permanecem indefinidos e explicitados no contexto aceito em D-004. A revisão não comprova capacidade de250/dia, correção fiscal ou carga sustentável; examinou somente os materiais fornecidos.
+
+## Review · B-03 · approved
+
 Blocking: none · Return to: none · Limitations: Reviewed only the supplied B-03 draft, cited evidence, D-002 and Business/general rules. Approval covers honest recording of an open partial answer; it does not establish B3 completion, operational capacity, target sufficiency, fiscal correctness or sustainable effort.
 
 ## Review · B-04 · approved
