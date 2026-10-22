@@ -1,3 +1,7 @@
+## Review · B-03 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão restrita a B-03, à proposta D-002, às evidências citadas disponíveis e às regras Business. Não verifica capacidade operacional, demanda elegível, critérios fiscais, baseline ou data da próxima etapa; esses dados permanecem explicitamente desconhecidos e a escolha do critério aguarda o PM.
+
 ## Review · B-02 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão restrita à B-02 e às evidências fornecidas. Os relatos sustentam a observação declaratória; não comprovam baseline medido, déficit de capacidade ou restrição efetiva à expansão, limites explicitados na resposta. Não foram verificadas fontes originais nem dados operacionais.
