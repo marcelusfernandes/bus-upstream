@@ -1,6 +1,6 @@
 # Descoberta mínima · esforço para concluir um lote fiscal
 
-**Estado:** proposta para decisão do PM; não executada. Meta de 250 emissões/dia já decidida em D-002.
+**Estado:** proposta histórica superada por D-003/E-009 como condição para avançar. O PM confirmou a validação do problema manual entre dois sistemas e escolheu o fluxo completo 99→Mainô; não é necessário repetir descoberta para reconhecer sua existência. A coleta abaixo não foi executada pelos agentes, não está agendada e não foi escolhida pelo PM; conserva-se como referência opcional para medir esforço e resultado na avaliação das alternativas. Meta de 250 emissões/dia já decidida em D-002.
 
 **População e situação:** a pessoa que hoje extrai os dados da 99 e emite no Maino para a operação 3P de 15 lojas, segundo E-002/E-007. Observar trabalho habitual, incluindo as verificações que ela já faz. Não solicitar emissão adicional para a pesquisa.
 
@@ -18,6 +18,6 @@
 - **Concentração de segunda:** distinguir volume concentrado de trabalho por nota. Se o lote de segunda trouxer mais notas mas esforço semelhante por nota, há sinal de concentração de demanda, não prova de que o calendário deva mudar; se trouxer mix mais difícil, isso muda o problema a investigar.
 - **H-04 / ativações:** caso documentado em que capacidade fiscal condiciona liberação sustenta o elo apenas naquele caso; outra restrição explicando o ritmo ou capacidade suficiente o enfraquece. Um caso não prova causalidade geral.
 
-**Saída mínima:** uma tabela de tempos e contagens do lote, descrição do trecho que exige mais esforço ou espera, um exemplo real de exceção se houver e limites de representatividade; proposta de U1 revisada para gate 2. H-01/H-04 só recebem fechamento compatível com os resultados ou decisão explícita sobre risco.
+**Saída mínima:** uma tabela de tempos e contagens do lote, descrição do trecho que exige mais esforço ou espera, um exemplo real de exceção se houver e limites de representatividade; proposta de U1 revisada para gate 2. Este era o plano anterior: H-01 foi posteriormente validada pela confirmação do PM em D-003; H-04 foi estacionada por não ser necessária ao recorte de insuficiência atual, sem comprovação de efeito em ativações.
 
 **Limites:** amostra diagnóstica, sem comprovação de 250/dia sustentáveis, generalização para todos os dias, obrigação legal D-1 ou suficiência para 30 lojas. E-008 é síntese das mesmas declarações E-002/E-006/E-007, sem evidência independente.
