@@ -2,7 +2,7 @@
 
 **Statement:** A capacidade atual de emissão fiscal do Marketplace não atende à demanda das 15 dark stores, segundo o PM, comprometendo a sustentação da operação durante a expansão 3P.
 
-**State:** Outcome escolhido em D-001 e meta de 250 emissões/dia decidida como opção própria em D-002. B-01/B-02/B-03/B-04 foram atualizados para revisão independente; B-05 permanece como registrado. A meta não foi atingida ou medida nesta etapa.
+**State:** Outcome escolhido em D-001 e meta de 250 emissões/dia decidida como opção própria em D-002. B-01/B-02/B-03/B-04 foram atualizados para revisão independente; B-05 permanece como registrado. A meta não foi atingida ou medida nesta etapa. B3 permanece aberto por falta de prazo e guardrails operacionais; a investigação de U pode avançar para preencher essas lacunas.
 
 ## Reading order
 
@@ -18,7 +18,7 @@
 |---|---|
 | B-01 | evidenced — insuficiência atual relatada pelo PM; causa raiz e magnitude não medidas. |
 | B-02 | evidenced — 15 lojas, 80 notas/dia com 8h contínuas consideradas inviáveis e 200+ na segunda; baseline declaratório. |
-| B-03 | evidenced — 250 emissões/dia decidido; prazo de alcance, janela de comprovação, critérios fiscais e condições humanas ainda não informados. |
+| B-03 | open — meta de 250 emissões/dia evidenciada por D-002; a pergunta permanece incompleta até definir prazo de alcance, janela de comprovação e guardrails de correção e esforço sustentável. |
 | B-04 | evidenced — problema presente e expansão em curso; dezembro é expectativa e 15/11 é início de desenvolvimento, sem entrega prevista. |
 | B-05 | evidenced — registro das hipóteses, sem validá-las; permanece sem alteração. |
 
