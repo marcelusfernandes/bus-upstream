@@ -2,7 +2,7 @@
 
 **Statement:** A capacidade atual de emissão fiscal do Marketplace não atende à demanda das 15 dark stores, segundo o PM, comprometendo a sustentação da operação durante a expansão 3P.
 
-**State:** Outcome escolhido em D-001 e meta de 250 emissões/dia decidida como opção própria em D-002. B-01/B-02/B-03/B-04 foram atualizados para revisão independente; B-05 permanece como registrado. A meta não foi atingida ou medida nesta etapa. B3 permanece aberto por falta de prazo e guardrails operacionais; a investigação de U pode avançar para preencher essas lacunas.
+**State:** Outcome escolhido em D-001 e meta de 250 emissões/dia decidida como opção própria em D-002. B-01/B-02/B-03/B-04 foram atualizados para revisão independente; B-05 permanece como registrado. A meta não foi atingida ou medida nesta etapa. B3 permanece conscientemente aberto (knowingly open): D-004 aceita avançar com prazo, janela de comprovação e guardrails operacionais ainda indefinidos, herdados pelo design e PRD. Isso permite encerrar o trabalho upstream de Business, sujeito à revisão do orchestrator, sem declarar completo o protocolo de sucesso.
 
 ## Reading order
 
@@ -18,10 +18,10 @@
 |---|---|
 | B-01 | evidenced — insuficiência atual relatada pelo PM; causa raiz e magnitude não medidas. |
 | B-02 | evidenced — 15 lojas, 80 notas/dia com 8h contínuas consideradas inviáveis e 200+ na segunda; baseline declaratório. |
-| B-03 | open — meta de 250 emissões/dia evidenciada por D-002; a pergunta permanece incompleta até definir prazo de alcance, janela de comprovação e guardrails de correção e esforço sustentável. |
+| B-03 | open (knowingly open) — meta de 250/dia decidida em D-002; D-004 aceita avançar com prazo, janela e guardrails de correção e esforço ainda abertos, herdados pelo PRD. Não bloqueiam a direção; impedem declarar sucesso antes de definição e verificação. |
 | B-04 | evidenced — problema presente e expansão em curso; dezembro é expectativa e 15/11 é início de desenvolvimento, sem entrega prevista. |
 | B-05 | evidenced — registro das hipóteses, sem validá-las; permanece sem alteração. |
 
-O novo relato E-007 atualiza 8 lojas históricas para 15 atuais e a insuficiência antes desconhecida para insuficiência explicitamente declarada. Não equivale a observação independente ou prova causal. A meta já foi decidida e não será novamente submetida para aprovação. A etapa seguinte deve investigar H-01/H-04 e as condições reais da operação.
+O novo relato E-007 atualiza 8 lojas históricas para 15 atuais e a insuficiência antes desconhecida para insuficiência explicitamente declarada. Não equivale a observação independente ou prova causal. A meta já foi decidida e não será novamente submetida para aprovação. As lacunas de B3 seguem para validação posterior conforme o aceite de D-004; esse aceite não comprova compatibilidade local, ganho líquido ou 250/dia.
 
 D-1 é rotina operacional relatada; 200+ é limite inferior; 8h descreve esforço atual considerado inviável, não orçamento para a nova meta. Correção fiscal e esforço sustentável exigem definição operacional. O papel provisório desta iniciativa permanece inferência sem prazo final aprovado; APIs seguem fora do escopo.
