@@ -1,3 +1,7 @@
+## Review · U-02 · approved
+
+Blocking: none · Return to: none · Limitations: Revisão limitada aos arquivos fornecidos. A validação,1 pessoa,80 notas/dia,8h,200+ na segunda-feira e15 lojas têm suporte declaratório; não foram comprovados por observação independente. As8h caracterizam o esforço considerado inviável, não uma jornada medida. A correspondência com U-01 não foi verificada diretamente, pois esse arquivo não integra o escopo.
+
 ## Review · U-01 · approved
 
 Blocking: none · Return to: none · Limitations: Revisão restrita a U-01 e às fontes fornecidas. A confirmação é declaratória; não foram verificados método de validação, medições independentes, etapa dominante, relação B→U ou eficácia de solução.
