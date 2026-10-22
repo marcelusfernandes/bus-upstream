@@ -1,24 +1,27 @@
 # Business problem
 
-**Statement:** O Marketplace precisa sustentar sua expansão 3P gradual com capacidade fiscal suficiente, atualmente concentrada em uma pessoa com teto declarado de 80 notas por dia.
+**Statement:** A capacidade atual de emissão fiscal do Marketplace não atende à demanda das 15 dark stores, segundo o PM, comprometendo a sustentação da operação durante a expansão 3P.
 
-**State:** Outcome escolhido em D-001; respostas abaixo são rascunhos atualizados para revisão independente. B3 segue aberto e a camada não está concluída.
+**State:** Outcome escolhido em D-001 e meta de 250 emissões/dia decidida como opção própria em D-002. B-01/B-02/B-03/B-04 foram atualizados para revisão independente; B-05 permanece como registrado. A meta não foi atingida ou medida nesta etapa.
 
 ## Reading order
 
-1. [B-01](answers/B-01.md): outcome escolhido e limites da evidência.
-2. [B-02](answers/B-02.md), [B-03](answers/B-03.md), [B-04](answers/B-04.md), [B-05](answers/B-05.md): baseline, proposta de sucesso, urgência e hipóteses.
-3. [E-006](evidence/E-006.md) e [D-001](../decisions/D-001.md): novo contexto e decisão do PM; o intake original permanece preservado.
-4. [Registro de hipóteses](../hypotheses.md) e [review.md](review.md): hipóteses abertas e revisão anterior, que cobriu apenas o primeiro rascunho de B-01.
+1. [B-01](answers/B-01.md) e [B-02](answers/B-02.md): problema atual e baseline declaratório atualizado.
+2. [B-03](answers/B-03.md): meta decidida de 250 emissões/dia e condições ainda desconhecidas.
+3. [B-04](answers/B-04.md) e [B-05](answers/B-05.md): relevância atual e hipóteses encaminhadas.
+4. [E-007](evidence/E-007.md), [D-002](../decisions/D-002.md), [E-006](evidence/E-006.md) e [D-001](../decisions/D-001.md): relato e decisões do PM; intake e evidências anteriores preservados.
+5. [Hipóteses](../hypotheses.md) e [review.md](review.md): H-01/H-04 em U e H-02/H-03 em S; revisões anteriores antecedem E-007.
 
 ## Questions
 
-| ID | Estado do rascunho e limite |
+| ID | Estado e limite |
 |---|---|
-| B-01 | evidenced — prioridade escolhida e operação declarada; déficit não comprovado. |
-| B-02 | evidenced — baseline declaratório de 8 lojas, uma pessoa e teto de 80 notas/dia; baseline medido permanece incompleto. |
-| B-03 | open — proposta: demonstrar suficiência na avaliação da próxima etapa gradual; alternativa: ganho inicial observado. A aplicação requer demanda elegível, intervalo e critérios fiscais da etapa. |
-| B-04 | evidenced — expectativa de 30 lojas em dezembro e início de desenvolvimento Seller a partir de 15/11; custo de espera desconhecido. |
-| B-05 | evidenced — H-01/H-04 abertas em U e H-02/H-03 abertas em S; registro não equivale a validação. |
+| B-01 | evidenced — insuficiência atual relatada pelo PM; causa raiz e magnitude não medidas. |
+| B-02 | evidenced — 15 lojas, 80 notas/dia com 8h contínuas consideradas inviáveis e 200+ na segunda; baseline declaratório. |
+| B-03 | evidenced — 250 emissões/dia decidido; prazo de alcance, janela de comprovação, critérios fiscais e condições humanas ainda não informados. |
+| B-04 | evidenced — problema presente e expansão em curso; dezembro é expectativa e 15/11 é início de desenvolvimento, sem entrega prevista. |
+| B-05 | evidenced — registro das hipóteses, sem validá-las; permanece sem alteração. |
 
-Correção fiscal é condição declarada, com critérios ainda não especificados. A integração futura por Seller sugere papel provisório para esta iniciativa, como inferência de contexto sem prazo de encerramento ou novo escopo aprovados. A restrição sem APIs permanece. H-04 representa o possível efeito da capacidade fiscal no ritmo de ativação; não há atraso ou backlog observado.
+O novo relato E-007 atualiza 8 lojas históricas para 15 atuais e a insuficiência antes desconhecida para insuficiência explicitamente declarada. Não equivale a observação independente ou prova causal. A meta já foi decidida e não será novamente submetida para aprovação. A etapa seguinte deve investigar H-01/H-04 e as condições reais da operação.
+
+D-1 é rotina operacional relatada; 200+ é limite inferior; 8h descreve esforço atual considerado inviável, não orçamento para a nova meta. Correção fiscal e esforço sustentável exigem definição operacional. O papel provisório desta iniciativa permanece inferência sem prazo final aprovado; APIs seguem fora do escopo.
